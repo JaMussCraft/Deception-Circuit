@@ -1,0 +1,53 @@
+[
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/dispatch.sh"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "observed_unix": 1794032278.8759575
+  },
+  {
+    "argv": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/launch.sh",
+      "--config",
+      "UNBOUND",
+      "--config-sha256",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "stdout": "{\n  \"diagnostic_only\": true,\n  \"policy\": {\n    \"CPUs\": 4,\n    \"RAM_bytes\": 34359738368,\n    \"duration_seconds\": 900,\n    \"bootstrap_seconds\": 75,\n    \"prime_cap_seconds\": 480,\n    \"fresh_cap_seconds\": 240,\n    \"publication_margin_seconds\": 45,\n    \"CPU_finish_margin_seconds\": 60,\n    \"kill_grace_seconds\": 15,\n    \"fixed_GPU_window_seconds\": 300\n  },\n  \"new_interpreters\": 2,\n  \"operational_admission\": false,\n  \"required_bindings_unset\": true,\n  \"commands\": [\n    [\n      \"/u/swong2/.conda/envs/mgnp/bin/python\",\n      \"-B\",\n      \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/child.py\",\n      \"--config\",\n      \"UNBOUND\",\n      \"--config-sha256\",\n      \"0000000000000000000000000000000000000000000000000000000000000000\",\n      \"--diagnostic-stage\",\n      \"prime\",\n      \"--output\",\n      \"ABSENT/prime\",\n      \"--deadline\",\n      \"0\"\n    ],\n    [\n      \"/u/swong2/.conda/envs/mgnp/bin/python\",\n      \"-B\",\n      \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/child.py\",\n      \"--config\",\n      \"UNBOUND\",\n      \"--config-sha256\",\n      \"0000000000000000000000000000000000000000000000000000000000000000\",\n      \"--diagnostic-stage\",\n      \"fresh\",\n      \"--output\",\n      \"ABSENT/fresh\",\n      \"--deadline\",\n      \"0\"\n    ]\n  ]\n}\n",
+    "stderr": "",
+    "observed_unix": 1794032279.0401287
+  },
+  {
+    "argv": [
+      "sbatch",
+      "--test-only",
+      "--parsable",
+      "--account=bjhz-delta-cpu",
+      "--partition=cpu-interactive",
+      "--constraint=projects",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=4",
+      "--mem=32G",
+      "--time=00:15:00",
+      "--no-requeue",
+      "--export=ALL,CUDA_VISIBLE_DEVICES=",
+      "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime",
+      "--job-name=lad-A2-data239",
+      "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/slurm-%j.log",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/dispatch.sh"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "sbatch: Job 23624969 to start at 2026-11-07T00:17:59 a using 4 processors on nodes cn093 in partition cpu-interactive\n",
+    "observed_unix": 1794032279.0997407
+  }
+]

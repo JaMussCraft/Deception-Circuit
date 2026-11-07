@@ -1,0 +1,15 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_runtime.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/validation-correction282/component_analysis/a3_direction_runtime.py
+@@ -2711,7 +2711,11 @@
+ def _completed_pilot_source(receipt_path,receipt,expected_pilot,origin,*,injected):
+     require(isinstance(origin,dict) and origin.get('kind')=='a3_direction_pilot_origin_v1','original pilot execution bindings required')
+     def resolved_object(name):
+-        ref=origin[name];path=ref['path'];require(object_reference(path)==ref,'completed pilot '+name+' bytes changed');return path,read_object(path)
++        ref=origin.get(name)
++        require(isinstance(ref,dict),'completed pilot '+name+' reference required')
++        path=ref.get('path')
++        require(isinstance(path,(str,os.PathLike)) and bool(path),'completed pilot '+name+' path required')
++        require(object_reference(path)==ref,'completed pilot '+name+' bytes changed');return path,read_object(path)
+     reservation_path,reservation=resolved_object('reservation_reference')
+     mapping_path,_=resolved_object('original_mapping_reference')
+     require(reservation.get('kind')=='a3_root_execution_reservation_v1' and reservation.get('identity')==expected_pilot['identity']

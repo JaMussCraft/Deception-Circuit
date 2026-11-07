@@ -1,0 +1,168 @@
+{
+  "actual_checks": "1133 source files/eight aliases each binding; three actual stage mount smokes host readonly/child writes;host3.6/subreaper/SIF hash;spool equality against dispatch bytes;initial failure recovery sameheldsource/job",
+  "all_four_final_readbacks_passed": true,
+  "budget": {
+    "baseline": 610,
+    "final": 120,
+    "oracle": 90,
+    "overhead": 360,
+    "single_cleanup": 20,
+    "suite": 3600,
+    "sum": 4800
+  },
+  "deployment_manifest_sha256": "0da6a11ee021622a4fc153db3dc2d702c663cf55230ee885f2ad45135031bcdc",
+  "final_readbacks_checked": [
+    {
+      "canonical_owned_empty_child_absent": true,
+      "fresh_spool_pointer_source_scheduler_checks": true,
+      "job_id": "23631878",
+      "mode": "0o2700",
+      "permission_bits": "0o700",
+      "receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/base-0/final-readback.json",
+      "sha256": "255fd58589a1d35a7d8b9a32cf515fd6771d2d92d9017de84ca08059004b1433",
+      "slot": "base-0"
+    },
+    {
+      "canonical_owned_empty_child_absent": true,
+      "fresh_spool_pointer_source_scheduler_checks": true,
+      "job_id": "23631880",
+      "mode": "0o2700",
+      "permission_bits": "0o700",
+      "receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/base-1/final-readback.json",
+      "sha256": "53ec17fb3886f2afaadecc53c8596b464b87d07202143ae084f1320bd8655f13",
+      "slot": "base-1"
+    },
+    {
+      "canonical_owned_empty_child_absent": true,
+      "fresh_spool_pointer_source_scheduler_checks": true,
+      "job_id": "50319105",
+      "mode": "0o2700",
+      "permission_bits": "0o700",
+      "receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/mgnp-0/final-readback.json",
+      "sha256": "41f8a2a8d7d44f4ec2c32a02afef52e570c17fa2764460d07c029f66c364d0ba",
+      "slot": "mgnp-0"
+    },
+    {
+      "canonical_owned_empty_child_absent": true,
+      "fresh_spool_pointer_source_scheduler_checks": true,
+      "job_id": "50319108",
+      "mode": "0o2700",
+      "permission_bits": "0o700",
+      "receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/mgnp-1/final-readback.json",
+      "sha256": "8d7bdde18028cb14b62cce723622c62f0456bd07fe91781da8dac2182119535d",
+      "slot": "mgnp-1"
+    }
+  ],
+  "jobs": [
+    {
+      "account": "beto-delta-cpu",
+      "aliases_checked": 8,
+      "cluster": "delta",
+      "config_sha256": "6b2b15f884422b64a4d4d07ddad7f743550e99ac61cf6d2dfcf04d48bb6fc8a8",
+      "cpus": 2,
+      "environment": "base",
+      "job_id": "23631878",
+      "memory_gib": 32,
+      "partition": "cpu-preempt",
+      "qos": "beto-delta-cpu",
+      "root_empty_owner_verified": true,
+      "root_mode_observation": {
+        "final_readback_verified": true,
+        "inherited_setgid": true,
+        "permission_bits": "0o700",
+        "raw": "0o2700"
+      },
+      "seconds": 4800,
+      "shard": 0,
+      "source_files_checked": 1133,
+      "spool_sha256": "d0ff305fd6826b0e083c26ce7da42c8f565c8900abacb6a5cfdbb72a86c25260"
+    },
+    {
+      "account": "beto-delta-cpu",
+      "aliases_checked": 8,
+      "cluster": "delta",
+      "config_sha256": "0e639498c473aceef3ff169187a3cb1a316a573117defea965e073aa5a10408e",
+      "cpus": 2,
+      "environment": "base",
+      "job_id": "23631880",
+      "memory_gib": 32,
+      "partition": "cpu-preempt",
+      "qos": "beto-delta-cpu",
+      "root_empty_owner_verified": true,
+      "root_mode_observation": {
+        "final_readback_verified": true,
+        "inherited_setgid": true,
+        "permission_bits": "0o700",
+        "raw": "0o2700"
+      },
+      "seconds": 4800,
+      "shard": 1,
+      "source_files_checked": 1133,
+      "spool_sha256": "5ea73d4be3e3914910c7b676e6d97fbe97228c2eacc6c01ab4e3535052c0f6fb"
+    },
+    {
+      "account": "cis260361p",
+      "aliases_checked": 8,
+      "cluster": "bridges2",
+      "config_sha256": "13669a21507d998c679262c4135100d098bfd92bb921199a748e210b8ab00a97",
+      "cpus": 18,
+      "environment": "mgnp",
+      "job_id": "50319105",
+      "memory_gib": 32,
+      "partition": "RM-shared",
+      "qos": "rm",
+      "root_empty_owner_verified": true,
+      "root_mode_observation": {
+        "final_readback_verified": true,
+        "inherited_setgid": true,
+        "permission_bits": "0o700",
+        "raw": "0o2700"
+      },
+      "seconds": 4800,
+      "shard": 0,
+      "source_files_checked": 1133,
+      "spool_sha256": "cce667109a64a29432c19a18914b6ab7eb6c1dab38fe16abd76d5f39fa1c33e7"
+    },
+    {
+      "account": "cis260361p",
+      "aliases_checked": 8,
+      "cluster": "bridges2",
+      "config_sha256": "908fcbf7340d71c4f8a385b329b316fb35837edaaae21a08077d6e07925af2ff",
+      "cpus": 18,
+      "environment": "mgnp",
+      "job_id": "50319108",
+      "memory_gib": 32,
+      "partition": "RM-shared",
+      "qos": "rm",
+      "root_empty_owner_verified": true,
+      "root_mode_observation": {
+        "final_readback_verified": true,
+        "inherited_setgid": true,
+        "permission_bits": "0o700",
+        "raw": "0o2700"
+      },
+      "seconds": 4800,
+      "shard": 1,
+      "source_files_checked": 1133,
+      "spool_sha256": "2077eabb594c328b648678d258b0da141bc1bb8df1ea34a4277f1fddf9c7fe91"
+    }
+  ],
+  "launch_blockers_after_required_final_checks": [],
+  "limits": "Actual smoke uses separate job-smoke273-r2 with substituted pure probe, not native/actual-job outcomes. Readback raw0o2700 transparently retains inherited setgid; permission bits0700/no group-other access. Root must inspect all4 final readbacks and final live usage before release.",
+  "not_acceptance": [
+    "actual compute-node own-job/controller/allocation checks or native outcomes",
+    "complete223GREEN in either interpreter or final trusted aggregation",
+    "model/GPU/scientific/protectedheldout authority"
+  ],
+  "partition_sha256": "73aa13bd780837687cc2953fe6f64cd1df60b92056d856b7aad74d0dfb8a5306",
+  "required_final_root_checks": [
+    "live usage below80 and no cadence freeze",
+    "all four samejob bindings still HELD/unstarted;same account/partition/QOS/CPUs/RAM80min/noGPU/no-requeue/command/workdir/logpaths",
+    "fresh source/partition/host-manifest/control-inventory/config/config.sha256 pointers and spooled bootstrap identities unchanged on actual routes",
+    "for all actual job roots: canonical resolve/no-symlink ancestry,owner,permission bits0700 (inherited setgid allowed),empty and child/execution absent; Bridges mode/canonical observation not in initial binding receipt",
+    "record release once each; preserve failures and bound waiters; no auto retry/replacement/extension"
+  ],
+  "source_or_job_edits_by_reviewer": false,
+  "source_pins_sha256": "0028bac99907b0f44781d668d3cd97f58030ac51c493c857456a58b90b7b1833",
+  "verdict": "ACCEPT_FOUR_EXISTING_HELD_CPU_RELEASES_AFTER_FINAL_ROOT_LIVE_CHECKS"
+}

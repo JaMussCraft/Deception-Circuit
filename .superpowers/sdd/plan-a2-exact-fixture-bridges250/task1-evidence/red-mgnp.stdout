@@ -1,0 +1,716 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                          [100%]
+=================================== FAILURES ===================================
+___________________________ test_exact_base_identity ___________________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3b6e030>
+
+    def test_exact_base_identity(probe):
+>       probe.check_identity('base', identity(), identity())
+        ^^^^^^^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3b6e030>
+name = 'check_identity'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: check_identity
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_ test_identity_rejects_equal_version_wrong_bytes_or_build[executable_sha256-0000000000000000000000000000000000000000000000000000000000000000] _
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb6660>
+field = 'executable_sha256'
+value = '0000000000000000000000000000000000000000000000000000000000000000'
+
+    @pytest.mark.parametrize('field,value', [('executable_sha256','0'*64),('version',[3,9,13]),
+        ('source_build_string','3.9.18 different build'),('SOABI','other'),('executable_bytes',1)])
+    def test_identity_rejects_equal_version_wrong_bytes_or_build(probe, field, value):
+        seen=identity();seen[field]=value
+>       with pytest.raises(probe.Rejected): probe.check_identity('base',seen,identity())
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb6660>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+___ test_identity_rejects_equal_version_wrong_bytes_or_build[version-value1] ___
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb66f0>
+field = 'version', value = [3, 9, 13]
+
+    @pytest.mark.parametrize('field,value', [('executable_sha256','0'*64),('version',[3,9,13]),
+        ('source_build_string','3.9.18 different build'),('SOABI','other'),('executable_bytes',1)])
+    def test_identity_rejects_equal_version_wrong_bytes_or_build(probe, field, value):
+        seen=identity();seen[field]=value
+>       with pytest.raises(probe.Rejected): probe.check_identity('base',seen,identity())
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb66f0>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_ test_identity_rejects_equal_version_wrong_bytes_or_build[source_build_string-3.9.18 different build] _
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7260>
+field = 'source_build_string', value = '3.9.18 different build'
+
+    @pytest.mark.parametrize('field,value', [('executable_sha256','0'*64),('version',[3,9,13]),
+        ('source_build_string','3.9.18 different build'),('SOABI','other'),('executable_bytes',1)])
+    def test_identity_rejects_equal_version_wrong_bytes_or_build(probe, field, value):
+        seen=identity();seen[field]=value
+>       with pytest.raises(probe.Rejected): probe.check_identity('base',seen,identity())
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7260>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+____ test_identity_rejects_equal_version_wrong_bytes_or_build[SOABI-other] _____
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7b30>
+field = 'SOABI', value = 'other'
+
+    @pytest.mark.parametrize('field,value', [('executable_sha256','0'*64),('version',[3,9,13]),
+        ('source_build_string','3.9.18 different build'),('SOABI','other'),('executable_bytes',1)])
+    def test_identity_rejects_equal_version_wrong_bytes_or_build(probe, field, value):
+        seen=identity();seen[field]=value
+>       with pytest.raises(probe.Rejected): probe.check_identity('base',seen,identity())
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7b30>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_ test_identity_rejects_equal_version_wrong_bytes_or_build[executable_bytes-1] _
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb59a0>
+field = 'executable_bytes', value = 1
+
+    @pytest.mark.parametrize('field,value', [('executable_sha256','0'*64),('version',[3,9,13]),
+        ('source_build_string','3.9.18 different build'),('SOABI','other'),('executable_bytes',1)])
+    def test_identity_rejects_equal_version_wrong_bytes_or_build(probe, field, value):
+        seen=identity();seen[field]=value
+>       with pytest.raises(probe.Rejected): probe.check_identity('base',seen,identity())
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb59a0>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_____________________ test_closure_cannot_weaken_base_pin ______________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bc1d0>
+
+    def test_closure_cannot_weaken_base_pin(probe):
+        seen=identity();seen['version']=[3,9,13]
+>       with pytest.raises(probe.Rejected): probe.check_identity('base',seen,seen)
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bc1d0>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+__________________________ test_pytest_origin_rejects __________________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bd2e0>
+
+    def test_pytest_origin_rejects(probe):
+        seen=identity();seen['origins']['pytest']='/tmp/pytest/__init__.py'
+>       with pytest.raises(probe.Rejected): probe.check_identity('base',seen,identity())
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bd2e0>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+___________________ test_file_and_literal_recursive_symlink ____________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bde50>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_file_and_literal_recursiv0/lib.so': {'kind': 'file', 'physical_path': '/tmp/...literal_recursiv0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_file_and_literal_recursiv0/libalias.so'))
+
+    def test_file_and_literal_recursive_symlink(probe, tree):
+        entries,leaf,alias=tree
+>       probe.check_entries(entries, readonly=False)
+        ^^^^^^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bde50>
+name = 'check_entries'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: check_entries
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+__________________ test_missing_recursive_elf_target_rejects ___________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3939430>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_missing_recursive_elf_tar0/libalias.so': {'kind': 'symlink', 'physical_path'...ecursive_elf_tar0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_missing_recursive_elf_tar0/libalias.so'))
+
+    def test_missing_recursive_elf_target_rejects(probe, tree):
+        entries,leaf,alias=tree
+        del entries[str(leaf)]
+>       with pytest.raises(probe.Rejected): probe.check_entries(entries, readonly=False)
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3939430>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_____________________ test_changed_literal_symlink_rejects _____________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3939940>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_changed_literal_symlink_r0/lib.so': {'kind': 'file', 'physical_path': '/tmp/...iteral_symlink_r0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_changed_literal_symlink_r0/libalias.so'))
+
+    def test_changed_literal_symlink_rejects(probe, tree):
+        entries,leaf,alias=tree
+        alias.unlink();alias.symlink_to(str(leaf))
+>       with pytest.raises(probe.Rejected): probe.check_entries(entries, readonly=False)
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3939940>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+__________________________ test_changed_file_rejects ___________________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393a180>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_changed_file_rejects0/lib.so': {'kind': 'file', 'physical_path': '/tmp/pytes..._changed_file_rejects0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_changed_file_rejects0/libalias.so'))
+
+    def test_changed_file_rejects(probe, tree):
+        entries,leaf,alias=tree; leaf.write_bytes(b'changed')
+>       with pytest.raises(probe.Rejected): probe.check_entries(entries, readonly=False)
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393a180>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+____ test_unlisted_helper_read_or_provider_rejects[/tmp/unlisted-helper.py] ____
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393ab70>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_unlisted_helper_read_or_p0/lib.so': {'kind': 'file', 'physical_path': '/tmp/...helper_read_or_p0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_unlisted_helper_read_or_p0/libalias.so'))
+seen = '/tmp/unlisted-helper.py'
+
+    @pytest.mark.parametrize('seen', ['/tmp/unlisted-helper.py','/tmp/unlisted.so'])
+    def test_unlisted_helper_read_or_provider_rejects(probe, tree, seen):
+        entries,leaf,alias=tree
+>       with pytest.raises(probe.Rejected): probe.check_observed(entries, [seen], [])
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393ab70>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_______ test_unlisted_helper_read_or_provider_rejects[/tmp/unlisted.so] ________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bfd10>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_unlisted_helper_read_or_p1/lib.so': {'kind': 'file', 'physical_path': '/tmp/...helper_read_or_p1/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_unlisted_helper_read_or_p1/libalias.so'))
+seen = '/tmp/unlisted.so'
+
+    @pytest.mark.parametrize('seen', ['/tmp/unlisted-helper.py','/tmp/unlisted.so'])
+    def test_unlisted_helper_read_or_provider_rejects(probe, tree, seen):
+        entries,leaf,alias=tree
+>       with pytest.raises(probe.Rejected): probe.check_observed(entries, [seen], [])
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bfd10>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_________________________ test_observed_closed_imports _________________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bc170>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_observed_closed_imports0/lib.so': {'kind': 'file', 'physical_path': '/tmp/py...ved_closed_imports0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_observed_closed_imports0/libalias.so'))
+
+    def test_observed_closed_imports(probe, tree):
+        entries,leaf,alias=tree
+>       probe.check_observed(entries,[str(leaf)], [dict(name='helper',origin=str(leaf))])
+        ^^^^^^^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bc170>
+name = 'check_observed'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: check_observed
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_________________ test_scientific_import_always_rejects[torch] _________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7c50>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_0/lib.so': {'kind': 'file', 'physical_path': '/tmp/...c_import_always_0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_0/libalias.so'))
+name = 'torch'
+
+    @pytest.mark.parametrize('name',['torch','numpy','transformers','pandas','scipy'])
+    def test_scientific_import_always_rejects(probe, tree, name):
+        entries,leaf,alias=tree
+>       with pytest.raises(probe.Rejected): probe.check_observed(entries,[],[dict(name=name,origin=str(leaf))])
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7c50>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_________________ test_scientific_import_always_rejects[numpy] _________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7b90>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_1/lib.so': {'kind': 'file', 'physical_path': '/tmp/...c_import_always_1/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_1/libalias.so'))
+name = 'numpy'
+
+    @pytest.mark.parametrize('name',['torch','numpy','transformers','pandas','scipy'])
+    def test_scientific_import_always_rejects(probe, tree, name):
+        entries,leaf,alias=tree
+>       with pytest.raises(probe.Rejected): probe.check_observed(entries,[],[dict(name=name,origin=str(leaf))])
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7b90>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_____________ test_scientific_import_always_rejects[transformers] ______________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7500>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_2/lib.so': {'kind': 'file', 'physical_path': '/tmp/...c_import_always_2/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_2/libalias.so'))
+name = 'transformers'
+
+    @pytest.mark.parametrize('name',['torch','numpy','transformers','pandas','scipy'])
+    def test_scientific_import_always_rejects(probe, tree, name):
+        entries,leaf,alias=tree
+>       with pytest.raises(probe.Rejected): probe.check_observed(entries,[],[dict(name=name,origin=str(leaf))])
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb7500>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+________________ test_scientific_import_always_rejects[pandas] _________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393b560>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_3/lib.so': {'kind': 'file', 'physical_path': '/tmp/...c_import_always_3/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_3/libalias.so'))
+name = 'pandas'
+
+    @pytest.mark.parametrize('name',['torch','numpy','transformers','pandas','scipy'])
+    def test_scientific_import_always_rejects(probe, tree, name):
+        entries,leaf,alias=tree
+>       with pytest.raises(probe.Rejected): probe.check_observed(entries,[],[dict(name=name,origin=str(leaf))])
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393b560>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_________________ test_scientific_import_always_rejects[scipy] _________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393a5a0>
+tree = ({'/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_4/lib.so': {'kind': 'file', 'physical_path': '/tmp/...c_import_always_4/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2695/test_scientific_import_always_4/libalias.so'))
+name = 'scipy'
+
+    @pytest.mark.parametrize('name',['torch','numpy','transformers','pandas','scipy'])
+    def test_scientific_import_always_rejects(probe, tree, name):
+        entries,leaf,alias=tree
+>       with pytest.raises(probe.Rejected): probe.check_observed(entries,[],[dict(name=name,origin=str(leaf))])
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393a5a0>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+__________________ test_startup_preserves_distutils_behavior ___________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3939c10>
+
+    def test_startup_preserves_distutils_behavior(probe):
+        expected=dict(user_site=True,sitecustomize=None,usercustomize=None,sys_path=['/literal'],
+            meta_path=['_distutils_hack.DistutilsMetaFinder'],preloaded=['_distutils_hack'],
+            pth=['/literal/distutils-precedence.pth'])
+>       probe.check_startup('base', expected, expected)
+        ^^^^^^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3939c10>
+name = 'check_startup'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: check_startup
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_____________ test_startup_omission_cannot_be_approved_by_closure ______________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393a300>
+
+    def test_startup_omission_cannot_be_approved_by_closure(probe):
+        empty=dict(user_site=True,sitecustomize=None,usercustomize=None,sys_path=[],meta_path=[],preloaded=[],pth=[])
+>       with pytest.raises(probe.Rejected): probe.check_startup('base',empty,empty)
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393a300>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+________________________ test_no_site_shortcut_rejects _________________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3939970>
+
+    def test_no_site_shortcut_rejects(probe):
+        expected=dict(user_site=False,sitecustomize=None,usercustomize=None,sys_path=[],meta_path=[],preloaded=[],pth=[])
+>       with pytest.raises(probe.Rejected): probe.check_startup('mgnp',expected,expected)
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3939970>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_______________________ test_wrong_collection_rejects[0] _______________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38fc6b0>
+count = 0
+
+    @pytest.mark.parametrize('count',[0,21,23])
+    def test_wrong_collection_rejects(probe,count):
+>       with pytest.raises(probe.Rejected): probe.check_collection('red',[str(n) for n in range(count)],['x']*22)
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38fc6b0>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+______________________ test_wrong_collection_rejects[21] _______________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38fcef0>
+count = 21
+
+    @pytest.mark.parametrize('count',[0,21,23])
+    def test_wrong_collection_rejects(probe,count):
+>       with pytest.raises(probe.Rejected): probe.check_collection('red',[str(n) for n in range(count)],['x']*22)
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38fcef0>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+______________________ test_wrong_collection_rejects[23] _______________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393b170>
+count = 23
+
+    @pytest.mark.parametrize('count',[0,21,23])
+    def test_wrong_collection_rejects(probe,count):
+>       with pytest.raises(probe.Rejected): probe.check_collection('red',[str(n) for n in range(count)],['x']*22)
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393b170>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_____________________ test_collection_names_not_just_count _____________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e39399d0>
+
+    def test_collection_names_not_just_count(probe):
+        names=['test_file.py::test_case[%d]'%n for n in range(22)]
+>       probe.check_collection('red',names,names)
+        ^^^^^^^^^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e39399d0>
+name = 'check_collection'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: check_collection
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+________________________ test_unbound_template_rejects _________________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e393a450>
+
+    def test_unbound_template_rejects(probe):
+>       closure=json.loads(PROBE.with_name('closure.template.json').read_text())
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/closure.template.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/closure.template.json'
+
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1013: FileNotFoundError
+___________________ test_elf_missing_needed_provider_rejects ___________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb6840>
+
+    def test_elf_missing_needed_provider_rejects(probe):
+        objects={'/x':dict(needed=['libc.so.6'],interpreter=None,rpath=[],runpath=[],undefined=[],exports=[])}
+>       with pytest.raises(probe.Rejected):probe.check_elf_graph(objects, {'/x':{}})
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb6840>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+__________________ test_elf_missing_versioned_symbol_rejects ___________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb6b10>
+
+    def test_elf_missing_versioned_symbol_rejects(probe):
+        objects={'/x':dict(needed=['libc.so.6'],interpreter='/ld',rpath=[],runpath=[],undefined=['missing@GLIBC_2.99'],exports=[]),
+                 '/libc':dict(needed=[],interpreter=None,rpath=[],runpath=[],undefined=[],exports=['present@GLIBC_2.2.5']),
+                 '/ld':dict(needed=[],interpreter=None,rpath=[],runpath=[],undefined=[],exports=[])}
+>       with pytest.raises(probe.Rejected):probe.check_elf_graph(objects,{'/x':{'libc.so.6':'/libc'},'/libc':{},'/ld':{}})
+                           ^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e3bb6b10>
+name = 'Rejected'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: Rejected
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+_______________ test_readelf_parser_uses_undefined_symbol_needs ________________
+
+probe = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bfbf0>
+
+    def test_readelf_parser_uses_undefined_symbol_needs(probe):
+        raw='''  INTERP 0x0 0x0\n      [Requesting program interpreter: /lib64/ld.so]\n 0x1 (NEEDED) Shared library: [libc.so.6]\n 0x1 (RUNPATH) Library runpath: [$ORIGIN/../lib]\n  1: 000 0 FUNC GLOBAL DEFAULT UND memcpy@GLIBC_2.14 (2)\n  2: 000 0 FUNC WEAK DEFAULT UND optional\n  3: 000 0 FUNC GLOBAL DEFAULT 10 provided@@V1\n'''
+>       parsed=probe.parse_readelf(raw)
+               ^^^^^^^^^^^^^^^^^^^
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_runtime_probe.probe.<locals>.Missing object at 0x7fb6e38bfbf0>
+name = 'parse_readelf'
+
+    def __getattr__(self, name):
+>       raise AssertionError('Task 1 runtime probe has not been implemented: '+name)
+E       AssertionError: Task 1 runtime probe has not been implemented: parse_readelf
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:16: AssertionError
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_exact_base_identity
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_identity_rejects_equal_version_wrong_bytes_or_build[executable_sha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_identity_rejects_equal_version_wrong_bytes_or_build[version-value1]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_identity_rejects_equal_version_wrong_bytes_or_build[source_build_string-3.9.18 different build]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_identity_rejects_equal_version_wrong_bytes_or_build[SOABI-other]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_identity_rejects_equal_version_wrong_bytes_or_build[executable_bytes-1]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_closure_cannot_weaken_base_pin
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_pytest_origin_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_file_and_literal_recursive_symlink
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_missing_recursive_elf_target_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_changed_literal_symlink_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_changed_file_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_unlisted_helper_read_or_provider_rejects[/tmp/unlisted-helper.py]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_unlisted_helper_read_or_provider_rejects[/tmp/unlisted.so]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_observed_closed_imports
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_scientific_import_always_rejects[torch]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_scientific_import_always_rejects[numpy]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_scientific_import_always_rejects[transformers]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_scientific_import_always_rejects[pandas]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_scientific_import_always_rejects[scipy]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_startup_preserves_distutils_behavior
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_startup_omission_cannot_be_approved_by_closure
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_no_site_shortcut_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_wrong_collection_rejects[0]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_wrong_collection_rejects[21]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_wrong_collection_rejects[23]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_collection_names_not_just_count
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_unbound_template_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_elf_missing_needed_provider_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_elf_missing_versioned_symbol_rejects
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_readelf_parser_uses_undefined_symbol_needs
+31 failed in 0.37s

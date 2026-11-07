@@ -1,0 +1,205 @@
+FFFFFFFFFFFFFFFFFFF............F.                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_whole_chain_normal_native_full_publication ________________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:447: in test_whole_chain_normal_native_full_publication
+    j=joined(chain,tmp_path,monkeypatch,full=True)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:303: in joined
+    scored=full_native_score(m,p,producer.g,tmp_path,monkeypatch)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:344: in full_native_score
+    prepared,_,_=p._load_context(args);p._validate_live(args,receipt,prepared)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/a2_pipeline.py:1225: in _validate_live
+    validate_receipt(receipt, prepared)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/a2_pipeline.py:295: in validate_receipt
+    require(
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/dataset/user_inversion_pipeline.py:32: in require
+    raise ValueError(message)
+E   ValueError: stale A2 model_geometry
+_________ test_transfer_failure_cannot_cross_score_boundary[catalogue] _________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:497: in test_transfer_failure_cannot_cross_score_boundary
+    assert 'stage' in j.events  # intended mutation boundary must actually run
+E   AssertionError: assert 'stage' in ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect']
+E    +  where ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect'] = namespace(m=<module 'task3_helper' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specifici... next checkpoint 3 at +120\nfreeze: none; acked\nweekly cap exception: expired (last observed); captured reset 87602'}).events
+____________ test_transfer_failure_cannot_cross_score_boundary[CPU] ____________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:497: in test_transfer_failure_cannot_cross_score_boundary
+    assert 'stage' in j.events  # intended mutation boundary must actually run
+E   AssertionError: assert 'stage' in ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect']
+E    +  where ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect'] = namespace(m=<module 'task3_helper' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specifici... next checkpoint 3 at +120\nfreeze: none; acked\nweekly cap exception: expired (last observed); captured reset 87602'}).events
+____________ test_transfer_failure_cannot_cross_score_boundary[SIF] ____________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:497: in test_transfer_failure_cannot_cross_score_boundary
+    assert 'stage' in j.events  # intended mutation boundary must actually run
+E   AssertionError: assert 'stage' in ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect']
+E    +  where ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect'] = namespace(m=<module 'task3_helper' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specifici... next checkpoint 3 at +120\nfreeze: none; acked\nweekly cap exception: expired (last observed); captured reset 87602'}).events
+__________ test_transfer_failure_cannot_cross_score_boundary[ledger] ___________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:497: in test_transfer_failure_cannot_cross_score_boundary
+    assert 'stage' in j.events  # intended mutation boundary must actually run
+E   AssertionError: assert 'stage' in ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect']
+E    +  where ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect'] = namespace(m=<module 'task3_helper' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specifici... next checkpoint 3 at +120\nfreeze: none; acked\nweekly cap exception: expired (last observed); captured reset 87602'}).events
+__________ test_transfer_failure_cannot_cross_score_boundary[WAITING] __________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:497: in test_transfer_failure_cannot_cross_score_boundary
+    assert 'stage' in j.events  # intended mutation boundary must actually run
+E   AssertionError: assert 'stage' in ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect']
+E    +  where ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect'] = namespace(m=<module 'task3_helper' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specifici... next checkpoint 3 at +120\nfreeze: none; acked\nweekly cap exception: expired (last observed); captured reset 87602'}).events
+___________ test_transfer_failure_cannot_cross_score_boundary[cache] ___________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:497: in test_transfer_failure_cannot_cross_score_boundary
+    assert 'stage' in j.events  # intended mutation boundary must actually run
+E   AssertionError: assert 'stage' in ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect']
+E    +  where ['root-verify-runtime-pins', 'root-reviewed-admission', 'root-verify-runtime-pins', 'root-reviewed-admission', 'usage:publish-start', 'remote-inspect'] = namespace(m=<module 'task3_helper' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specifici... next checkpoint 3 at +120\nfreeze: none; acked\nweekly cap exception: expired (last observed); captured reset 87602'}).events
+___________ test_entry_failure_has_zero_score_calls[postactivation] ____________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+______________ test_entry_failure_has_zero_score_calls[catalogue] ______________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+________________ test_entry_failure_has_zero_score_calls[bank] _________________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+_______________ test_entry_failure_has_zero_score_calls[release] _______________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+___________ test_entry_failure_has_zero_score_calls[existing-score] ____________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+____________ test_entry_failure_has_zero_score_calls[null-resource] ____________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+_______________ test_entry_failure_has_zero_score_calls[config] ________________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+_______________ test_entry_failure_has_zero_score_calls[WAITING] _______________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+_______________ test_entry_failure_has_zero_score_calls[expired] _______________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+____________ test_entry_failure_has_zero_score_calls[old-authority] ____________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+__________ test_entry_failure_has_zero_score_calls[short-allocation] ___________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:504: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+_____________ test_consumed_partial_is_preserved_and_never_retried _____________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:511: in test_consumed_partial_is_preserved_and_never_retried
+    j=joined(chain,tmp_path,monkeypatch);j.producer.publish()
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+_________ test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI _________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py:593: in test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI
+    j=joined(chain,tmp_path,monkeypatch);j.producer.publish()
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:609: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138: in authenticate_cutover
+    need(value['active_mapping_reference']==normalized['active_mapping_reference']
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: unauthorized new transition or changed preserved native lineage
+=============================== warnings summary ===============================
+test_full_score_integration.py::test_whole_chain_normal_native_full_publication
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39.xml -
+=========================== short test summary info ============================
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_whole_chain_normal_native_full_publication
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_transfer_failure_cannot_cross_score_boundary[catalogue]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_transfer_failure_cannot_cross_score_boundary[CPU]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_transfer_failure_cannot_cross_score_boundary[SIF]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_transfer_failure_cannot_cross_score_boundary[ledger]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_transfer_failure_cannot_cross_score_boundary[WAITING]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_transfer_failure_cannot_cross_score_boundary[cache]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[postactivation]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[catalogue]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[bank]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[release]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[existing-score]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[null-resource]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[config]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[WAITING]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[expired]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[old-authority]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[short-allocation]
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_consumed_partial_is_preserved_and_never_retried
+FAILED ../../plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py::test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI
+20 failed, 13 passed, 1 warning in 324.46s (0:05:24)

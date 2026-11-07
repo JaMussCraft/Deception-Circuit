@@ -67,6 +67,8 @@ axis identity, not merely an individual array file digest.
 """
 from __future__ import annotations
 
+STARTUP_REFERENCE_BYTES=8192
+
 from collections import Counter, defaultdict
 import copy
 import hashlib
@@ -153,11 +155,12 @@ def _source_rows(design, task, split):
         return design[task+'_validation'] if split=='validation' else design['utility'][task]
     field={'train':'fit_ids','validation':'selection_ids','assessment':'assessment_ids'}[split]
     ids=design['tasks'][task][field]
-    result=[r for r in design['access_rows'][task] if r['instance_id'] in set(ids)]
-    _require(len(result)==len(ids)*5,'incomplete mechanism source rows')
+    conditions=('D','I','H','user_neutral') if split=='train' else CONDITIONS
+    result=[r for r in design['access_rows'][task] if r['instance_id'] in set(ids) and r['condition'] in conditions]
+    _require(len(result)==len(ids)*len(conditions),'incomplete mechanism source rows')
     index={(r['condition'],r['instance_id']):r for r in result}
     _require(len(index)==len(result),'duplicate source rows')
-    return [index[(c,i)] for c in CONDITIONS for i in ids]
+    return [index[(c,i)] for c in conditions for i in ids]
 
 
 def _length(row, stream):
@@ -253,6 +256,10 @@ def derive_storage_requirements(workload):
             components['capture_source_records']+=source_bytes
             components['capture_readout_numeric']+=len(sites)*h*4
             components['clause_summary_numeric']+=len(sites)*h*4
+        if cap.get('dummy_sources'):
+            factor=1+len(cap['dummy_sources'])
+            size*=factor; host*=factor
+            components['execution_dummy_capture_allowance']+=size
         projection=len(sites)*h*d*4
         size+=projection+1024*len(sites); host+=projection+2048*len(sites)
         components['capture_payloads']+=size; capture_host+=host; largest_capture=max(largest_capture,size)
@@ -298,6 +305,8 @@ def derive_storage_requirements(workload):
             complete_groups.add(group)
         donor_bytes=source_max[group]
         size=4*(source_bytes+donor_bytes)+2*wire(senders)+wire(req['profile'])+wire(extra)
+        repetitions=max(1,req['batches']//3)
+        size*=repetitions
         components['positive_evidence']+=size
         raw_host+=4*(source_host+source_host_max[group])+2*_host_bound(senders)+_host_bound(extra)+_host_bound(req['profile'])
         largest_control=max(largest_control,size)
@@ -331,7 +340,8 @@ def derive_storage_requirements(workload):
     scratch=max(largest_capture,largest_output,largest_control,metadata,arrays)+identity+4096
     # Full completed-shard reader materializes all observations. Add its source
     # objects, captures and immutable metadata independently of numeric tensors.
-    host=capture_host+raw_host+arrays+probe_peak+_host_bound(base)+2*scratch+4*(8*d*h+8*h*h)
+    components['authority_key_proof_host_bytes']=1024*len(workload['expected_keys'])+65536
+    host=capture_host+raw_host+arrays+probe_peak+_host_bound(base)+2*scratch+4*(8*d*h+8*h*h)+components['authority_key_proof_host_bytes']
     return dict(schema='a3_target_storage_bound_v1',tiers=dict(host_ram=host,cache_disk=cache,
         output_disk=output,scratch_disk=scratch),components=dict(components),
         policy='full target retention plus largest atomic publication; optional summaries included; no pilot-size inference')
@@ -361,7 +371,7 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
     _require(isinstance(cfg,dict),'frozen protocol workload execution geometry required')
     batch=_integer(cfg.get('microbatch_size'),'microbatch size')
     tile=_integer(cfg.get('axis_tile_sizes',{}).get(stage,cfg.get('axis_tile_size')),'axis tile size')
-    jobs=_integer(cfg.get('jobs'),'job count')
+    jobs=_integer(cfg.get('jobs_by_stage',{}).get(stage,cfg.get('jobs')),'job count')
     _require(stage not in ('prefit','selected-pilot') or jobs==1,'one atomic timing job required per pilot part')
     _integer(cfg.get('num_layers',32),'model layer count')
     for key in ('head_width','hidden_size','dtype_bytes'):
@@ -375,7 +385,10 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
     identity=inventory_identity(design,protocol)
     numeric=protocol.get('numeric_profile',{})
     _require(design.get('injected') or numeric.get('dtype') and numeric.get('backend'),'numeric dtype/backend required')
-    timing={t:_timing_ids(_source_rows(design,t,'validation')) for t in list(design['tasks'])+['ioi','mmlu']}
+    _require(design.get('injected') is True or 'task_order' in protocol,'production requires frozen task_order')
+    task_order=protocol.get('task_order',sorted(design['tasks']))
+    _require(len(task_order)==len(set(task_order)) and set(task_order)==set(design['tasks']),'changed frozen task order coverage')
+    timing={t:_timing_ids(_source_rows(design,t,'validation')) for t in list(task_order)+['ioi','mmlu']}
     if 'timing_ids' in cfg:
         _require(cfg['timing_ids']==timing,'changed frozen metadata-only timing membership')
     inv=dict(schema_version=1,kind='a3_direction_inventory',stage=stage,
@@ -391,6 +404,7 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
     counters=Counter(); profile_by_id={}; captures={}; positives={}; peaks=Counter(); shard_ids=set(); source_index={}
 
     def profile(task,split,n,lanes,sites,*,singleton=False):
+        if cfg.get('pad_tail_batches') and not singleton and split!='train': n=batch
         width=cfg['widths'][task][split]
         _integer(width,'padded width')
         return dict(source_task=task,padded_width=width,physical_batch_size=n*lanes,
@@ -415,6 +429,18 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
             out.append(dict(source_task=task,analysis_split=split,instance_id=rid,condition=c,stream=stream,
                 record=copy.deepcopy(row),unpadded_length=_length(row,stream),
                 padded_width=p['padded_width'],readout=data.get('readout',_length(row,stream)-1)))
+        if cfg.get('pad_tail_batches') and out and not p.get('positive_singleton'):
+            size=p['physical_batch_size']//p['axis_tile_size']
+            real_ids=[x['instance_id'] for x in out]
+            # Requirements are one homogeneous recipient batch; aliases are
+            # execution-only duplicates and never enter scientific target keys.
+            while len(out)<size:
+                duplicate=copy.deepcopy(out[0]); original=duplicate['instance_id']
+                alias='a3-dummy:'+digest([duplicate['source_task'],duplicate['analysis_split'],duplicate['condition'],real_ids,len(out)])
+                duplicate.update(instance_id=alias,source_instance_id=original)
+                duplicate['record']=dict(duplicate['record'],instance_id=alias,
+                    execution_dummy=dict(duplicate_of=original,source_sha256=digest(out[0]['record'])))
+                out.append(duplicate)
         return out
 
     def req(operation,p,keys,axes,*,batches=1,family='',timing_keys=None,axis_scope=None,job_id=None):
@@ -452,7 +478,9 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
     def groups(task,split,*,pilot=False,train=False,target_split=None):
         rows=_source_rows(design,task,split)
         chosen=timing[task] if pilot else list(dict.fromkeys(r['instance_id'] for r in rows))
-        chunks=_chunks(chosen,batch)
+        chunk_size=cfg.get('train_microbatch_size',batch) if train else batch
+        _integer(chunk_size,'train microbatch size')
+        chunks=_chunks(chosen,chunk_size)
         if pilot:
             target_rows=_source_rows(design,task,target_split or split)
             target_n=len({r['instance_id'] for r in target_rows})
@@ -477,12 +505,17 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
         for c,s,ids in groups(task,split,pilot=pilot,train=train,target_split=profile_split or split):
             for stream in ((s,'corrupt') if donor and task=='ioi' else (s,)):
                 p=profile(task,profile_split or split,len(ids),lanes,sites)
+                if train and protocol.get('fit_cache'):
+                    p=copy.deepcopy(protocol['fit_cache']['capture_identity']['numeric_profile'])
+                    sites=copy.deepcopy(p['sites'])
                 source={r['instance_id']:r for r in _source_rows(design,task,split) if r.get('condition',task)==c}
                 _require(all(_length(source[i],stream)<=p['padded_width'] for i in ids),'capture profile truncates recipient/donor source')
                 key=digest([task,split,c,stream,ids,p,invocation])
                 if key in captures:
                     continue
-                captures[key]=dict(capture_id=key,source_task=task,split=split,condition=c,
+                execution=input_scope([[task,split,c,stream,i] for i in ids],p)
+                captures[key]=dict(capture_id=key,execution_ids=[x['instance_id'] for x in execution],
+                    dummy_sources={x['instance_id']:x['source_instance_id'] for x in execution if 'source_instance_id' in x},source_task=task,split=split,condition=c,
                     stream=stream,instance_ids=ids,sites=sites,profile=p)
                 op='capture_train' if train else ('capture_donor' if stream=='corrupt' and task=='ioi' else 'capture_intact')
                 # Timing rows always refer to frozen validation membership.
@@ -519,6 +552,11 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
                 capture(source,split,sites,pilot=True,donor=True,lanes=1,profile_split=profile_split,invocation=invocation)
             for condition,stream,ids in source_groups:
                 # Floors must each be physically dispatched as distinct cells.
+                execution_ids=list(ids); dummy_sources={}
+                if cfg.get('pad_tail_batches'):
+                    while len(execution_ids)<batch:
+                        alias='a3-dummy:'+digest([source,split,condition,ids,len(execution_ids)])
+                        dummy_sources[alias]=ids[0]; execution_ids.append(alias)
                 for start in range(0,len(expanded),tile):
                     block=expanded[start:start+tile]
                     p=profile(source,profile_split or split,len(ids),tile,sites)
@@ -531,8 +569,12 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
                     shard_ids.add(shard_id)
                     inv['shards'].append(dict(shard_id=shard_id,expected_keys=keys,profile=p,
                         panel=panel,split=split,cells=block,instance_ids=ids,
-                        requirement_ids=[],control_ids=[]))
+                        requirement_ids=[],control_ids=[],execution_ids=execution_ids,dummy_sources=dummy_sources,
+                        dummy_positive_forward_count=3*len(dummy_sources)))
                     shard=inv['shards'][-1]
+                    if p['axis_tile_size']>1:
+                        shard['requirement_ids'].append(req('packing_lookup',p,keys,[c['axis_index'] for c in block],timing_keys=tkeys,
+                            axis_scope=[{k:c[k] for k in ('seed','site','family','axis_index','operation','axis_reference','axis_sha256') if k in c} for c in block]))
                     inv['expected_keys'].extend(keys)
                     axes=[c['axis_index'] for c in block]
                     for op in REPLAYS:
@@ -549,6 +591,11 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
                                 for op in REPLAYS:
                                     req('equivalence_dummy_'+str(lanes)+'_'+op,dummy,keys[:len(ids)],axes[:1],
                                         family=block[0]['family'],timing_keys=tkeys[:len(ids)],axis_scope=[{k:block[0][k] for k in ('seed','site','family','axis_index','operation','axis_reference','axis_sha256') if k in block[0]}])
+                    if dummy_sources:
+                        peaks['execution_dummy_rows']+=len(dummy_sources)*len(block)
+                        pp=profile(source,profile_split or split,1,1,sites,singleton=True)
+                        req('positive_control',pp,[[source,split,condition,stream,ids[0]]],[],batches=3*len(dummy_sources),
+                            timing_keys=[[source,'validation',condition,stream,timing[source][0]]])
                     # Reviewed positive_control uses separately padded singleton donors.
                     for rid in ids:
                         pp=profile(source,profile_split or split,1,1,sites,singleton=True)
@@ -598,7 +645,8 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
             _require(tuple(record['site']) in map(tuple,design['tasks'][record['task']]['direction_sites']),'selected site outside frozen list')
             sel[k]=record
         _require(set(sel)=={(t,s) for t in design['tasks'] for s in SEEDS},'complete selected task/seed coverage required')
-    for task,definition in design['tasks'].items():
+    for task in task_order:
+        definition=design['tasks'][task]
         sites=definition['direction_sites']
         if not design.get('injected'):
             _require(len(definition['assessment_ids'])==100,'fixed 100 assessment IDs required')
@@ -669,9 +717,16 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
                         [cell('learned',0)]+[cell('calibration_null',i) for i in range(32)],pilot=True)
             inv['probe_reads'].append(dict(task=task,split='assessment',extra_forwards=0,source='matched intact captures'))
     inv['captures']=list(captures.values())
+    inv['capture_shards']=[dict(shard_id=c['capture_id'],capture=copy.deepcopy(c)) for c in inv['captures'] if c['split']=='train']
     _require(len(inv['expected_keys'])==len(set(map(_freeze,inv['expected_keys']))),'duplicate raw row keys')
-    # One explicit warmup and serialization profile per job; measured independently.
+    # Guard checks are real elapsed work, not invented model forwards. The
+    # bound includes model publication and complete validation-cache adaptation.
     profiles=list(profile_by_id.values())
+    if cfg.get('account_runtime_guards'):
+        gp=dict(profiles[0],axis_tile_size=1,physical_batch_size=1,control='root_live_guard')
+        count=10*len(inv['shards'])+3*len(inv['captures'])+2*jobs
+        req('guard_refresh',gp,[],[],batches=max(1,count),job_id='job-0')
+    # One explicit warmup and serialization profile per job; measured independently.
     _require(profiles,'empty workload')
     for j in range(jobs):
         inv['jobs'].append(dict(job_id='job-'+str(j),shard_ids=[s['shard_id'] for i,s in enumerate(inv['shards']) if i%jobs==j]))
@@ -682,9 +737,12 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
         shapes=[dict(kind='direction_shard',profile=s['profile'],rows=len(s['expected_keys']),
                      key_bytes=len(json.dumps(s['expected_keys']).encode()))
                 for i,s in enumerate(inv['shards']) if i%jobs==j]
+        shapes += [dict(kind='profile_reuse_attestation',profile=shard['profile'],rows=len(shard['expected_keys']),
+                        key_bytes=len(json.dumps(shard['expected_keys']).encode()))
+                   for i,shard in enumerate(inv['shards']) if i%jobs==j and shard['profile']['axis_tile_size']>1]
         if j==0:
             shapes += [dict(kind='readout_capture',profile=c['profile'],rows=len(c['instance_ids']),
-                            numeric_bytes=len(c['instance_ids'])*len(c['sites'])*cfg['head_width']*4) for c in inv['captures']]
+                            numeric_bytes=(2*len(c.get('execution_ids',c['instance_ids']))+cfg['hidden_size'])*len(c['sites'])*cfg['head_width']*4) for c in inv['captures']]
             shapes += [dict(kind='positive_control',profile=v['profile'],rows=1) for v in positives.values()]
         shapes += [dict(kind='completion',rows=1)]
         shapes += [dict(kind='declared_extra_finalization',rows=1) for _ in range(cfg['serialization_batches'])]
@@ -697,9 +755,9 @@ def build_inventory(design: dict, protocol: dict, *, stage: str, fits=None, sele
             if (r['declared_job_id'] or assigned.get(r['requirement_id'],'job-0'))==job['job_id']]
         job['depends_on']=['job-0'] if job['job_id']!='job-0' else []
     inv['operation_counts']=dict(counters)
-    inv['forward_counts']={op:n for op,n in counters.items() if op!='serialization'}
+    inv['forward_counts']={op:n for op,n in counters.items() if op not in ('serialization','guard_refresh','packing_lookup')}
     inv['bytes']=dict(peaks)
-    inv['bytes']['capture_disk']=sum(len(c['instance_ids'])*len(c['sites'])*cfg['head_width']*4 for c in inv['captures'])
+    inv['bytes']['capture_disk']=sum(len(c.get('execution_ids',c['instance_ids']))*len(c['sites'])*cfg['head_width']*4 for c in inv['captures'])
     inv['bytes']['projection_blocks']=sum(len(x['direction_sites'])*cfg['head_width']*cfg['hidden_size']*4 for x in design['tasks'].values())
     inv['bytes']['row_keys_utf8']=len(json.dumps(inv['expected_keys']).encode())
     inv['storage_requirements']=derive_storage_requirements(inv)
@@ -714,7 +772,7 @@ def _validate_inventory(workload):
     frozen=workload.get('frozen_inputs',{})
     rebuilt=build_inventory(frozen['design'],frozen['protocol'],stage=workload['stage'],
                             fits=frozen.get('fits'),selected=frozen.get('selected'))
-    _require(rebuilt==workload,'inventory differs from independent frozen-input reconstruction')
+    _require(digest(rebuilt)==digest(workload),'inventory differs from independent frozen-input reconstruction')
     _require(workload.get('stage') in STAGES,'unknown inventory stage')
     keys=[_freeze(k) for s in workload['shards'] for k in s['expected_keys']]
     _require(Counter(keys)==Counter(map(_freeze,workload['expected_keys'])),'inventory shard/row coverage mismatch')
@@ -749,6 +807,43 @@ def _ledger(ledger, identity):
     _require(contingency+sums['contingency']>=6,'full A3 contingency must remain counted')
     sums['contingency_remaining']=contingency
     return sums
+
+
+class _FrozenJSONDict(dict):
+    __slots__=('_initialized',)
+    def __init__(self,*args,**kwargs):
+        if getattr(self,'_initialized',False):self._immutable()
+        values=dict(*args,**kwargs)
+        dict.__init__(self,((key,_freeze_json(value)) for key,value in values.items()))
+        object.__setattr__(self,'_initialized',True)
+    def _immutable(self,*args,**kwargs):raise TypeError('validated inventory is immutable')
+    __setitem__=__delitem__=clear=pop=popitem=setdefault=update=__ior__=__setattr__=__delattr__=_immutable
+    def __copy__(self):return self
+    def __deepcopy__(self,memo):return self
+
+
+class _FrozenJSONList(list):
+    __slots__=('_initialized',)
+    def __init__(self,*args,**kwargs):
+        if getattr(self,'_initialized',False):self._immutable()
+        values=list(*args,**kwargs)
+        list.__init__(self,(_freeze_json(value) for value in values))
+        object.__setattr__(self,'_initialized',True)
+    def _immutable(self,*args,**kwargs):raise TypeError('validated inventory is immutable')
+    __setitem__=__delitem__=append=clear=extend=insert=pop=remove=reverse=sort=__iadd__=__imul__=__setattr__=__delattr__=_immutable
+    def __copy__(self):return self
+    def __deepcopy__(self,memo):return self
+
+
+def _freeze_json(value,memo=None):
+    if memo is None:memo={}
+    if type(value) in (_FrozenJSONDict,_FrozenJSONList) and getattr(value,'_initialized',False):return value
+    if not isinstance(value,(dict,list,tuple)):return value
+    if id(value) in memo:return memo[id(value)]
+    if isinstance(value,dict):out=_FrozenJSONDict({k:_freeze_json(v,memo) for k,v in value.items()})
+    else:out=_FrozenJSONList(_freeze_json(v,memo) for v in value)
+    memo[id(value)]=out
+    return out
 
 
 def _packing_evidence(evidence, measurement):
@@ -830,6 +925,11 @@ def _packing_evidence(evidence, measurement):
             _require(set(errors)=={'empty','head_self','zero_coefficient'}
                 and all(type(v) in (int,float) and math.isfinite(v) and 0<=v<=1e-5 for v in errors.values()),'packing measured replay invalid')
     _require(len(nonzero)>=2,'packing lacks distinct measured nonzero axes')
+    _packing_measurement_scope(measured_rows,measured_specs,measurement)
+    return receipt['receipt_sha256']
+
+
+def _packing_measurement_scope(measured_rows,measured_specs,measurement):
     for frozen in measurement['timing_inputs']:
         k=(frozen['source_task'],frozen['condition'],frozen['stream'],frozen['instance_id'])
         row=measured_rows.get(k); data=frozen['record']['streams'][frozen['stream']]
@@ -845,10 +945,139 @@ def _packing_evidence(evidence, measurement):
     for wanted in measurement.get('axis_scope',[]):
         _require(any(all(spec.get(k)==v for k,v in wanted.items() if k!='axis_reference')
                      for spec in measured_specs),'packing actual axis/site/operation coverage missing')
-    return receipt['receipt_sha256']
 
 
-def project_cost(pilot_receipts: list[dict], workload: dict, ledger: dict) -> dict:
+_PACKING_PROOF_SEAL=object()
+_PACKING_AXIS_FIELDS=('site','seed','family','axis_index','operation','axis_sha256')
+_PACKING_ROW_FIELDS=('source_task','condition','stream','instance_id','seed','site','family','axis_index','operation')
+
+
+def _axis_selector(spec):return tuple(_freeze(spec.get(k)) for k in _PACKING_AXIS_FIELDS)
+
+
+class _PackingProof:
+    """Private immutable index minted only after full numeric producer validation."""
+    __slots__=('_profile','_rows','_specs','_batches','_observed','source_digest','receipt_sha256','distinct_axes','_sealed')
+    def __init__(self,seal,evidence):
+        _require(seal is _PACKING_PROOF_SEAL,'packing proof requires independent validation')
+        receipt=evidence['runner_receipt'];rows={};specs={};batches={}
+        for bid,group in evidence['snapshots'].items():
+            for row in group:rows[(row['task'],row['condition'],row['stream'],row['instance_id'])]=row
+        for bid,values in receipt['scope']['batches'].items():
+            batch=[]
+            for value in values:
+                spec={k:v for k,v in value.items() if k!='donors'};key=_axis_selector(spec)
+                if key not in specs:specs[key]=spec
+                batch.append(specs[key])
+            batches[bid]=batch
+        object.__setattr__(self,'_profile',_freeze_json(copy.deepcopy(receipt['scope']['profile'])))
+        object.__setattr__(self,'_rows',_freeze_json(copy.deepcopy(rows)))
+        object.__setattr__(self,'_specs',_freeze_json(specs))
+        object.__setattr__(self,'_batches',_freeze_json(batches))
+        object.__setattr__(self,'_observed',frozenset(tuple(_freeze(c['key'].get(k)) for k in _PACKING_ROW_FIELDS) for c in receipt['comparisons']))
+        object.__setattr__(self,'source_digest',digest(evidence))
+        object.__setattr__(self,'receipt_sha256',receipt['receipt_sha256'])
+        object.__setattr__(self,'distinct_axes',receipt['distinct_axes'])
+        object.__setattr__(self,'_sealed',True)
+    def __setattr__(self,*args):raise TypeError('validated packing proofs are immutable')
+    def __reduce__(self):raise TypeError('validated packing proofs are process-local')
+    def check(self,measurement):
+        _require(measurement['profile']==self._profile,'packing source/profile mismatch')
+        wanted=measurement.get('axis_scope',[]);specs=[]
+        for axis in wanted:
+            if all(k in axis for k in _PACKING_AXIS_FIELDS):
+                value=self._specs.get(_axis_selector(axis));_require(value is not None,'packing actual axis/site/operation coverage missing');specs.append(value)
+            else:specs.extend(self._specs.values())
+        _packing_measurement_scope(self._rows,specs,measurement)
+        source=self._profile.get('source_task') or next(iter(self._rows))[0]
+        convention=('none' if not self._profile.get('positive_singleton') else 'frozen_cyclic_different_question_readout') if source=='mmlu' else ('repeated_B_corrupt' if source=='ioi' else 'same_ID_condition_opposite_stream')
+        _require(measurement.get('donor_convention',convention)==convention,'packing donor convention mismatch')
+        return self.receipt_sha256
+    def covers_axes(self,wanted):
+        for axis in wanted:
+            if all(k in axis for k in _PACKING_AXIS_FIELDS):
+                spec=self._specs.get(_axis_selector(axis))
+                if spec is None or not all(spec.get(k)==v for k,v in axis.items() if k!='axis_reference'):return False
+            elif not any(all(spec.get(k)==v for k,v in axis.items() if k!='axis_reference') for spec in self._specs.values()):return False
+        return True
+    def observed_requirement(self,requirement):
+        seen=[]
+        for key in requirement['timing_keys']:
+            if len(key)!=12:continue
+            values=(key[2],key[10],key[11],key[9],key[4],_freeze(key[5]),key[6],key[7],key[8])
+            _require(values in self._observed,'actual measured producer did not cover frozen timing key');seen.append(key)
+        return seen
+
+
+def _validate_packing_proof(evidence,measurement):
+    _packing_evidence(evidence,measurement)
+    return _PackingProof(_PACKING_PROOF_SEAL,evidence)
+
+
+def _capture_lane_evidence(evidence, measurement):
+    """Validate actual replicated intact capture, without asserting serial parity."""
+    import struct
+    _require(isinstance(evidence,dict) and evidence.get('kind')=='a3_intact_lane_equivalence_v1'
+        and evidence.get('timing_inputs_sha256')==digest(measurement['timing_inputs']), 'capture lane source scope mismatch')
+    profile=measurement['profile'];receipts=evidence.get('runner_receipts',[]);snapshots=evidence.get('snapshots',{})
+    _require(receipts and len(receipts)==len(snapshots),'capture lane receipts/snapshots missing')
+    seen={}
+    for receipt in receipts:
+        _require(receipt.get('kind')=='a3_intact_lane_consistency_v1' and receipt.get('valid') is True
+            and receipt.get('serial_comparison_performed') is False
+            and receipt.get('operation')=='readout_capture'
+            and receipt.get('receipt_sha256')==digest({k:v for k,v in receipt.items() if k!='receipt_sha256'}),
+            'capture lane producer kind/content mismatch')
+        _require(receipt.get('numeric_profile')==profile and receipt.get('source_sha256')==profile['source_sha256']
+            and receipt.get('profile_id')==digest({k:v for k,v in profile.items() if k!='profile_id'}), 'capture lane profile mismatch')
+        bid=receipt['batch_sha256'];rows=snapshots.get(bid,[]);tile=profile['axis_tile_size']
+        _require(rows and digest([digest(r) for r in rows])==bid and len(rows)*tile==profile['physical_batch_size']
+            and receipt.get('replicated_lanes')==tile and receipt.get('physical_batch_size')==profile['physical_batch_size'],
+            'capture lane actual physical geometry mismatch')
+        maps=receipt.get('readout_map',[])
+        _require(maps==[dict(instance_id=r['instance_id'],source_readout=r['readout'],execution_readouts=[r['readout']]*tile) for r in rows],
+            'capture lane readout mapping mismatch')
+        refs=receipt.get('head_references',[]);sites=profile.get('sites',list({tuple(r['site']) for r in refs}))
+        wanted={(r['instance_id'],tuple(site)) for r in rows for site in sites}
+        actual=[(r['instance_id'],tuple(r['site'])) for r in refs]
+        _require(len(actual)==len(set(actual)) and set(actual)==wanted,'capture lane head coverage mismatch')
+        vectors=evidence.get('head_vectors',{}).get(bid,[]);vector_index={(r['instance_id'],tuple(r['site'])):r for r in vectors}
+        _require(len(vector_index)==len(vectors) and set(vector_index)==wanted,'capture lane head vectors missing')
+        for ref in refs:
+            values=vector_index[(ref['instance_id'],tuple(ref['site']))]['values']
+            _require(isinstance(values,list) and values and all(type(x) in (float,int) and math.isfinite(x) for x in values),'capture lane nonfinite head')
+            payload=struct.pack('<'+'f'*len(values),*values)
+            descriptor=dict(dtype='torch.float32',shape=[len(values)],bytes_sha256=hashlib.sha256(payload).hexdigest())
+            _require(ref['vector_sha256']==digest(descriptor) and ref['vector_shape']==[len(values)]
+                and ref['dtype']=='torch.float32','capture lane numeric head bytes differ')
+        comparisons=receipt.get('comparisons',[])
+        expected={(rid,site,lane) for rid,site in wanted for lane in range(1,tile)}
+        actual=[(r['instance_id'],tuple(r['site']),r['lane']) for r in comparisons]
+        _require(len(actual)==len(set(actual)) and set(actual)==expected,'capture lane duplicate/dummy coverage mismatch')
+        references={(r['instance_id'],tuple(r['site'])):r for r in refs}
+        for row in comparisons:
+            ref=references[(row['instance_id'],tuple(row['site']))]
+            _require(row['reference_sha256']==ref['vector_sha256'] and row['readout']==ref['readout']
+                and row.get('head_allclose') is True and row.get('argmax_equal') is True,'capture lane measured head/readout failure')
+            for key in ('max_abs_head_error','reference_max_abs_head','max_abs_margin_error'):_finite(row[key],'capture lane '+key)
+            margin=row['reference_margin'];_require(type(margin) in (int,float) and math.isfinite(margin),'nonfinite capture lane margin')
+            _require(row['max_abs_head_error']<=1e-5+1e-5*row['reference_max_abs_head']
+                and row['max_abs_margin_error']<=1e-5+1e-5*abs(margin),'capture lane measured disagreement')
+        for row in rows:
+            key=(row['task'],row['condition'],row['stream'],row['instance_id'])
+            _require(key not in seen,'duplicate measured capture input');seen[key]=row
+    for frozen in measurement['timing_inputs']:
+        key=(frozen['source_task'],frozen['condition'],frozen['stream'],frozen['instance_id']);row=seen.get(key)
+        _require(row is not None,'capture lane missing measured input')
+        data=frozen['record']['streams'][frozen['stream']];n=frozen['unpadded_length'];width=frozen['padded_width']
+        _require(row['tokens'][:n]==data['tokens'] and len(row['tokens'])==width and row['mask']==[1]*n+[0]*(width-n)
+            and row['readout']==frozen['readout'] and all(row['record'].get(k)==v for k,v in frozen['record'].items()),
+            'capture lane source tokens/masks/records differ')
+    _require(len(seen)==len(measurement['timing_inputs']),'capture lane extra measured source scope')
+    return digest(evidence)
+
+
+def project_cost(pilot_receipts: list[dict], workload: dict, ledger: dict, *, packing_proofs=None, runtime_cost=None) -> dict:
     """Return a conservative proposal; incomplete evidence always raises ValueError."""
     _validate_inventory(workload)
     sums=_ledger(ledger,workload['identity'])
@@ -862,23 +1091,33 @@ def project_cost(pilot_receipts: list[dict], workload: dict, ledger: dict) -> di
         _require(receipt.get('identity')==workload['identity'],'stale receipt source/model identity')
         _require(receipt.get('hardware')==workload['hardware'],'changed receipt hardware')
         _require(receipt.get('inventory_sha256')==workload['inventory_sha256'],'receipt not bound to frozen target inventory')
-        startup.append(_finite(receipt.get('startup_seconds'),'measured startup'))
+        startup.append(_finite(receipt.get('startup_seconds'),'measured startup')+_finite(receipt.get('proof_validation_seconds',0),'measured packing proof validation'))
         host_peaks.append(_integer(receipt.get('host_peak_bytes'),'measured host peak'))
-        receipt_digests.append(digest(receipt))
+        receipt_sha=digest(receipt);receipt_digests.append(receipt_sha)
         _require(isinstance(receipt.get('measurements'),list) and receipt['measurements'],'missing measured profiles')
         packing=receipt.get('packing_evidence',{})
-        checked_packing=set()
+        checked_packing=set();validated_packing={}
         for m in receipt['measurements']:
             _require(m.get('source_split')=='validation','pilot must retain actual validation measurement scope')
             _require(m.get('synchronized') is True,'unsynchronized timing')
             _require(m.get('cache_fit') is True,'measured cache-fit failure')
             capacity=_integer(m.get('memory_capacity_bytes'),'measured memory capacity')
             cache_capacity=_integer(m.get('cache_capacity_bytes'),'measured cache capacity')
-            if m.get('profile',{}).get('axis_tile_size',1)>1:
+            if m.get('profile',{}).get('axis_tile_size',1)>1 and m.get('operation','').startswith('capture_') and 'capture_lane_equivalence' in m:
+                _capture_lane_evidence(m['capture_lane_equivalence'],m)
+            elif m.get('profile',{}).get('axis_tile_size',1)>1:
                 evidence=packing.get(m.get('packing_id'))
                 check_key=(m.get('packing_id'),digest(m.get('timing_inputs')),digest(m.get('axis_scope',[])))
                 if check_key not in checked_packing:
-                    _packing_evidence(evidence,m)
+                    pid=m.get('packing_id')
+                    if pid not in validated_packing:
+                        if isinstance(evidence,dict) and evidence.get('kind')=='a3_packing_proof_reference_v1':
+                            proof=(packing_proofs or {}).get((receipt_sha,pid))
+                            _require(type(proof) is _PackingProof and proof.source_digest==evidence.get('evidence_sha256'),
+                                'independently validated completed packing reference required')
+                        else:proof=_validate_packing_proof(evidence,m)
+                        validated_packing[pid]=proof
+                    validated_packing[pid].check(m)
                     checked_packing.add(check_key)
             if m.get('operation')=='serialization':
                 shapes=m['profile'].get('serialization_shapes',[])
@@ -898,6 +1137,18 @@ def project_cost(pilot_receipts: list[dict], workload: dict, ledger: dict) -> di
             _require(cache_capacity>=max(m['cache_bytes'],workload['storage_requirements']['tiers']['cache_disk']),'full target cache capacity underflow')
             measured[(digest(m.get('profile')),m.get('operation'),digest(m.get('expected_keys',[])),
                       digest(m.get('axis_ids',[])),digest(m.get('axis_scope',[])),digest(m.get('timing_inputs')),m.get('donor_convention'))].append(m)
+    completed_startup=0
+    if runtime_cost is not None:
+        _require(runtime_cost.get('kind')=='a3_completed_host_startup_cost_v1'
+            and runtime_cost.get('target_inventory_sha256')==workload['inventory_sha256']
+            and runtime_cost.get('execution_authorized') is False and runtime_cost.get('conditional') is True,'completed host cost source/scope/portability differs')
+        completed_startup=_finite(runtime_cost.get('seconds'),'completed authentication/index startup')
+        _require(runtime_cost.get('guard_seconds') and runtime_cost.get('host_profile'),'completed host guard/profile evidence missing')
+        for value in runtime_cost['guard_seconds']:_finite(value,'completed full-union guard seconds',positive=True)
+        host_peaks.append(_integer(runtime_cost['peak_host_bytes'],'completed host peak'))
+        capacity=_integer(runtime_cost['frozen_host_capacity_bytes'],'frozen host startup capacity')
+        _require(max(runtime_cost['peak_host_bytes'],runtime_cost['construction_working_bytes'],runtime_cost['retained_bytes'])<=capacity,
+            'completed startup footprint exceeds frozen admitted host capacity')
     storage=_storage_admission(workload,ledger,max(host_peaks))
     total=0; used=[]; reuse_records=[]
     requirement_jobs={rid:job['job_id'] for job in workload['jobs'] for rid in job['requirement_ids']}
@@ -922,14 +1173,16 @@ def project_cost(pilot_receipts: list[dict], workload: dict, ledger: dict) -> di
                 assumptions=policy['assumptions'],uncertainty='target examples unmeasured; fixed 25 percent workload buffer',
                 target_rows_are_measured=False))
         seconds=max(max(m['batch_seconds']) for m in good)
+        if requirement['operation']=='guard_refresh' and runtime_cost is not None:seconds=max(seconds,max(runtime_cost['guard_seconds']))
         work=_integer(requirement['batches'],'required batches')*seconds
         total+=work
         job_work[requirement_jobs[requirement['requirement_id']]]+=work
         used.append(dict(requirement_id=requirement['requirement_id'],batches=requirement['batches'],batch_seconds=seconds))
     jobs=len(workload['jobs']); _integer(jobs,'job count')
-    seconds=jobs*max(startup)+1.25*total+jobs*_finite(workload['finish_reserve_seconds'],'finish reserve')
-    job_projections=[dict(job_id=j['job_id'],projected_seconds=max(startup)+1.25*job_work[j['job_id']]+workload['finish_reserve_seconds'],
-        walltime_seconds=math.ceil(max(startup)+1.25*job_work[j['job_id']]+workload['finish_reserve_seconds']),
+    per_job_startup=max(startup)+completed_startup
+    seconds=jobs*per_job_startup+1.25*total+jobs*_finite(workload['finish_reserve_seconds'],'finish reserve')
+    job_projections=[dict(job_id=j['job_id'],projected_seconds=per_job_startup+1.25*job_work[j['job_id']]+workload['finish_reserve_seconds'],
+        walltime_seconds=math.ceil(per_job_startup+1.25*job_work[j['job_id']]+workload['finish_reserve_seconds']),
         requirement_ids=j['requirement_ids'],depends_on=j['depends_on']) for j in workload['jobs']]
     gpu_hours=seconds*workload['hardware']['count']/3600
     phase=workload['phase']
@@ -1019,11 +1272,22 @@ def project_cost(pilot_receipts: list[dict], workload: dict, ledger: dict) -> di
         inventory_sha256=workload['inventory_sha256'],receipt_sha256s=receipt_digests,
         ledger_sha256=ledger['snapshot_sha256'],phase=phase,subphase='directions',storage_admission=storage,
         projected_seconds=seconds,projected_gpu_hours=gpu_hours,additional_gpu_hours=additional,proposed_walltime_seconds=max(j['walltime_seconds'] for j in job_projections),jobs=job_projections,
-        required_job_count=jobs,startup_seconds=max(startup),measured_work_seconds=total,
+        required_job_count=jobs,startup_seconds=per_job_startup,completed_host_startup_cost=runtime_cost,measured_work_seconds=total,
         finish_reserve_seconds=workload['finish_reserve_seconds'],existing_gpu_hours=sums['all'],
         existing_reserved_gpu_hours=sums['all'],existing_actual_gpu_hours=sums['actual_all'],actual_unknown_entries=sums['actual_unknown_entries'],
         direction_m1_gpu_hours=dm1,all_m1_gpu_hours=m1,direction_m2_gpu_hours=dm2,
         all_a3_gpu_hours=all_a3,requirements=used,reuse_records=reuse_records,fit_validation_consumed_gpu_hours=envelope_consumed,
-        conditional_proposal=any(x['profile']['axis_tile_size']>1 for x in workload['requirements']),
+        conditional_proposal=runtime_cost is not None and runtime_cost.get('conditional') is not False or any(x['profile']['axis_tile_size']>1 for x in workload['requirements']),
         packed_execution_blocker='Unit F reviewed reuse adapter required; exact-scope runner unchanged' if any(x['profile']['axis_tile_size']>1 for x in workload['requirements']) else None,
-        missing_execution_prerequisites=['matching root RS reservation','live source/registry/ledger recheck'])
+        missing_execution_prerequisites=['matching root RS reservation','live source/registry/ledger recheck']+
+            (['bounded allocated-host authentication/index startup'] if runtime_cost is not None and runtime_cost.get('conditional') is not False else []))
+
+
+def execution_membership(source,split,condition,instance_ids,physical_recipients):
+    """Execution aliases are shared by both streams of an authenticated source."""
+    ids=list(instance_ids);dummy={}
+    _require(ids and len(ids)==len(set(ids)) and len(ids)<=physical_recipients,'invalid scientific recipient chunk')
+    while len(ids)<physical_recipients:
+        alias='a3-dummy:'+digest([source,split,condition,list(instance_ids),len(ids)])
+        dummy[alias]=instance_ids[0];ids.append(alias)
+    return ids,dummy

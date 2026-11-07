@@ -1,0 +1,86 @@
+{
+  "stage": "PRE_FIX_REAL_ENTRY_REGRESSION_RED",
+  "observations": [
+    {
+      "python": [
+        3,
+        9,
+        18
+      ],
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--tb=short",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-red/env1.xml",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-red/tmp-env1",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py"
+      ],
+      "exit_code": 1,
+      "tests": 14,
+      "failed": [
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[release-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[release-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[config-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[config-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-allocation]",
+        "test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[allocation]",
+        "test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[context]",
+        "test_real_entry_positive_and_exact_floor_survive_slow_consume[2000-750]",
+        "test_real_entry_positive_and_exact_floor_survive_slow_consume[1850-600]",
+        "test_real_entry_reobserves_shortened_allocation_after_consume",
+        "test_real_entry_allowed_shortening_sets_exact_Popen_timeout"
+      ],
+      "errors": []
+    },
+    {
+      "python": [
+        3,
+        12,
+        13
+      ],
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--tb=short",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-red/env2.xml",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-red/tmp-env2",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py"
+      ],
+      "exit_code": 1,
+      "tests": 14,
+      "failed": [
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[release-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[release-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[config-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[config-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-allocation]",
+        "test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[allocation]",
+        "test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[context]",
+        "test_real_entry_positive_and_exact_floor_survive_slow_consume[2000-750]",
+        "test_real_entry_positive_and_exact_floor_survive_slow_consume[1850-600]",
+        "test_real_entry_reobserves_shortened_allocation_after_consume",
+        "test_real_entry_allowed_shortening_sets_exact_Popen_timeout"
+      ],
+      "errors": []
+    }
+  ],
+  "original_test_sha256": "c5789c8fdc3a6a7aeb0f45a9f08b9f406b9641719659173276658076ffdcae8c",
+  "regression_test_sha256": "7a0b1d498bc6b5e29dd4524c03c8ef742d4c5aa4ce11137ca1ad7ae193981a2e",
+  "no_model_or_native_or_heavy_suite": true
+}

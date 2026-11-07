@@ -1,0 +1,43 @@
+{
+  "entry_reference_keys": [
+    "target",
+    "preparation"
+  ],
+  "explicit_final_phase_witness": {
+    "SHA_passes": 1,
+    "full_payload_reads": 1
+  },
+  "implementation_started": false,
+  "namespace_policy": {
+    "allowed_aliases": "ordered (absolute lexical symlink path,literal readlink string) pairs",
+    "expected_resolved": "dict with work_dir,target_root,preparation_root resolved absolute paths; checked at entry",
+    "preparation_root": "normalized absolute lexical ordinary root",
+    "target_root": "normalized absolute lexical ordinary root",
+    "work_dir": "normalized absolute lexical path"
+  },
+  "namespace_policy_authority": false,
+  "observed_io": {
+    "SHA_passes": 2,
+    "freeze_passes": 1,
+    "full_payload_reads": 2,
+    "parse_passes": 1,
+    "target_writes": 0
+  },
+  "reader_return": [
+    "frozen_value",
+    "entry_references",
+    "namespace_identity",
+    "phase_witness",
+    "observed_io",
+    "observed_resources"
+  ],
+  "resource_minimum_fields": [
+    "recipe",
+    "scope",
+    "retained_metadata_bytes",
+    "extra_transient_bytes"
+  ],
+  "resource_scope": "actual retained receiver graph and entry refs; overlapping raw/decode/freeze/memo temporaries; applicable process/cgroup observations required by identified recipe. T2 validates comparability and each actual observation against anchored bounds before loader. No measured alias or baseline subtraction.",
+  "status": "ROOT_ACCEPTED_API_SPELLINGS_RED_ONLY",
+  "tests": "Existing publisher primitive fixtures, corruption of either object, native prefit inventory seam without model construction. Source-byte observers count logical reads, not physical storage traffic."
+}

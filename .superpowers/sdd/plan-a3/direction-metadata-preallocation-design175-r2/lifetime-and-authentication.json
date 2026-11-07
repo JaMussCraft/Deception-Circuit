@@ -1,0 +1,16 @@
+{
+  "transport": "Existing JSON artifact bytes are authoritative; never pickle or an executable object graph. No new storage server/daemon/heartbeat.",
+  "aliasing": [
+    "JSON does not preserve Python object identity or shared references. Do not assume the builder memory peak or original alias sharing describes parsed JSON.",
+    "Do not intern/coalesce timing records or profiles as part of this design. Distinct retained timing records stay distinct; values/order/types/keys and every byte/hash/bound remain exact for identical inputs.",
+    "A single immutable handle supplies exactly one target graph to all consumers. _PilotReconciliationPass._requirement_ids must refer to those exact requirement objects, with no re-decoding/copy/replacement after sealing.",
+    "Before returning from the loader, raw-buffer hashing and strict parsing refer to the same immutable buffer. Freeing local temporaries normally is allowed; no GC/runtime hook is introduced. Measure raw bytes+decoded graph+freeze coexistence."
+  ],
+  "proposed_file_lifetime_contract": "Independent180 accepts phase-scoped transport against the original in-memory-target contract in principle. Entry authentication plus an immutable exact graph and final phase-only witness/namespace barrier preserve this data lifetime. The final barrier is AFTER _measure_complete_guard_union and reconciliation.before_publication and immediately before the bounded receipt writer; no blanket continuous-filesystem claim is made after that last check.",
+  "explicit_review_decision": "No stronger per-refresh target witness is inherent in original semantics, and no separate cap/authority-policy exception is inherently required. The revised source/reader/lifetime implementation still needs normal independent design/correctness review and measured .5h feasibility. Existing live/numeric guard schedules are untouched.",
+  "why_not_guard_cache": "The CPU descriptor certifies deterministic data construction at an immutable source/input identity. It does not certify current protection, source files, model geometry, ledger, budget, allocation or lease. Those existing checks run freshly before and after load and on their existing per-operation schedule.",
+  "trust_change": "The prepared-target authenticity rule changes from rebuilding the target during the GPU process to accepting an independently CPU-reconstructed object whose exact bytes/provenance root explicitly anchors in the original pilot admission. A self-consistent payload+marker+claimed validation flag is insufficient. Root acceptance of actual CPU provenance is part of this proposed trust rule and requires independent review.",
+  "namespace_contract": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-preallocation-design175-r2/namespace-policy.json",
+  "exact_read_count_contract": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-preallocation-design175-r2/receiver-and-pass-counts.json",
+  "receiver_graph_and_RAM": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-preallocation-design175-r2/receiver-graph-and-RAM.json"
+}

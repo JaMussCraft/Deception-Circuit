@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "rsync",
+    "-rl",
+    "--no-perms",
+    "--no-times",
+    "--checksum",
+    "-e",
+    "ssh -o BatchMode=yes -o ConnectTimeout=15 -o ControlMaster=no -o ControlPath=none",
+    "--",
+    "/work/nvme/beto/swong2/hub/datasets--cais--mmlu/",
+    "b2dtn:/ocean/projects/cis260361p/swong2/hf/hub/datasets--cais--mmlu/"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "",
+  "elapsed_seconds": 3.389358551008627
+}

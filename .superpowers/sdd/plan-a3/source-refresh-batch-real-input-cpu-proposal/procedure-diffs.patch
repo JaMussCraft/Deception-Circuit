@@ -1,0 +1,76 @@
+--- 122-validator
++++ cpu-proposal-validator
+@@ -54,7 +54,9 @@
+ def resolved_registry_map(values):
+  result={}
+  for path,sha in values.items():
+-  source=pathlib.Path(path);assert source.is_file() and common.file_hash(source)==sha,path
++  source=pathlib.Path(path);assert source.is_file(),path
++  # Stored catalog digests are historical preparation provenance. Real owner
++  # validators above re-read CURRENT sets/graders; unrelated updates are allowed.
+   resolved=str(source.resolve());assert resolved not in result or result[resolved]==sha,path
+   result[resolved]=sha
+  return result
+@@ -118,7 +120,7 @@
+ assert all(pathlib.Path(path).resolve().is_relative_to(b) for path in project_imports.values()),project_imports
+ for name in ('root-ruling.json','execution-settings.json'):assert (prior/name).read_bytes()==(o/name).read_bytes()
+ files={str(p.relative_to(o)):dict(sha256=common.file_hash(p),bytes=p.stat().st_size) for folder in ('canonical','edge','mask','mask-source-settings') for p in (o/folder).rglob('*') if p.is_file()}
+-manifest=dict(kind='a3_edge_successor_cpu_preparation_manifest_v1',commit=c,source_snapshot=str(snapshot_path),source_snapshot_sha256=common.file_hash(snapshot_path),source_archive_sha256=snapshot['source_archive_sha256'],source_files_expected=511,source_files_observed=len(snapshot['source_sha256']),source_bytes_unchanged=True,source_readonly=True,input_links={name:str((b/name).resolve()) for name in snapshot['input_links']},complete_cpu_preparation=True,edge_status='prepared_cpu_only',execution_authorized=False,weights_loaded=False,scientific_verdict=None,job_id=None,cluster=None,local_cpu=True,exit_code=0,checked_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),python=sys.executable,project_imports=project_imports,parent_evidence=evidence,a1_code_dependencies=len(parent['code_hashes']),cohorts=cohorts,assessment_rows=assessment_rows,utility_counts=comparison['utility_counts'],validation_utilities=comparison['validation_utilities'],scientific_comparison=str(o/'evidence/scientific-comparison.json'),source_rows_sha256=comparison['source_rows_digest_successor'],ancestry_files_expected=len(before),ancestry_files_observed=len(after),static_ancestry_bytes_unchanged=True,current_registry_bytes_recorded=True,ancestry_before=str(o/'evidence/ancestry-before.json'),ancestry_after=str(o/'evidence/ancestry-after.json'),edge_graphs={t:dict(edges=len(g['edges']),geometry=g['geometry'],unsupported_bins=g['unsupported_bins']) for t,g in pre['graphs'].items()},edge_inventories=invinfo,mask_inventories=maskinfo,mask_protected_registry_evidence=mlive,receiver_groups=receiver_groups,validate_prepared_timing=validation_timing,prepared_object_reference=authority.object_reference(o/'edge/prepared'),canonical_numeric_profile=protocol['numeric_profile'],canonical_workload=protocol['workload'],protected_registry_evidence=live,artifacts=files,commands={p.stem:json.loads(p.read_text()) for p in (o/'evidence').glob('*-command.json') if p.stem!='validate-command'},next_m1_prerequisites=['Root successor mapping/reservation tied to this exact new commit/output/inventory; existing queued mask job23444798 mapping remains original','Fresh actual Slurm H200 allocation and live lease/storage/capacity/ledger checks','Independent readiness review; no model admission from CPU prep','Exact initial pilot with both independent model-loading/readout controls, native VJP, complete toy endpoint, serial geometry, 8/16 validation stability and complete source-bound target measurements','Initial pilot measures the full fit target only; later exact select/assess profiles require their actual completed fit/selection ancestry and separate root-approved measurements; all edge M1 reservations share the existing 0.75 GPU-hour ceiling','No fit/select/assess/finalization before owning later-stage gates'])
++manifest=dict(kind='a3_edge_successor_cpu_preparation_manifest_v1',commit=c,source_snapshot=str(snapshot_path),source_snapshot_sha256=common.file_hash(snapshot_path),source_archive_sha256=snapshot['source_archive_sha256'],source_files_expected=511,source_files_observed=len(snapshot['source_sha256']),source_bytes_unchanged=True,source_readonly=True,input_links={name:str((b/name).resolve()) for name in snapshot['input_links']},complete_cpu_preparation=True,edge_status='prepared_cpu_only',execution_authorized=False,weights_loaded=False,scientific_verdict=None,job_id=os.environ['SLURM_JOB_ID'],cluster='delta',local_cpu=False,slurm_cpu=True,allocation=json.loads((o/'evidence/allocation-start.json').read_text()),exit_code=0,checked_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),python=sys.executable,project_imports=project_imports,parent_evidence=evidence,a1_code_dependencies=len(parent['code_hashes']),cohorts=cohorts,assessment_rows=assessment_rows,utility_counts=comparison['utility_counts'],validation_utilities=comparison['validation_utilities'],scientific_comparison=str(o/'evidence/scientific-comparison.json'),source_rows_sha256=comparison['source_rows_digest_successor'],ancestry_files_expected=len(before),ancestry_files_observed=len(after),static_ancestry_bytes_unchanged=True,current_registry_bytes_recorded=True,ancestry_before=str(o/'evidence/ancestry-before.json'),ancestry_after=str(o/'evidence/ancestry-after.json'),edge_graphs={t:dict(edges=len(g['edges']),geometry=g['geometry'],unsupported_bins=g['unsupported_bins']) for t,g in pre['graphs'].items()},edge_inventories=invinfo,mask_inventories=maskinfo,mask_protected_registry_evidence=mlive,receiver_groups=receiver_groups,validate_prepared_timing=validation_timing,prepared_object_reference=authority.object_reference(o/'edge/prepared'),canonical_numeric_profile=protocol['numeric_profile'],canonical_workload=protocol['workload'],protected_registry_evidence=live,artifacts=files,commands={p.stem:json.loads(p.read_text()) for p in (o/'evidence').glob('*-command.json') if p.stem!='validate-command'},next_m1_prerequisites=['Root successor mapping/reservation tied to this exact new commit/output/inventory; existing queued mask job23444798 mapping remains original','Fresh actual Slurm H200 allocation and live lease/storage/capacity/ledger checks','Independent readiness review; no model admission from CPU prep','Exact initial pilot with both independent model-loading/readout controls, native VJP, complete toy endpoint, serial geometry, 8/16 validation stability and complete source-bound target measurements','Initial pilot measures the full fit target only; later exact select/assess profiles require their actual completed fit/selection ancestry and separate root-approved measurements; all edge M1 reservations share the existing 0.75 GPU-hour ceiling','No fit/select/assess/finalization before owning later-stage gates'])
+ (o/'run_manifest.json').write_text(json.dumps(manifest,indent=2,allow_nan=False)+'\n')
+ print(json.dumps({k:manifest[k] for k in ('commit','cohorts','assessment_rows','utility_counts','validation_utilities','edge_graphs','edge_inventories','complete_cpu_preparation','execution_authorized')},indent=2))
+ print('CANONICAL_EDGE_AND_COMPLETE_INVENTORY_OWNER_CPU_VALIDATION_PASSED')
+
+--- 23454781-observer
++++ successor-observer
+@@ -3,10 +3,10 @@
+ assert owner in ('mask','edge') and os.environ.get('SLURM_JOB_ID') and os.environ.get('CUDA_VISIBLE_DEVICES')==''
+ job=os.environ['SLURM_JOB_ID'];raw=subprocess.run(['scontrol','show','job',job,'-o'],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True).stdout
+ facts=dict(x.split('=',1) for x in raw.split() if '=' in x)
+-assert facts['JobState']=='RUNNING' and facts['Account']=='bjhz-delta-cpu' and facts['Partition'] in ('cpu','cpu-interactive')
++assert facts['JobState']=='RUNNING' and facts['Account']=='beto-delta-cpu' and facts['Partition']=='cpu'
+ tres=dict(x.split('=',1) for x in facts.get('AllocTRES',facts.get('TRES','')).split(',') if '=' in x)
+ assert not any(k.startswith('gres/gpu') and float(v)>0 for k,v in tres.items())
+-release=e/'isolation-release.json';assert release.is_file()
++release=e/'cpu-release.json';assert release.is_file()
+ import torch
+ assert not torch.cuda.is_available(),'CPU-only allocation must expose no CUDA device'
+ from types import SimpleNamespace
+@@ -57,8 +57,8 @@
+ project_imports={name:module.__file__ for name,module in list(sys.modules.items()) if name.split('.')[0] in ('component_analysis','dataset','scripts','evaluation','models') and getattr(module,'__file__',None)}
+ assert all(pathlib.Path(path).resolve().is_relative_to(b) for path in project_imports.values())
+ report=dict(kind='actual_source_only_cost_measurement_v1',owner=owner,commit=commit,python=sys.executable,source_only=True,execution_authority_exercised=False,execution_authorized=False,model_loaded=False,job_id=job,cluster='delta',allocated_resources=facts,scheduler_record=raw,diagnostic_comparison=True,
+-    semantics='Cold process-local source initialization and actual owner source-half refresh; unchanged ledger/reservation/lease hooks are not called without a real allocation, and are not replaced/injected.',
+-    cache_state='OS/filesystem caches not flushed on this compute node; cold means no process-local source state existed; compare against recorded warmed login-node inputs without assuming matching filesystem caches',
++    semantics='Cold process-local source initialization and actual owner source-half refresh in a genuine Slurm CPU allocation; model reservation/lease hooks remain unchanged and unexercised because no model admission is requested, and are not replaced/injected.',
++    cache_state='OS/filesystem caches uncontrolled; process-local cold only. New preparation warms inputs on this compute node; f5 CPU job23454781 used earlier node/cache state. Comparison is observational, not controlled attribution.',
+     cold=cold_measure,source_stats_before=stats_before,source_stats_after=stats_after,stats_walk=stats_timing,refreshes=refreshes,
+     consumed_cost_fields=dict(startup_seconds_source_component=consumed_startup,host_peak_bytes=sources.host_peak_bytes(),projectors_unchanged=True,native_load_component_not_measured=True),
+     runtime_signature=__import__('component_analysis.a3_edge_pipeline',fromlist=['runtime_signature']).runtime_signature(),hostname=os.uname().nodename,
+@@ -66,3 +66,26 @@
+     thread_environment={k:os.environ.get(k) for k in ('OMP_NUM_THREADS','MKL_NUM_THREADS','OPENBLAS_NUM_THREADS','NUMEXPR_NUM_THREADS')},source_roots=list(state._witness.paths),isolation_release=json.loads(release.read_text()),project_imports=project_imports)
+ (e/('source-cost-'+owner+'.json')).write_text(json.dumps(report,indent=2,allow_nan=False)+'\n')
+ print(json.dumps({key:report[key] for key in ('owner','commit','cold','refreshes','consumed_cost_fields','cache_state','execution_authorized')},indent=2))
++
++# Clean costs above are already published before any diagnostic/audit extra work.
++expected=state._witness.identities
++oracle,oracle_timing=observe(lambda:tuple(authority._file_tree_identity(path) for path in state._witness.paths))
++assert oracle==expected
++batch,batch_timing=observe(lambda:state._scan_plan._rows_now(hash_files=True))
++assert batch==oracle
++expected_files=[row for tree in oracle for row in tree if row[0]=='file']
++active=False;opened=[]
++def audit(event,values):
++    if not active or event!='open' or not isinstance(values[0],(str,bytes)):return
++    frame=sys._getframe(1)
++    while frame is not None:
++        if frame.f_code.co_name=='_read_source_file' and frame.f_code.co_filename.endswith('a3_source_validation.py'):
++            opened.append(os.fsdecode(values[0]));break
++        frame=frame.f_back
++sys.addaudithook(audit);active=True
++try:audited,audit_timing=observe(refresh)
++finally:active=False
++assert opened==[row[1] for row in expected_files]
++assert audited['commit']==commit and audited['registry_hashes'] and audited['grader_registry']
++agreement=dict(owner=owner,commit=commit,oracle_timing=oracle_timing,batch_timing=batch_timing,audited_refresh=audit_timing,expected_paths=[row[1] for row in expected_files],audited_paths=opened,file_occurrences=len(expected_files),expected_bytes=sum(row[2][3] for row in expected_files),batch_bytes=sum(row[2][3] for tree in batch for row in tree if row[0]=='file'),full_rows_and_order_equal=True,complete_fd_reads_guaranteed_by_authenticated_owner_scanner=True,diagnostic_only=True,clean_refreshes_already_saved=True)
++(e/('byte-agreement-'+owner+'.json')).write_text(json.dumps(agreement,indent=2)+'\n')

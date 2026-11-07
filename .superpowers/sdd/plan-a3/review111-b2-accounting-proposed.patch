@@ -1,0 +1,51 @@
+*** Begin Patch
+*** Update File: component_analysis/a3_direction_runtime.py
+@@
+-    return dict(lookup_scope_seconds=max(lookup_samples),evidence=evidence,receipt=receipt,samples=samples+donor_samples,positive_samples=positive_samples,positive_controls=positive_records,
++    overhead=None
++    if evidence is not None:
++        overhead=_measure_reuse_overhead(root,profile,evidence,batches,cells,local_axes,index,runtime_kernel_identity(model))
++    return dict(lookup_scope_seconds=max(lookup_samples)+(0 if overhead is None else overhead['context_seconds']),packing_overhead=overhead,
++        evidence=evidence,receipt=receipt,samples=samples+donor_samples,positive_samples=positive_samples,positive_controls=positive_records,
+         local_axes=local_axes,batches=batches,cells=cells)
++
++
++def _measure_reuse_overhead(root,profile,evidence,batches,cells,axes,capture_index,kernel):
++    """Time the actual attestation/context/exact-scope path without model forwards."""
++    import tempfile
++    parent=Path(root)/'pilot-scratch';parent.mkdir(parents=True,exist_ok=True)
++    setup=time.perf_counter()
++    with tempfile.TemporaryDirectory(prefix='reuse-overhead-',dir=parent) as tmp:
++        measured=Path(tmp)/'measured'
++        publish_object(measured,dict(injected=True,runtime_profile=kernel,evidence=evidence,
++            measurement=dict(profile=profile,timing_inputs=[],axis_scope=[])))
++        proof=_CompletedPackingProof(measured);guard=_DependencyGuard(lambda:None,_PackingCandidateIndex([proof]))
++        setup_seconds=time.perf_counter()-setup
++        batch=batches[0];block=cells[:profile['axis_tile_size']];start=time.perf_counter()
++        reuse=Path(tmp)/'reuse'
++        freeze_profile_reuse(reuse,measured_path=measured,batch=batch,cells=block,axes=axes,capture_index=capture_index,
++            policy=workload.PROFILE_REUSE_POLICY,runtime_profile=kernel,validated_proof=proof)
++        identity=dict(numeric_profile=profile,runtime_profile=kernel,profile_reuse=str(reuse))
++        context=_validated_reuse_context(identity,batch,proof=proof)
++        with context.operation(guard):
++            runner._geometry(batch,identity,reuse_context=context)
++            covered=runner._packing_receipt(identity,batch,reuse_context=context)
++            require([runner._cell_scope(batch,c,axes,capture_index) for c in block]==covered,'measured exact target scope differs')
++        seconds=time.perf_counter()-start-guard.elapsed_seconds
++        return dict(profile=profile,context_seconds=max(seconds,1e-12),setup_seconds=setup_seconds,
++            scope_checks=2,boundary_refreshes=guard.calls,verified_bytes=guard.index.forest.verified_bytes,
++            attestation_bytes=sum(p.stat().st_size for p in reuse.iterdir() if p.is_file()),
++            includes=['attestation_publication','context_validation','target_byte_witness','runner_geometry','runner_exact_scope'],
++            boundary_refresh_accounting='separate measured guard_refresh requirement')
+@@
+-    measured=[];packing={};packing_refs={};serial_refs={};invocation_results=[];seen_measurements=set();proof_validation_seconds=0;proof_retained_bytes=0
++    measured=[];packing={};packing_refs={};serial_refs={};invocation_results=[];seen_measurements=set();proof_validation_seconds=0;proof_retained_bytes=0;packing_overheads=[]
+@@
+         guard();result['invocation']=invocation;result['packing_id']=None
++        if result.get('packing_overhead') is not None:
++            packing_overheads.append(result['packing_overhead']);proof_validation_seconds+=result['packing_overhead']['setup_seconds']
+@@
+-        packing_references=packing_refs,serial_numeric_references=serial_refs,serialization_bytes=serialization_bytes,part=part,runtime=runtime_environment(model),
++        packing_references=packing_refs,serial_numeric_references=serial_refs,packing_overhead_measurements=packing_overheads,
++        serialization_bytes=serialization_bytes,part=part,runtime=runtime_environment(model),
+*** End Patch

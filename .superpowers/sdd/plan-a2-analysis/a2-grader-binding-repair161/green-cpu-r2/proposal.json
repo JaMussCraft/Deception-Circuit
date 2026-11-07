@@ -1,0 +1,27 @@
+{
+  "kind": "A2graderbinding161_GREEN_CPU_r2_authentic_fixture",
+  "candidate": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-candidate161",
+  "baseline": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "source_count": 511,
+  "tests": [
+    "tests/test_a2_pipeline.py",
+    "tests/test_a2_mask_comparison.py"
+  ],
+  "cpus": 4,
+  "memory_GiB": 8,
+  "minutes": 8,
+  "gpus": 0,
+  "constraint": "projects",
+  "command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-repair161/green-cpu-r2/green_cpu.sh"
+  ],
+  "resource_basis": "Original first full GREEN used95s with47 setup errors from missing522byte authentic config; same source, tests, resources and watchdogs. Authentic copied config now bound before/after with sourceclosure.",
+  "changed_files": {
+    "component_analysis/a2_pipeline.py": "45ba2b7d551164d75ed6bdd3fd5c7f171087b6f60753691e7fb6831f9e56aa51",
+    "tests/test_a2_pipeline.py": "bc8d2419cf0f217d8373f5879461f126a9549012ccdc93981600d55a65cd4be5"
+  },
+  "no_gpu_or_model": true,
+  "input_fixture_count": 1,
+  "prior_failure": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-repair161/green-cpu/result-23482237-mgnp.json"
+}

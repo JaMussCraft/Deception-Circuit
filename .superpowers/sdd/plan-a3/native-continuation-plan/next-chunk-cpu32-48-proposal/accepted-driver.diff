@@ -1,0 +1,82 @@
+--- accepted137/coordinator.py
++++ proposed/coordinator.py
+@@ -1,16 +1,16 @@
+-"""UNEXECUTED Slurm CPU proposal: original cases12 through31, real allocation retained."""
++"""UNEXECUTED Slurm CPU proposal: original cases32 through48, real allocation retained."""
+ from pathlib import Path
+ import argparse,hashlib,json,os,resource,time
+-START=12
+-COUNT=20
+-PRESERVED=12
++START=32
++COUNT=17
++PRESERVED=32
+ 
+ def main():
+  parser=argparse.ArgumentParser(allow_abbrev=False);parser.add_argument('--root',required=True);parser.add_argument('--out',required=True);args=parser.parse_args()
+  root=Path(args.root).resolve();out=Path(args.out).resolve();w=Path.cwd();began=time.perf_counter();phase='startup';forwards=[0];auth_active=[False];forbidden=[0];authenticated=[];native=[]
+  catalog_path=Path(__file__).resolve().parents[1]/'source-and-cases.json';catalog=json.loads(catalog_path.read_text());assert root==Path(catalog['scenario_root']) and out.is_dir()
+  from allocation_facts import read_current
+- allocation=read_current(w,minimum_remaining_seconds=3375)
++ allocation=read_current(w,minimum_remaining_seconds=2895)
+  expected=json.loads((out/'allocation-before.json').read_text());assert allocation['job_id']==expected['job_id'] and allocation['host']==expected['host'] and allocation['slurm_environment']==expected['slurm_environment']
+  def write(name,value):
+   with (out/name).open('x') as stream:json.dump(value,stream,indent=2,allow_nan=False);stream.write('\n')
+--- accepted137/supervisor.py
++++ proposed/supervisor.py
+@@ -2,7 +2,7 @@
+ from pathlib import Path
+ import hashlib,json,os,signal,subprocess,time
+ from allocation_facts import environment,read_current,cgroup_snapshot
+-CAP=3300
++CAP=2820
+ GRACE=15
+ ROOT=Path('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder')
+ SCENARIO=ROOT/'outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8'
+@@ -12,7 +12,7 @@
+ def main():
+  assert Path.cwd().resolve()==ROOT
+  allocation=read_current(ROOT,minimum_remaining_seconds=CAP+GRACE+60)
+- out=SCENARIO/('diagnostics/cpu-next-cases12-31-job'+allocation['job_id']);out.mkdir(parents=True,exist_ok=False)
++ out=SCENARIO/('diagnostics/cpu-next-cases32-48-job'+allocation['job_id']);out.mkdir(parents=True,exist_ok=False)
+  write(out/'allocation-before.json',allocation)
+  before=cgroup_snapshot();write(out/'memory-before.json',before);assert any('headroom_bytes' in item for item in before),'Visible finite memory-controller headroom required';assert all(item.get('headroom_bytes',2**64)>=16*1024**3 for item in before),'Insufficient finite ancestor headroom'
+  slurm_original={k:v for k,v in os.environ.items() if k.startswith('SLURM_')}
+@@ -34,7 +34,7 @@
+   if term is not None and elapsed>=term+GRACE:os.killpg(child.pid,signal.SIGKILL)
+   time.sleep(.5)
+  code=os.waitstatus_to_exitcode(status);child.returncode=code;log.close();samples.close()
+- result=dict(command=command,pid=child.pid,exit_code=code,elapsed_seconds=elapsed,user_seconds=usage.ru_utime,system_seconds=usage.ru_stime,peak_child_rss_bytes=usage.ru_maxrss*1024,timeout_seconds=CAP,kill_grace_seconds=GRACE,term_sent_at=term,actual_slurm_job_id=allocation['job_id'],actual_step_id=allocation['step_id'],host=allocation['host'],allocated_CPU_memory_bytes=allocation['allocation_memory_bytes'],allocated_GPUs=0,selected_case_start=12,selected_case_count=20,injected_fixture=True,scientific_execution=False,production_admission=False,prior_login_timings_not_relabelled=True)
++ result=dict(command=command,pid=child.pid,exit_code=code,elapsed_seconds=elapsed,user_seconds=usage.ru_utime,system_seconds=usage.ru_stime,peak_child_rss_bytes=usage.ru_maxrss*1024,timeout_seconds=CAP,kill_grace_seconds=GRACE,term_sent_at=term,actual_slurm_job_id=allocation['job_id'],actual_step_id=allocation['step_id'],host=allocation['host'],allocated_CPU_memory_bytes=allocation['allocation_memory_bytes'],allocated_GPUs=0,selected_case_start=32,selected_case_count=17,injected_fixture=True,scientific_execution=False,production_admission=False,prior_login_timings_not_relabelled=True)
+  write(out/'result.json',result);write(out/'memory-after.json',cgroup_snapshot())
+  try:write(out/'allocation-after.json',read_current(ROOT))
+  except BaseException as error:write(out/'allocation-after-read-error.json',dict(error=repr(error)));raise
+--- accepted137/launch.sbatch
++++ proposed/launch.sbatch
+@@ -1,5 +1,5 @@
+ #!/bin/bash
+-#SBATCH --job-name=lad-a3-native-cpu12-31
++#SBATCH --job-name=lad-a3-native-cpu32-48
+ #SBATCH --account=bjhz-delta-cpu
+ #SBATCH --partition=cpu-interactive
+ #SBATCH --constraint=projects
+@@ -8,10 +8,10 @@
+ #SBATCH --cpus-per-task=4
+ #SBATCH --mem=32G
+ #SBATCH --gres=none
+-#SBATCH --time=00:59:00
++#SBATCH --time=00:49:00
+ #SBATCH --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder
+-#SBATCH --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu12-31-%j.out
+-#SBATCH --error=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu12-31-%j.err
++#SBATCH --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu32-48-%j.out
++#SBATCH --error=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs/lad-a3-native-cpu32-48-%j.err
+ set -euo pipefail
+ : "${SLURM_JOB_ID:?Real Slurm CPU allocation required; do not run on login}"
+ cd /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder
+@@ -20,4 +20,4 @@
+ # No source ~/.bashrc, no allocation-variable edits, no GPU visibility workaround.
+ exec srun --ntasks=1 --cpus-per-task=4 --cpu-bind=cores --gres=none \
+   /sw/external/python/anaconda3/bin/python3.9 \
+-  .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu12-31-proposal/supervisor.py
++  .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu32-48-proposal/supervisor.py

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/deployment/bridge-existing-G3-cpu-r2/supervisor.py", line 143, in <module>
+    if __name__=="__main__":main()
+  File "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/deployment/bridge-existing-G3-cpu-r2/supervisor.py", line 142, in main
+    dump(e/"result.json",result);need(result["status"]=="PASS","CPU validation failed")
+  File "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/deployment/bridge-existing-G3-cpu-r2/supervisor.py", line 11, in need
+    if not ok: raise RuntimeError(msg)
+RuntimeError: CPU validation failed

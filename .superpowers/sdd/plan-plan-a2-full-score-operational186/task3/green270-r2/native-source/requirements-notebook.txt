@@ -1,0 +1,24 @@
+# Extra dependencies for the component-analysis review notebook
+# (review_components.ipynb) only. Nothing else in this repository imports
+# them: the CLI, the Slurm jobs and both test suites run without them, which is
+# why they are not in requirements.txt.
+#
+# Install into the `mgnp` environment, where the notebook runs, and NOT into
+# the login-node base environment:
+#
+#   source /sw/external/python/anaconda3/etc/profile.d/conda.sh
+#   conda activate mgnp
+#   pip install --no-deps circuitsvis importlib_metadata
+#   pip install plotly ipykernel nbformat
+#
+# circuitsvis takes --no-deps on purpose: its metadata pins torch, and letting
+# pip resolve that would move the torch the analyses run on. It then needs
+# importlib_metadata, which it imports without declaring.
+#
+# Verified in mgnp at these versions, with no version of torch (2.11.0),
+# transformers (5.13.0), numpy (2.5.1) or nnsight (0.7.0) changed:
+circuitsvis>=1.43      # 1.43.3 — attention views over Segments and tokens
+importlib_metadata     # 9.0.1  — imported by circuitsvis, undeclared there
+plotly>=6.0            # 7.1.0  — every heatmap, bar chart and line
+nbformat>=4.2          # 5.11.1 — plotly refuses to render inline without it
+ipykernel              # 7.3.0  — so the notebook can select this environment

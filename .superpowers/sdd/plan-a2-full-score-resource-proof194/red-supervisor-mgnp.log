@@ -1,0 +1,36 @@
+test_late_zero_is_not_complete (__main__.SupervisorTests.test_late_zero_is_not_complete) ... FAIL
+test_normal_child_does_not_infer_numeric_controls (__main__.SupervisorTests.test_normal_child_does_not_infer_numeric_controls) ... ok
+test_partial_child_not_complete (__main__.SupervisorTests.test_partial_child_not_complete) ... FAIL
+test_term_zero_is_not_complete (__main__.SupervisorTests.test_term_zero_is_not_complete) ... FAIL
+
+======================================================================
+FAIL: test_late_zero_is_not_complete (__main__.SupervisorTests.test_late_zero_is_not_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-resource-proof194/test_supervisor.py", line 6, in test_late_zero_is_not_complete
+    with self.assertRaises(ValueError):m.normal_child(0,None,101,100,{'status':'CHILD_NORMAL_POSTGUARDS_AWAIT_SUPERVISOR','complete':False,'MODEL_LOADED':False,'EFFECTS_READ':False,'SYNTHETIC_SCHEMA_ONLY':True,'NUMERICAL_CONTROLS_TESTED':False,'GPU_ADMITTED':False})
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_partial_child_not_complete (__main__.SupervisorTests.test_partial_child_not_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-resource-proof194/test_supervisor.py", line 10, in test_partial_child_not_complete
+    with self.assertRaises(ValueError):m.normal_child(0,None,95,100,{'status':'CHILD_NORMAL_POSTGUARDS_AWAIT_SUPERVISOR','complete':True,'MODEL_LOADED':False,'EFFECTS_READ':False,'SYNTHETIC_SCHEMA_ONLY':True,'NUMERICAL_CONTROLS_TESTED':False,'GPU_ADMITTED':False})
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_term_zero_is_not_complete (__main__.SupervisorTests.test_term_zero_is_not_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-resource-proof194/test_supervisor.py", line 8, in test_term_zero_is_not_complete
+    with self.assertRaises(ValueError):m.normal_child(0,90,95,100,{'status':'CHILD_NORMAL_POSTGUARDS_AWAIT_SUPERVISOR','complete':False,'MODEL_LOADED':False,'EFFECTS_READ':False,'SYNTHETIC_SCHEMA_ONLY':True,'NUMERICAL_CONTROLS_TESTED':False,'GPU_ADMITTED':False})
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.002s
+
+FAILED (failures=3)

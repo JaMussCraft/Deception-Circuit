@@ -1,0 +1,78 @@
+{
+  "kind": "STATIC_dependency_walk_not_runtime_success",
+  "launch_target": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/supervisor.py",
+  "supervisor_prepare": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/prepare.py",
+  "prepare_validation": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/validate.py",
+  "config": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/config.json",
+  "settings_sha256": "38d0e759e9ae2892d8ac5fd541d7a9a1010f843b08fdb23a4b6ab1ebdaacdc54",
+  "files": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/launch.sbatch": "510ff67025add5d7079f24d4d0ffde53f5b295f171b64815167dccfc7b9f28c0",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/supervisor.py": "d852e1da192c9ef0a28ab7d8b29c3eeef8aa674ae6feecdeed71e4471a3e63f4",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/allocation_facts.py": "2eccafbcd4006dedd5e08cf9219b0a70b594708f20843b6861795345a84c2b3d",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/prepare.py": "fdb80c415a2b8ac60a22ac7f04f925564990a7a43d920c58a03a5b57b2332f92",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/config.json": "6a5f2d2b11213e6d28cc3033f78cb807355ea83d8d73bd4192bf17c50968df7b",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/execution-settings.json": "38d0e759e9ae2892d8ac5fd541d7a9a1010f843b08fdb23a4b6ab1ebdaacdc54",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2/validate.py": "70c3c462cd2f9d3d59d97f062b6c7566fa2341984b28b1cb1969f75b4c2b87d0",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/snapshot.json": "09c259db6ae45fc9eb77fc3af10518f015deb641e777a0f9233e5155a379e690",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-mask-n5-pilots-861f84a3938a/canonical/design.json": "a9d11dd35bbc30061714c7067d750eb7de794532920e640d2104f0a1443a8dce",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical/design.json": "93825fb80c716f445f0d2b846fd338aae435f05dcf979dcc8765fa5de5ad4b95",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical/direction_protocol.json": "0d516122f536a5c550a18b077041239211052baa885d1e34eea310a6a254b36b"
+  },
+  "commands_checked": [
+    {
+      "name": "inventory-fit-select",
+      "argv": [
+        "bash",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/scripts/jobs/specificity_a3.sh",
+        "--experiment",
+        "directions",
+        "--design",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical/design.json",
+        "--commit",
+        "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+        "--work-dir",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical",
+        "--registry",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+        "--stage",
+        "prepare",
+        "--action",
+        "inventory",
+        "--inventory-stage",
+        "fit-select",
+        "--inventory",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-remaining-861f84a3938a-r163-r2/inventory/fit-select"
+      ],
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime"
+    },
+    {
+      "name": "prefit-dry-run-without-authority",
+      "argv": [
+        "bash",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/scripts/jobs/specificity_a3.sh",
+        "--experiment",
+        "directions",
+        "--design",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical/design.json",
+        "--commit",
+        "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+        "--work-dir",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical",
+        "--registry",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+        "--stage",
+        "pilot",
+        "--pilot-part",
+        "prefit",
+        "--inventory",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical/inventory/prefit",
+        "--dry-run"
+      ],
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime"
+    }
+  ],
+  "bash_syntax_exit": 0,
+  "python_ast_parses": 4,
+  "old_packet_not_executed": true,
+  "GPU_or_model_execution": false
+}

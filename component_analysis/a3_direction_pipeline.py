@@ -58,7 +58,11 @@ def _fit_contract(design, protocol):
     require(type(injected) is bool and protocol.get('injected') is injected, 'changed injected provenance')
     rows, layout, ids, site_union = [], [], [], []
     require(isinstance(design.get('tasks'), dict) and design['tasks'], 'missing fit tasks')
-    for ti, (task, spec) in enumerate(design['tasks'].items()):
+    require(design.get('injected') is True or 'task_order' in protocol,'production requires frozen task_order')
+    task_order=protocol.get('task_order',sorted(design['tasks']))
+    require(len(task_order)==len(set(task_order)) and set(task_order)==set(design['tasks']),'changed frozen operational task_order')
+    for ti, task in enumerate(task_order):
+        spec=design['tasks'][task]
         task_ids = spec['fit_ids']; sites = spec['direction_sites']
         require(task_ids and len(set(task_ids)) == len(task_ids), 'duplicate/empty fit IDs')
         require(not set(task_ids) & (set(spec['selection_ids']) | set(spec['assessment_ids']) |
@@ -85,7 +89,7 @@ def _fit_contract(design, protocol):
                 projection=f'geometry{site_union.index(site)}_projection'))
     require(len(ids) == len(set(ids)), 'cross-task duplicate fit ID')
     core = {k:v for k,v in design.items() if k not in ('direction_protocol', 'direction_protocol_sha256')}
-    expected_operational = dict(task_order=list(design['tasks']), stream_order=list(STREAMS),
+    expected_operational = dict(task_order=list(task_order), stream_order=list(STREAMS),
         seeds=list(design['seeds']), candidate_sites={t:v['direction_sites'] for t,v in design['tasks'].items()},
         design_sha256=artifacts.ladder.design._hash(core))
     for field, value in expected_operational.items():
@@ -143,9 +147,11 @@ def _axis_fit(fn, d, i, h, projection, *, seed, layout, bootstrap, arrays, prefi
         return dict(status='unfitted', reason=str(error), bootstrap=bootstrap), None
 
 
-def _metadata_features(design, task, ids):
+def _metadata_features(design, task, ids, *, split="train"):
+    require(split in ("train","validation","assessment"),"unknown probe source split")
+    source_split="test" if split=="assessment" else split
     indexed = {(r['condition'],r['instance_id']):r for r in design['access_rows'][task]
-               if r.get('split') == 'train' and r['instance_id'] in ids and r['condition'] in ('D','I')}
+               if r.get('split') == source_split and r['instance_id'] in ids and r['condition'] in ('D','I')}
     values = []
     for condition in ('D','I'):
         cohort = []
@@ -723,3 +729,13 @@ def freeze_selection(design: dict, fits_path, validation_root, *, protocol: dict
     _selection_protocol_reference(protocol, protocol_path, injected=design.get('injected'), expected=protocol_reference)
     artifacts.write_bundle(output, result, arrays)
     return result
+
+
+def main(argv=None, *, tokenizer=None, model_loader=None):
+    """Lazy dispatch; pure CPU fit/selection imports remain model-free."""
+    from component_analysis.a3_direction_runtime import main as runtime_main
+    return runtime_main(argv,tokenizer=tokenizer,model_loader=model_loader)
+
+
+if __name__=='__main__':
+    main()

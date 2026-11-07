@@ -1,0 +1,26 @@
+{
+  "automatic_retry": false,
+  "cpus_per_job": 2,
+  "estimate": "RED spent ~555seconds on selected preflights and ~11seconds on prefit preflights. GREEN adds selected producer and selected damaged-anchor cases formerly missing-symbol short-circuits, plus many prefit anchors/readers/pilots and all59 old regression cases. Budget roughly 20-30minutes per interpreter plus buffer;35minute child/40minute shard is a bounded estimate, not an observed GREEN timing. Combined75minutes uses same immutable scope sequentially.",
+  "evidence": {
+    "preflight_prefit_seconds": {
+      "base": 5.757390294020297,
+      "mgnp": 4.984120952984085
+    },
+    "preflight_selected_seconds": {
+      "base": 290.2412397899898,
+      "mgnp": 264.31878689597943
+    },
+    "red_actual_parent_seconds": 723,
+    "red_job": "23618388",
+    "red_runner_seconds": 687.4813663959503
+  },
+  "expected_cases_per_environment": 196,
+  "independent_shard_walltime": "00:40:00",
+  "memory_per_job": "32G",
+  "memory_scope": "Retain prior completed32GiB allocation as diagnostic headroom; no proven required RAM peak, receiver bound, GPU feasibility or execution admission is claimed.",
+  "oracle_child_timeout_seconds": 90,
+  "parent_combined_walltime": "01:15:00",
+  "per_environment_pytest_child_timeout_seconds": 2100,
+  "queue_strategy": "Independent interpreter selection in existing runner; each shard retains full196cases, original-validator preflight/oracle, same source pins, exact function counts and no skips. No changed assertions or automatic retry."
+}

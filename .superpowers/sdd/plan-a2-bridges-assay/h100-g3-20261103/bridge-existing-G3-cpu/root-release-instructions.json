@@ -1,0 +1,50 @@
+{
+  "phase": "existing_G3_validation",
+  "status": "ROOT_ONLY_RELEASE_INSTRUCTIONS_NOT_A_RELEASE",
+  "entry_argv": [
+    "bash",
+    "REMOTE_PACKET/entry.sh",
+    "ROOT_BOUND_CONFIG_JSON",
+    "ROOT_BOUND_CONFIG_SHA256"
+  ],
+  "actual_job_paths": {
+    "READY": "PHYSICAL_EVIDENCE_PARENT/JOBID/READY.json",
+    "root_release_pending": "PHYSICAL_EVIDENCE_PARENT/JOBID/root-release.json.pending",
+    "root_release_final": "PHYSICAL_EVIDENCE_PARENT/JOBID/root-release.json",
+    "result": "PHYSICAL_EVIDENCE_PARENT/JOBID/result.json",
+    "owning_CPU_proof": "PHYSICAL_EVIDENCE_PARENT/JOBID/validation/cpu-readiness.json"
+  },
+  "copy_exact_identity_values_from_READY": [
+    "phase",
+    "job_id",
+    "source_commit",
+    "config_sha256",
+    "packet_manifest_sha256",
+    "proposal_sha256",
+    "groups_sha256",
+    "Delta_G3_proof_sha256",
+    "catalogues",
+    "allocation_sha256",
+    "parameters_sha256",
+    "namespace_aliases_sha256"
+  ],
+  "root_adds_after_fresh_actual_Delta_preflight_and_stable_copy": [
+    "Delta_current_catalogues_rechecked=true",
+    "Delta_current_catalogue_proof={remote_copied_actual_receipt_path,sha256}",
+    "issued_at=actualcurrentUTCepoch",
+    "expires_at=issued_at+300seconds_or_less"
+  ],
+  "root_must_check_before_publishing": [
+    "actualjobCPUallocation and READYactualscontrol/SIF/source/G3/proposal/params identity",
+    "actual Delta current fourcatalogue bytes stable around accepted preflight and transfer",
+    "actual remote hashes match READY expected exactcatalogue values",
+    "Delta bytes reread unchanged after transfer; no ignoredforeignmetadata exception outside acceptedowningcode",
+    "copiedactualcurrentDelta receipt SHA correct; remotelease latebinds that proof",
+    "future runtime deadline and rootlease freshness still sufficient"
+  ],
+  "root_publication": "Transfer complete root release as .pending then atomic rename to final path; supervisor only reads release. No renewal, retarget, modelauthority or automaticretry.",
+  "fetch_after_terminal": [
+    "all evidence files including READY/rootrelease/currentDelta receipt/allocationbefore-entry-after/actualparameters/command/validationlog/result/owningproof",
+    "actual terminal Slurm accounting and jobstdout/stderr"
+  ]
+}

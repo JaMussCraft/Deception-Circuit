@@ -1,0 +1,97 @@
+{
+  "kind": "narrow_actual_Delta_model_phase_CPU_preflight_design",
+  "status": "DESIGN_ONLY_AWAIT_INDEPENDENT160_NO_CPU_OR_MODEL_EXECUTION",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "source_runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime",
+  "owning_guard_precedent": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/cpu-freeze-G3-delta-r2.py",
+    "sha256": "9f91dfeecf5431fdab88f473a546766a0aa254bc1035feb745720da73d039def"
+  },
+  "resources": {
+    "CPUs": 4,
+    "memory_GiB": 16,
+    "standing_supervisor_minutes": 75,
+    "partition": "cpu normal only; cpu-interactive one-hour cap excludes75min",
+    "GPUs": 0
+  },
+  "preferred_orchestration": "One bounded standing CPU allocation, root-triggered separate bank and prefix4 request files; exactlyone originalguard child perphase, no retry. Root submitsGPU onlyafteractualCPU_READY; bounded75min mayexpire beforelateGPUqueue, which failsclosed ratherthan extending.",
+  "alternative": "Two separately submitted15min CPU allocations may be used only if actualphaseproof freshness and remote300s releasewait are shown tofit; no oldpreflight +byteequivalence shortcut for model phases.",
+  "timing": {
+    "total_supervisor_seconds": 4500,
+    "finish_reserve_seconds": 60,
+    "absolute_per_child_cap_seconds": 720,
+    "remote_release_wait_seconds": 300,
+    "root_publication_allowance_seconds": 30,
+    "effective_child_bound": "min(720, initial/current CPU EndTime minus60 -now, GPUphase WAITING.requested_at+300-30 -now)",
+    "window_missed": "If thisboundexpires, killchildTERM+15sgrace/KILL; saveFAILED orWINDOW_MISSED, stopstandingjob. No PASS receipt or stale rootrelease, even if guardwouldfinishlater.",
+    "basis": "Observed genuineDelta G3freeze+readiness248s includedcreation; thisvalidator omitscreation. Runtimefeasibility remains unmeasured; a270s usablewindow is a bound, not a forecast."
+  },
+  "phases": [
+    "bank",
+    "prefix4"
+  ],
+  "request_contract": {
+    "root_request_fields": [
+      "phase",
+      "actual_future_GPU_job_id",
+      "root_trigger_issued_at",
+      "GPU_WAITING_requested_at",
+      "GPU_WAITING_marker_path_and_sha256",
+      "accepted_source_commit",
+      "frozen_G3_path_and_sha256",
+      "final_GPU_bound_config_sha256",
+      "H100_packet_manifest_sha256",
+      "request_id",
+      "standing_CPU_job_id",
+      "standing_packet_manifest_sha256"
+    ],
+    "restrictions": [
+      "actualGPUjob numeric andsameforbank/prefix; CPUjobactualidentityexact",
+      "rootrequestphasebankthenprefix4 only, freshonarrival, exactconfig/source/G3/packet bindings",
+      "requestbytesareimmutable andphaseconsumedonce; no arbitraryargv/pathsubstitution",
+      "root proof of actualBridge allocation, liveledger+mapping+caps and placement performed separately atpublication, never asserted by CPUvalidator"
+    ]
+  },
+  "fixed_guard_sequence": [
+    "Capture exactbytes+SHA of actualprimary/worktree held_out.json and directions.json (four originalphysical routes); readactualDeltaCPUallocation+noGPU/sourceparameters.",
+    "Closedexport exact511ordinaryfiles+4literalinputlinks, noextras/missing/escapedpaths, fullhashes; verify accepted source/snapshot/G3/CPUreceipt/input-referencepins.",
+    "Read SAMEalready-frozen genuineG3 groups.json via owning read_artifact; requireexactboundfileSHA/noninjected/ninegroups; NEVERcallfreeze/mainfreeze/writegroups.",
+    "Construct owning args for requestedbankor score--limit4 using originalA1design+selected/currentheldout/G3source50e; call accepted p._load_context(args), then p._validate_live(args,receipt,prepared). This retains all18 source audit/currentgrader/protectedutility registries/selection sidecar/frozenref/code checks.",
+    "Require receipt.model_geometry==p.model_geometry_receipt(prepared), then set originalmodel/revision/tokenizer fields; loadtokenizeronly and run p.a1.validate_tokenization(prepared,tokenizer); call p._validate_live AGAIN. No model_loader argument, pretrained modelconstructor or stageexecution.",
+    "Check 2484 expectedprefixkeys/ninegroups; compare actualG3 bytes to initial; exactsourceexport and projectimportorigins before/after; capture currentactualCPUallocation again.",
+    "Capture fouractualcataloguebytes AFTERallowningchecks and require byte-for-byte equality withbefore; otherwiseFAIL no automaticretry.",
+    "If allchecksfinish withintheactualphasewindow, write completephase-specificCPUreceipt with actualCPUjob/host/exit/source/G3/tokenizergeometry/numeric/owningproof/catalogueSHA+capturedbytes/requestGPUjob+configuration+issued/finished times. ReceiptisNOT GPUadmission or lease."
+  ],
+  "proof_schema": {
+    "kind": "Delta_actual_model_phase_preflight",
+    "complete": "true onlyafterallguards+timelywindow",
+    "phase": "bank or prefix4",
+    "source_commit": "full50e",
+    "groups_file_sha256": "actualfrozenG3sha",
+    "actual_Delta_owning_guards_passed": true,
+    "stable_Delta_catalogues_before_after": true,
+    "catalogues": "ordered virtual_path+sha256 rows; saveexactcapturedbytes for roottransfer",
+    "actual_CPU_allocation": "actualjob,host,scontrol,TRES,noGPU,before/after",
+    "bound_request": "exactrootrequestfileSHA,actualfutureGPUjob,finalconfigSHA,packetSHA",
+    "metadata": "geometry+tokenizerrevision/numerics/importorigins/source511+4 and frozenreferenceSHA",
+    "ledger_scope": "No liveledger/capPASS claim; rootchecksactualcanonicalledger+completedsuccessormapping+exactandroundedcapsseparatelybeforepublication",
+    "model_loaded": false,
+    "GPU_admitted": false
+  },
+  "root_publication": "Root compares actualcompletedphase receipt to exactwaitingGPUjob/config/namespace, re-reads currentDelta cataloguebytes and requires equality to just-completed actualDelta preflight bytes, thenacceptedstablecapture/transfer/remoteSHA/Delta-reread+actualledger/mapping/caps+actualGPUallocation. Publish freshonce-only300s permissiontoENTERoneoriginalCLIstage, not continuous/internal-loader-time permission. NewDeltaowningcalls aremandatory BOTHphases; BridgeCPU byte-equivalence permission doesnotreplace modelphasepreflight.",
+  "unbound_root_inputs": [
+    "standingCPUjob",
+    "actualfutureGPUjob",
+    "acceptedG3SHA",
+    "acceptedDelta/BridgeG3proofs",
+    "finalH100configSHA",
+    "rootrequestdirectory",
+    "phasewaitingmarker/time",
+    "rootpublishedlease/ledger/mapping bindings"
+  ],
+  "no_source_changes": true,
+  "no_existing_G3_freeze": true,
+  "no_G3_rewrite": true,
+  "no_CPU_submission": true,
+  "no_GPU_or_model_execution": true
+}

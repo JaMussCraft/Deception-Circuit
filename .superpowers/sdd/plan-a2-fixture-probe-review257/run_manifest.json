@@ -1,0 +1,195 @@
+{
+  "kind": "INDEPENDENT_PURE_FIXTURE_REVIEW257",
+  "job_id": null,
+  "cluster": "local login; no Slurm",
+  "source_commit": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "source_commit_basis": "Root supplied; reviewer ran no git",
+  "author_manifest_sha256": "4f36b2dc51405b5475b25c70e6b833df9767a9b405129b75cdf5125842401b4d",
+  "author_files_hash_matched": [
+    "candidate/PROBE_SCHEMA.txt",
+    "candidate/closure.template.json",
+    "candidate/runtime-probe.py",
+    "candidate/test_runtime_probe.py",
+    "task1-evidence/final-base.exit",
+    "task1-evidence/final-base.stdout",
+    "task1-evidence/final-mgnp.exit",
+    "task1-evidence/final-mgnp.stdout",
+    "task1-evidence/green-base.exit",
+    "task1-evidence/green-base.stdout",
+    "task1-evidence/green-base2.exit",
+    "task1-evidence/green-base2.stdout",
+    "task1-evidence/green-base3.exit",
+    "task1-evidence/green-base3.stdout",
+    "task1-evidence/green-mgnp.exit",
+    "task1-evidence/green-mgnp.stdout",
+    "task1-evidence/red-base.exit",
+    "task1-evidence/red-base.stdout",
+    "task1-evidence/red-base2.exit",
+    "task1-evidence/red-base2.stdout",
+    "task1-evidence/red-helper-base.exit",
+    "task1-evidence/red-helper-base.stdout",
+    "task1-evidence/red-helper-base2.exit",
+    "task1-evidence/red-helper-base2.stdout",
+    "task1-evidence/red-inventory-base.exit",
+    "task1-evidence/red-inventory-base.stdout",
+    "task1-evidence/red-mgnp.exit",
+    "task1-evidence/red-mgnp.stdout",
+    "task1-evidence/red-resolution-base.exit",
+    "task1-evidence/red-resolution-base.stdout"
+  ],
+  "runs": [
+    {
+      "label": "base",
+      "argv": [
+        "timeout",
+        "30",
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py"
+      ],
+      "exit_code": 0,
+      "stdout": "base.stdout",
+      "stderr": "base.stderr",
+      "observed": 43,
+      "expected": 43
+    },
+    {
+      "label": "mgnp",
+      "argv": [
+        "timeout",
+        "30",
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py"
+      ],
+      "exit_code": 0,
+      "stdout": "mgnp.stdout",
+      "stderr": "mgnp.stderr",
+      "observed": 43,
+      "expected": 43
+    },
+    {
+      "label": "bytecode-base",
+      "argv": [
+        "timeout",
+        "30",
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fixture-probe-review257/reproduce.py",
+        "startup"
+      ],
+      "exit_code": 0,
+      "stdout": "bytecode-base.stdout",
+      "stderr": "bytecode-base.stderr",
+      "observation": {
+        "check": "startup_bytecode",
+        "accepted": true,
+        "source_value": 1,
+        "module_value": 2,
+        "cached_path": "/tmp/tmpl0mwjfe7/__pycache__/preloaded.cpython-39.pyc",
+        "cached_path_declared": false,
+        "observed_reads": []
+      }
+    },
+    {
+      "label": "tools-base",
+      "argv": [
+        "timeout",
+        "30",
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fixture-probe-review257/reproduce.py",
+        "tools"
+      ],
+      "exit_code": 0,
+      "stdout": "tools-base.stdout",
+      "stderr": "tools-base.stderr",
+      "observation": {
+        "check": "tool_graph",
+        "accepted": true,
+        "tools_in_elf": false
+      }
+    },
+    {
+      "label": "bytecode-mgnp",
+      "argv": [
+        "timeout",
+        "30",
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fixture-probe-review257/reproduce.py",
+        "startup"
+      ],
+      "exit_code": 0,
+      "stdout": "bytecode-mgnp.stdout",
+      "stderr": "bytecode-mgnp.stderr",
+      "observation": {
+        "check": "startup_bytecode",
+        "accepted": true,
+        "source_value": 1,
+        "module_value": 2,
+        "cached_path": "/tmp/tmpvqvuhzmu/__pycache__/preloaded.cpython-312.pyc",
+        "cached_path_declared": false,
+        "observed_reads": []
+      }
+    }
+  ],
+  "files": {
+    "mgnp.stdout": {
+      "bytes": 99,
+      "sha256": "833d012a83a02325fba476def3e5a60535d5f6d2dc08a4239f9640e6e6e8a088"
+    },
+    "tools-base.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bytecode-mgnp.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mgnp.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "tools-base.stdout": {
+      "bytes": 65,
+      "sha256": "b943cad3853543913d864807f494167f031ec469d26984501545746e9e1f5ac2"
+    },
+    "bytecode-mgnp.stdout": {
+      "bytes": 212,
+      "sha256": "7045b42ef4f3a90d6e36e17314a8253a2fc8ed2d1ecef9d1dd8416172647734b"
+    },
+    "base.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reproduce.py": {
+      "bytes": 4318,
+      "sha256": "aa3c917ebc666dd354518d632607238943ab6cda28efbe40912501afb103fda3"
+    },
+    "bytecode-base.stdout": {
+      "bytes": 211,
+      "sha256": "b628db2b219c99e93ffe799f0dfe3ac239d6b1993787c42a0ac0a7c565ddb4e3"
+    },
+    "bytecode-base.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "base.stdout": {
+      "bytes": 99,
+      "sha256": "5e1c826483282d3d9761eabf662f0bd1b4420474963053fe4068bd1c44086971"
+    }
+  },
+  "actual_runtime_compatibility": false,
+  "scientific_execution": false,
+  "baseline_assertion": "Supplied pure-suite baseline 43/43 each; independent rerun 43/43 each. No scientific baseline reproduced."
+}

@@ -1,0 +1,240 @@
+{
+  "kind": "prospective_A2_bank_and_scoring_timing_only",
+  "status": "NOT_ADMITTED_NO_GPU_SUBMISSION",
+  "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "main_groups": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2/groups.json",
+  "groups_file_sha256": "efe92038365ad010dbd5a889c6696d7a1b86a1ccb889564a65eca55005849f73",
+  "groups_receipt_sha256": "e334e93b930e2517f398661a079bf2db7a4ed9018eeba0ed1ebb09afd2446a5d",
+  "scope": {
+    "far_v2": {
+      "bank_original_H_ids": 400,
+      "bank_keys": 123,
+      "bank_head_keys": 120,
+      "bank_whole_MLP_keys": 3,
+      "bank_fp32_vector_bytes": 110592,
+      "assessment_ids": 100,
+      "compute_memberships": 3,
+      "aliases": [
+        "far_v2_seed123_DminusI",
+        "far_v2_seed1_DminusI",
+        "far_v2_seed42_DminusI"
+      ]
+    },
+    "sdr_v2": {
+      "bank_original_H_ids": 400,
+      "bank_keys": 122,
+      "bank_head_keys": 118,
+      "bank_whole_MLP_keys": 4,
+      "bank_fp32_vector_bytes": 125952,
+      "assessment_ids": 100,
+      "compute_memberships": 3,
+      "aliases": [
+        "sdr_v2_seed123_DminusI",
+        "sdr_v2_seed1_DminusI",
+        "sdr_v2_seed42_DminusI"
+      ]
+    },
+    "ser_v2": {
+      "bank_original_H_ids": 400,
+      "bank_keys": 145,
+      "bank_head_keys": 138,
+      "bank_whole_MLP_keys": 7,
+      "bank_fp32_vector_bytes": 185344,
+      "assessment_ids": 100,
+      "compute_memberships": 3,
+      "aliases": [
+        "ser_v2_seed123_DminusI",
+        "ser_v2_seed1_DminusI",
+        "ser_v2_seed42_DminusI"
+      ]
+    }
+  },
+  "utility_rows": {
+    "ioi": 100,
+    "mmlu": 32
+  },
+  "operations": [
+    "item_swap",
+    "zero",
+    "h_mean",
+    "h_twin",
+    "self_replay",
+    "empty"
+  ],
+  "group_aliases": 9,
+  "score_pilot_limit": 4,
+  "score_pilot_expected_rows": 2484,
+  "full_score_expected_rows_not_admitted": 59652,
+  "positive_controls_pilot": 144,
+  "bank_work_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2",
+  "score_pilot_work_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2-timing-limit4",
+  "bank_command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a2.sh",
+    "--design",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+    "--selected",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+    "--commit",
+    "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+    "--batch-size",
+    "8",
+    "--registry",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+    "--stage",
+    "bank",
+    "--work-dir",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2"
+  ],
+  "score_pilot_command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a2.sh",
+    "--design",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+    "--selected",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+    "--commit",
+    "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+    "--batch-size",
+    "8",
+    "--registry",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+    "--stage",
+    "score",
+    "--work-dir",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2-timing-limit4",
+    "--limit",
+    "4"
+  ],
+  "staging_contract": [
+    "new pilot namespace only; exclusive byte-identical copy of frozen groups.json",
+    "after actual main bank completion, pilot/bank symlink targets actual main bank; no copied/resigned fake bank",
+    "read_stage manifest depends on unchanged receipt/source refs, not work_dir; bank_reference resolves original main bank owner",
+    "main score path remains absent for later full scoring; pilot stays partial/nonfinal"
+  ],
+  "hardware_candidate": "same NVIDIA A100-SXM4-40GB as measured A1, BF16/fp32 readout; root may select different hardware before bank only with separate measured same-hardware bank/scoring contract",
+  "root_exploratory_maximum": {
+    "gpus": 1,
+    "cpus": 4,
+    "host_memory_GiB": 64,
+    "minutes": 25,
+    "reserved_gpu_hours": 0.4167,
+    "not_a_measured_A2_forecast_or_fit_guarantee": true
+  },
+  "sizing_orientation": {
+    "A1_pilot_seconds_per_returned_row": 0.28273442777082236,
+    "A2_pilot_rows_times_A1_reference_seconds": 702.3123185827227,
+    "two_pass_CPU_source_freeze_reference_seconds": 95,
+    "A1_pilot_total_seconds": 399,
+    "A1_pilot_outside_model_stage_seconds": 29.306626399047673,
+    "A1_selection_stage_bank_plus_screen_reference_seconds": 166.37134666461498,
+    "unbuffered_reference_sum_seconds": 1061.6085814025082,
+    "reference_buffer_fraction": 0.25,
+    "finish_seconds": 120,
+    "buffered_reference_sum_seconds": 1447.0107267531353,
+    "rounded_minutes": 25,
+    "new_A2_key_breadth_memory_and_input_shape_limits_not_validated_by_A1_rates": true
+  },
+  "actual_A1_rate_references": {
+    "pilot-4": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/pilot-4/score/run_manifest.json",
+      "file_sha256": "2ad5dd261d42bf3f0d953e2adc0c89e17a0a30d8265d8f4283a4f49b7e2f8035",
+      "execution": {
+        "cluster": "delta",
+        "cluster_source": "SLURM_CLUSTER_NAME",
+        "device": "cuda:0",
+        "dtype": "torch.bfloat16",
+        "gpu_name": "NVIDIA A100-SXM4-40GB",
+        "memory_scope": "scoring compute after model load; includes resident model",
+        "model_load_seconds": 32.87571912212297,
+        "peak_allocated_memory_bytes": 19575337984,
+        "peak_reserved_memory_bytes": 20759707648,
+        "scoring_compute_seconds": 335.88850019173697,
+        "scoring_stage_seconds": 369.6933736009523,
+        "slurm_job_id": "23417413",
+        "stage_time_scope": "model load plus scoring compute; excludes artifact publication"
+      },
+      "counts": {
+        "expected": 1188,
+        "positive_controls": 144,
+        "rows": 1188
+      },
+      "operations": [
+        "item_swap",
+        "zero",
+        "h_mean",
+        "h_twin",
+        "self_replay",
+        "empty",
+        "independent_resample"
+      ]
+    },
+    "full": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/full/score/run_manifest.json",
+      "file_sha256": "c5ab2339628d715e32d7301995db6ef09e97ced9bdf965982fd341693e3c6585",
+      "execution": {
+        "cluster": "delta",
+        "cluster_source": "SLURM_CLUSTER_NAME",
+        "device": "cuda:0",
+        "dtype": "torch.bfloat16",
+        "gpu_name": "NVIDIA A100-SXM4-40GB",
+        "memory_scope": "scoring compute after model load; includes resident model",
+        "model_load_seconds": 39.311663357075304,
+        "peak_allocated_memory_bytes": 19582702592,
+        "peak_reserved_memory_bytes": 20797456384,
+        "scoring_compute_seconds": 8059.250294802012,
+        "scoring_stage_seconds": 8099.647825964959,
+        "slurm_job_id": "23417811",
+        "stage_time_scope": "model load plus scoring compute; excludes artifact publication"
+      },
+      "counts": {
+        "expected": 28884,
+        "positive_controls": 3396,
+        "rows": 28884
+      },
+      "operations": [
+        "item_swap",
+        "zero",
+        "h_mean",
+        "h_twin",
+        "self_replay",
+        "empty",
+        "independent_resample"
+      ]
+    },
+    "selection_bank_plus_screen_reference": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selection_run_manifest.json",
+      "file_sha256": "50cf8feef06ecb661ecb8bc76d7ddbeaac7cf29002e947ddf21201e955add20c",
+      "execution": {
+        "cluster": "delta",
+        "cluster_source": "SLURM_CLUSTER_NAME",
+        "commit": "5f450dc93dac707af649dee8c8ca60888b2831db",
+        "device": "cuda:0",
+        "dtype": "torch.bfloat16",
+        "gpu_name": "NVIDIA A100-SXM4-40GB",
+        "memory_scope": "selection compute after model load; includes resident model",
+        "model": "meta-llama/Llama-3.1-8B-Instruct",
+        "model_load_seconds": 46.853518882766366,
+        "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+        "peak_allocated_memory_bytes": 18309796352,
+        "peak_reserved_memory_bytes": 18717081600,
+        "selection_compute_seconds": 118.42526046885177,
+        "selection_stage_seconds": 166.37134666461498,
+        "slurm_job_id": "23417240",
+        "stage_time_scope": "model load plus selection compute; excludes artifact publication",
+        "tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+      },
+      "not_A2_union_bank_upper_bound": true
+    }
+  },
+  "root_prerequisites": [
+    "fresh complete source/protection/grader/usage+actual ledger budget A2<=60/global<=125 including all old reserved charges",
+    "real exact allocation/source/cache/lease and new reservation/admission; no GPU action from this proposal",
+    "main bank and score must use identical actual GPU architecture/dtype/runtime; no cross-device speed ratios",
+    "actual bank measurements and resources retained even if no time remains for complete score pilot",
+    "before second child, require sufficient actual lease for complete fixed pilot+finish; never shorten controls/rows or auto retry",
+    "full scoring not admitted by prefix pilot; retain complete input-length/shape/memory/overhead and cost qualification"
+  ],
+  "assessment_effects_inspected": false,
+  "GPU_or_model_execution_here": false
+}

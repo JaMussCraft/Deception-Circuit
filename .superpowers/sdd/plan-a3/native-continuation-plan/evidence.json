@@ -1,0 +1,77 @@
+{
+  "status": "read-only planning, no model/native execution",
+  "inputs": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/existing-case-auth-01/steps.log": {
+      "bytes": 5697,
+      "sha256": "ae3c0d168f84d4f8fea3001282a25c58d15935c5995996f1eb6b884822cb4216"
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/existing-case-auth-01/result.json": {
+      "bytes": 870,
+      "sha256": "146edb00add4bbabce43ec5b6492c828154c66e79f1ea0b4b675dbc934ca3a5c"
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/selected-onecase-02-no-periodic/steps.log": {
+      "bytes": 5438,
+      "sha256": "6c11130e15cedb7e2b9b0a081ce9e7356ad9dec5cb2ce01c9dbe0a257257eca6"
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/diagnostics/selected-onecase-02-no-periodic/result.json": {
+      "bytes": 900,
+      "sha256": "08128c396b5fa8638a07ff518d24eaf1c431a510fed8c6303e963e9e28f3146d"
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/tests/a3_direction_native_scenario.py": {
+      "bytes": 23067,
+      "sha256": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/component_analysis/a3_direction_runtime.py": {
+      "bytes": 216440,
+      "sha256": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc"
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/component_analysis/a3_direction_workload.py": {
+      "bytes": 92293,
+      "sha256": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9"
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/component_analysis/a3_direction_pipeline.py": {
+      "bytes": 45954,
+      "sha256": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0"
+    }
+  },
+  "static_findings": {
+    "shared_numeric_backing_cache": "runtime._NUMERIC_BACKING_CACHE; default cache in _numeric_backing_proof; pid/reference/injected/model-source signature checked; every hit performs fresh full reference and witness checks",
+    "packed_proof_cache": "runtime._completed_packing_proof exists, but harness _read_pilot_case calls constructor directly; swapping it is a behavior change, not an existing argument",
+    "harness_shared_context": "pilot_cases holds model/design/protocol/inventory and local axes across its own case loop; no prepared-axes or prepared-inventory-context argument",
+    "inventory_validation": "pilot_cases calls _case_invocations\u2192_validate_inventory\u2192independent build_inventory; bypassing only run_phase outer duplicate leaves this intact",
+    "aggregation": "aggregate_pilot_cases demands exact full63 names/order and reauthenticates each; run_pilot then publishes and validates own original packing/serial evidence with full dependency union; no resumable aggregate/prevalidated-values parameter",
+    "source_pin": "scenario source_identity includes harness/runtime test; editing frozen harness invalidates preserved scenario lineage, with no permission to re-sign"
+  },
+  "no_source_or_harness_edit": true,
+  "no_model_import_or_forward": true,
+  "no_jobs_git_RS_API_or_subagents": true,
+  "all_owned_processes_terminal": true,
+  "proposed_coordinator_and_supervisor_syntax_only": "compile(...), no import or execution",
+  "next_step_status": "Accepted in principle by root; ON HOLD, benchmark contention and Bridges comparison first",
+  "artifacts": {
+    "number-check.json": {
+      "bytes": 2365,
+      "sha256": "e3e889106eee803a64d03fb67bd410cc8b849f99a2b809469b98b3428d2ff275"
+    },
+    "source-and-cases.json": {
+      "bytes": 136017,
+      "sha256": "3bd3c48fa7ccb1a43c2fea82504dc5d0e4129c0c9d57accd0bd25b7d10ebd7f5"
+    },
+    "plan.md": {
+      "bytes": 6931,
+      "sha256": "580f2e867276680df3132718a4d8faf82bd210edd86dcbcf162cb226990076dc"
+    },
+    "coordinator.py": {
+      "bytes": 6626,
+      "sha256": "5ac4ea6cec9b0bf51c5ab0c70010334ebe431c2589e05a85353be6f4af969b76"
+    },
+    "observed-costs-and-proposal.json": {
+      "bytes": 2454,
+      "sha256": "ea6d088f103f2870bc2cfe808314d0ba258a202395bcde24dfb09559922a9d56"
+    },
+    "supervisor.py": {
+      "bytes": 3029,
+      "sha256": "f6caa38524b5110d72a564c2eb3cc0f03fe75478346037bab1b818a8bfd01c91"
+    }
+  }
+}

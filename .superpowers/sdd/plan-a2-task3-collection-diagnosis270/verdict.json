@@ -1,0 +1,98 @@
+{
+  "status": "handed-back",
+  "verdict": "SELECTOR_CACHE_COLLISION_CONFIRMED_FULL98_COLLECTION_UNAFFECTED",
+  "root_cause": "BASE-I disables user-site and loads global pytest7.4.0. With -c/dev/null rootdir/dev, all explicit outside-root files get Module.nodeid empty. Its selector matchnodes_cache keys(type,nodeid), so subsequent files reuse first release report and named usage/cache tests are not found.",
+  "not_import_shadowing": "Both requested functions import from correct frozen red259 files and are present.",
+  "interpreter_identities": [
+    {
+      "label": "base-isolated",
+      "python": [
+        3,
+        9,
+        18
+      ],
+      "pytest": "7.4.0",
+      "pytest_file": "/sw/external/python/anaconda3/lib/python3.9/site-packages/pytest/__init__.py",
+      "package_file": "/sw/external/python/anaconda3/lib/python3.9/site-packages/_pytest/__init__.py",
+      "executable": "/sw/external/python/anaconda3/bin/python3.9",
+      "user_site": false
+    },
+    {
+      "label": "base-normal",
+      "python": [
+        3,
+        9,
+        18
+      ],
+      "pytest": "8.3.3",
+      "pytest_file": "/u/swong2/.local/lib/python3.9/site-packages/pytest/__init__.py",
+      "package_file": "/u/swong2/.local/lib/python3.9/site-packages/_pytest/__init__.py",
+      "executable": "/sw/external/python/anaconda3/bin/python3.9",
+      "user_site": true
+    },
+    {
+      "label": "mgnp-isolated",
+      "python": [
+        3,
+        12,
+        13
+      ],
+      "pytest": "9.1.1",
+      "pytest_file": "/u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/pytest/__init__.py",
+      "package_file": "/u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/_pytest/__init__.py",
+      "executable": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "user_site": false
+    }
+  ],
+  "source_provenance": {
+    "/sw/external/python/anaconda3/lib/python3.9/site-packages/_pytest/main.py": "f4576f5d73c3afb03e61700ad41346d721a780e46cdac6e911a5abd27852e4ee",
+    "/sw/external/python/anaconda3/lib/python3.9/site-packages/_pytest/nodes.py": "86be75d1b674c8c543de022aa5fb9dda7e8c071224b5176ac719a506dc73bbb2",
+    "/u/swong2/.local/lib/python3.9/site-packages/_pytest/main.py": "3a8c1ecf7e9490ec095e44d1ab8ad5b89451af5f08b419f3fd80e3800985095f"
+  },
+  "source_explanation": {
+    "pytest74_selector_cache": "main.py lines776-781: key=(type(node),node.nodeid); shared Module empty nodeid reuses prior report",
+    "pytest74_empty_nodeid": "nodes.py lines571-575,618-620: file outside rootpath and equal to initial path gets empty relative nodeid",
+    "pytest74_wholefile_bypass": "main.py lines771-773: no matchnames appends module and continues before selector cache",
+    "pytest83_collection_cache": "main.py lines826-837: collector object key rather than old type/nodeid selector key"
+  },
+  "observed": {
+    "original_brief_BASE_exit": 4,
+    "original_brief_BASE_tests": 0,
+    "fullfile_collect_each": 98,
+    "fullfile_collect_modes": [
+      "BASE-I7.4",
+      "BASE-normal8.3.3",
+      "mgnp-I9.1.1"
+    ],
+    "isolated_BASE_selector_with_explicit_rootdir": 12,
+    "normal_BASE_selector": 12
+  },
+  "queued_full98_collection_broken": false,
+  "fullsuite_or_native_bodies_executed_by_reviewer": false,
+  "current_queue_or_source_mutated": false,
+  "root_guidance": [
+    "Preserve queued23625160; this selector anomaly alone supplies no cancellation/hold reason. It remains a real pytest7.4 isolated-BASE run, not accepted standard8.3.3 identity.",
+    "For a prospective runner or brief standard-environment check, remove -I, retain -B/PYTHONDONTWRITEBYTECODE1, explicitly disable plugin autoload and retain conftest cutoff/cache disabling. Record/assert actual Python/pytest origins/versions. No install or PYTHONPATH injection needed.",
+    "If retaining legacy isolated selector probes, set --rootdir to red259 or its tests directory to avoid empty Module nodeid. This fixes selector resolution without pretending it changes pytest identity.",
+    "Keep frozen packet and all original-source-pins targets unchanged while queued fullRED exists; add implementation/new tests only under separately authorized files until root manages that dependency."
+  ],
+  "full_RED_and_GREEN_validation_still_required": true,
+  "no_jobs_remote_git_RS_source_edits_or_agents": true,
+  "probe_environment_scope": "All collect/import probes disable plugin autoload and execute no tests. No assertion of queued-job body outcomes or inherited plugin environment.",
+  "root_separate_normal_brief_update": {
+    "scope": "root-reported separate normal-startup brief only; no new reviewer test execution",
+    "expected_each": 12,
+    "failed_each": 7,
+    "passed_each": 5,
+    "errors": 0,
+    "skips": 0,
+    "pytest_versions": [
+      "8.3.3",
+      "9.1.1"
+    ],
+    "full98_job_unchanged": true,
+    "implementation_start": "Covered pure interfaces only; other features need focused RED; full baseline/GREEN/native chain still required",
+    "receipt_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/brief-orchestration-red270-r2/RESULT.json",
+    "receipt_sha256": "609649d953672d2451db639ebaa8639331ba439d12de3e30b7a7f3f2af46b6c7"
+  }
+}

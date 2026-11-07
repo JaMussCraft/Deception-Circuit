@@ -1,0 +1,34 @@
+[
+  {
+    "id": "B1",
+    "severity": "high",
+    "file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254/inner.py",
+    "line": 12,
+    "related_line": 22,
+    "title": "Effective readonly stack is rejected as writable",
+    "observed": "Known successful Bridges v1 memory mount evidence has hidden lower rw and upper ro at the same path, with actual statvfs ST_RDONLY set. mount_for max(tuple) selects rw by lexicographic options on equal paths, and main separately rejects every hidden rw row. Both prevent pytest from starting on that valid layout.",
+    "reproduction": "test_B1_known_effective_ro_stack_is_falsely_rejected; actual50316939 memory lines/read_only evidence, no real container launched.",
+    "minimal_fix": "Check effective declared readonly mount targets using actual path flags or correctly resolved topmost mount IDs; do not reject hidden lower mounts. Keep raw mount evidence and the intended readonly guard; do not weaken it to a bind-string assertion."
+  },
+  {
+    "id": "B2",
+    "severity": "medium",
+    "file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254/host.py",
+    "line": 86,
+    "title": "Budget can expire during log opening before Popen",
+    "observed": "Last allocation/clock decision occurs before opening stdout/stderr. Advancing time past the phase deadline while opening pytest.stdout still calls Popen; only afterward is timed_out recorded.",
+    "reproduction": "test_B2_expired_after_log_open_still_launches: fake clock601 after deadline600, one Popen call, no real child launched.",
+    "minimal_fix": "After final prelaunch I/O, immediately recheck/clamp actual allocation and wall/monotonic budget before Popen; refuse expired launch without increasing an existing deadline."
+  },
+  {
+    "id": "B3",
+    "severity": "medium",
+    "file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254/host.py",
+    "line": 103,
+    "related_line": 97,
+    "title": "Cleanup failure resets a second full grace period",
+    "observed": "cleanup_group called normally may exhaust15TERM+5KILL/reap and raise; execute_phase except calls cleanup_group again, resetting the full budget. This exceeds the claimed one20second cleanup allowance.",
+    "reproduction": "test_B3_cleanup_error_restarts_cleanup_budget observes2cleanup invocations when the first cleanup raises.",
+    "minimal_fix": "Use one shared absolute cleanup budget or do not restart grace after cleanup itself failed. Preserve primary and cleanup error evidence and retain best-effort KILL/reap within that single bound."
+  }
+]

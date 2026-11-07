@@ -1,0 +1,28 @@
+--- green-r1/component_analysis/a3_direction_runtime.py
++++ green-r2/component_analysis/a3_direction_runtime.py
+@@ -217,7 +217,7 @@
+         originals=(target_reference,preparation_reference)
+         initial=tuple(_prepared_object_stats(root) for root in roots)
+         process_before=_prepared_process_observation()
+-        raw_buffers=[];decoder_buffers=[];values=[];references={};witness_rows=[]
++        raw_buffers=[];decoder_buffers=[];parsed_objects=[];values=[];references={};witness_rows=[]
+         payload_reads=0;payload_hashes=0;payload_parses=0
+         for index,(label,root,expected,(root_stat,leaf_stats)) in enumerate(zip(
+                 ('target','preparation'),roots,originals,initial)):
+@@ -231,6 +231,7 @@
+                 files[name]=dict(sha256=digest,nbytes=len(raw))
+                 data[name]=_prepared_json_buffer(raw,decoder_buffers)
+                 if index==0 and name=='payload.json':payload_parses+=1
++            parsed_objects.append(data)
+             require(expected['files']==files,'prepared entry reference byte/hash/count differs')
+             marker=data['COMPLETE.json']
+             require(isinstance(marker,dict) and marker.get('schema_version')==1 and marker.get('kind')=='a3_complete',
+@@ -265,7 +266,7 @@
+         result=(frozen['value'],frozen['entry_references'],namespace,witness,observed,resources)
+         # Measure actual retained roots and the overlapping temporary graph
+         # separately, with no subtraction for presumed aliases or baselines.
+-        temporaries=(raw_buffers,decoder_buffers,values,references,decoded,memo,witness_rows,initial)
++        temporaries=(raw_buffers,decoder_buffers,parsed_objects,values,references,decoded,memo,witness_rows,initial)
+         workspace=[]
+         resources['extra_transient_bytes']=_prepared_graph_bytes(temporaries,workspace)
+         previous=None

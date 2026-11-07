@@ -1,0 +1,105 @@
+{
+  "kind": "explicit_file_io_plan_and_measurement_contract",
+  "payload_symbol": "B = exact prepared target payload byte length; known old-context mgnp fit-select B=11421127399, not a promised new-source/selected size.",
+  "existing_primitives": [
+    {
+      "call": "object_reference(target)",
+      "full_payload_file_reads": 2,
+      "full_payload_SHA_passes": 2,
+      "parse_passes": 0,
+      "reason": "_complete hashes children once; object_reference hashes them again."
+    },
+    {
+      "call": "read_object(target)",
+      "full_payload_file_reads": 2,
+      "full_payload_SHA_passes": 1,
+      "parse_passes": 1,
+      "reason": "_complete child hash plus _strict_json read/parse."
+    },
+    {
+      "call": "artifacts._finish(target)",
+      "full_payload_file_reads": 3,
+      "full_payload_SHA_passes": 3,
+      "parse_passes": 0,
+      "reason": "_children twice, then _complete hashes children again."
+    },
+    {
+      "call": "_make_file_witness or _check_file_witness on resolved target",
+      "full_payload_file_reads": 1,
+      "full_payload_SHA_passes": 1,
+      "parse_passes": 0,
+      "reason": "One full byte fingerprint per leaf; not a cheap stat check."
+    }
+  ],
+  "statusquo_late_target_path": {
+    "full_payload_writes": 1,
+    "full_payload_file_reads": 7,
+    "full_payload_file_SHA_passes": 6,
+    "parse_passes": 1,
+    "additional_full_canonical_memory_digest_passes": 2,
+    "excludes": "Original builder/other memory serialization, pilot-inventory/source/numeric guard I/O and later CPU admission intake."
+  },
+  "chosen_CPU_producer": {
+    "full_payload_writes": 1,
+    "on_write_SHA_passes": 1,
+    "finish_read_SHA_passes": 3,
+    "object_reference_read_SHA_passes": 2,
+    "minimum_file_read_SHA_passes": 5,
+    "additional_semantic_work": "Original build plus unchanged _validate_inventory reconstruction/canonical hashes on CPU. Emitted hash/count is compared to final reference so a re-signed file cannot be adopted after semantic validation. Any additional postcheck or helper call increases the measured total."
+  },
+  "chosen_receiver": [
+    {
+      "step": "E0",
+      "operation": "Exact child/type/size, lexical policy, root-pinned small marker/descriptor buffers; no object_reference/read_object composition for the large target.",
+      "full_target_file_reads": 0,
+      "full_target_SHA_passes": 0
+    },
+    {
+      "step": "E1",
+      "operation": "Read entire target payload into immutable byte buffer, SHA that buffer once, strict-parse exactly that same buffer.",
+      "full_target_file_reads": 1,
+      "full_target_SHA_passes": 1,
+      "parse_passes": 1
+    },
+    {
+      "step": "E2",
+      "operation": "Check exact input/summary/source/part bindings, freeze one target graph, release ordinary temporaries normally; no production full-target rebuild or canonical reserialization.",
+      "full_target_file_reads": 0,
+      "full_target_SHA_passes": 0,
+      "freeze_passes": 1
+    },
+    {
+      "step": "E3",
+      "operation": "Mint phase-only _FileWitness over resolved target+descriptor; match hashes/stats to authenticated entry bytes and entry namespace seal.",
+      "full_target_file_reads": 1,
+      "full_target_SHA_passes": 1
+    },
+    {
+      "step": "F1",
+      "operation": "AFTER union measurement and before_publication: namespace+full phase-witness comparison against entry, then fresh live/deadline and cheap unchanged identity seal.",
+      "full_target_file_reads": 1,
+      "full_target_SHA_passes": 1
+    },
+    {
+      "step": "Origin/publication",
+      "operation": "Use authenticated entry refs; no target object_reference, late target publication or full target readback; old bounded pilot-receipt writer remains.",
+      "full_target_file_reads": 0,
+      "full_target_SHA_passes": 0
+    }
+  ],
+  "planned_target_total": {
+    "logical_full_payload_file_reads": 3,
+    "SHA_passes": 3,
+    "parse_passes": 1,
+    "freeze_passes": 1,
+    "full_payload_writes_during_GPU": 0,
+    "known_old_context_logical_payload_read_bytes": 34263382197
+  },
+  "measurement_rules": [
+    "These are planned counts to prove with instrumented small fixtures and actual CPU receiver traces, not observed runtime measurements.",
+    "Count separate logical file reads, bytes requested, hashing bytes, parse/decode/freeze passes, canonical encodings and actual filesystem/disk I/O. Cache hits do not turn logical byte verification into zero cost.",
+    "Verify optimized reader equivalence to original completion/child-set/nonfinite contract; do not relax an existing numeric witness or replace bytes with cached stat.",
+    "If implementation retains object_reference/read_object or adds a target dependency to any repeated guard, update the table with the actual larger counts before feasibility/admission.",
+    "All original pilot-inventory, source, numeric witness and ledger reads remain and must be costed separately. Later independent CPU intake reconstruction also stays."
+  ]
+}

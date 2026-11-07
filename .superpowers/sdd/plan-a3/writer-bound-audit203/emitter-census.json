@@ -1,0 +1,32 @@
+[
+  {
+    "writer": "runtime.scientific_identity / _capture_bundle",
+    "sites": "runtime.py560-570,573-603",
+    "shape": "Fresh scientific identity has local ordered_ids/sites/conditions and empty capture_lineage. Capture metadata stores local runner_rows, per-site projection names, local lane_receipts and arrays. No global captures list."
+  },
+  {
+    "writer": "runtime.score_runtime_shard / artifacts.publish_shard",
+    "sites": "runtime.py669-680,721-743; artifacts.py297-310",
+    "shape": "Exactly one fixed-schema capture_reference in identity; local expected_keys and rows plus execution references/runtime/guard/startup fields. startup_fields explicitly <=8192 serialized bytes. Actual authority guard/reservation metadata needs explicit bound; global capture count is not its schema."
+  },
+  {
+    "writer": "artifacts.capture_reference / _finish / write_bundle",
+    "sites": "artifacts.py180-189,205-253",
+    "shape": "Capture lineage ref has five SHA strings and two byte counts. Numeric manifest array descriptors are local to actual arrays. COMPLETE stores only this publication child relative paths/hash/bytes; no global capture table."
+  },
+  {
+    "writer": "runtime.assemble_fit_pieces",
+    "sites": "runtime.py919-954",
+    "shape": "Global train-piece object references accumulated into capture_references and emitted ONCE in fit-completion. object_reference has path and root-file digest/length map; no file contents. Aggregate cache itself carries full local union identity/arrays once."
+  },
+  {
+    "writer": "pipeline._read_selection_validation / select_from_cache",
+    "sites": "pipeline.py599-611,720-730",
+    "shape": "Validation references list is accumulated into selection metadata ONCE. Each reference contains capture and shard byte closure; repeated group capture references must be counted as physically serialized, not deduplicated by this proposal."
+  },
+  {
+    "writer": "runtime.select and assemble_selection_cache",
+    "sites": "runtime.py1220,1251-1260; pipeline.py340-345",
+    "shape": "Per-validation-shard execution.fit_reference duplicates whole FIT bundle child descriptor closure; size scales fit array descriptors, not all target captures. Charge every real duplicate. Adapted canonical validation shards/captures are additional publications, not silently removed."
+  }
+]

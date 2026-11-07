@@ -1,0 +1,100 @@
+{
+  "status": "GENUINE_COMPONENT_DIAGNOSIS_PASS_NOT_EXECUTION_ADMISSION",
+  "job_id": "23471274",
+  "elapsed_seconds": 43,
+  "node": "cn001",
+  "account": "bjhz-delta-cpu",
+  "partition": "cpu-interactive",
+  "cpus": 4,
+  "memory_GiB": 32,
+  "gpus": 0,
+  "components_passed": 28,
+  "all_components_pass": true,
+  "production_live_admission": false,
+  "models_loaded": false,
+  "full_valid_path_measured": false,
+  "harness_unchanged": true,
+  "proposal_sha256": "56b5252d500b5e238385dc84504edb7816937c0b935dcd199bf0ac902f929610",
+  "raw_components_sha256": "6d8418cfa8ed518cb26dedc44419fb62320e30dfa416174ac65c5eedfed70f41",
+  "sampler_scope": "Serial compute-node observations, caches uncontrolled, no targetGPU/native estimate; components not independent additive total.",
+  "scheduler_RPC": {
+    "n": 6,
+    "mean_seconds": 0.02152096883704265,
+    "min_seconds": 0.019236531108617783,
+    "max_seconds": 0.028856929973699152,
+    "samples_seconds": [
+      0.028856929973699152,
+      0.02189996198285371,
+      0.0203639519168064,
+      0.019493003957904875,
+      0.019275434082373977,
+      0.019236531108617783
+    ]
+  },
+  "mapping_chain": {
+    "n": 3,
+    "mean_seconds": 0.10565725702326745,
+    "min_seconds": 0.05872959201224148,
+    "max_seconds": 0.19899130600970238,
+    "samples_seconds": [
+      0.19899130600970238,
+      0.05925087304785848,
+      0.05872959201224148
+    ]
+  },
+  "actual_ledger_normalization": {
+    "n": 3,
+    "mean_seconds": 0.09805362469827135,
+    "min_seconds": 0.08664914802648127,
+    "max_seconds": 0.11513236607424915,
+    "samples_seconds": [
+      0.09237935999408364,
+      0.11513236607424915,
+      0.08664914802648127
+    ]
+  },
+  "authority_static_byte_witness": {
+    "n": 3,
+    "mean_seconds": 0.029161669973594446,
+    "min_seconds": 0.025790109997615218,
+    "max_seconds": 0.03360351000446826,
+    "samples_seconds": [
+      0.03360351000446826,
+      0.025790109997615218,
+      0.02809138991869986
+    ]
+  },
+  "one_time_components": {
+    "validate_original_upper_pilot_inventory": {
+      "wall_seconds": 0.08107042300980538,
+      "host_peak_bytes": 698273792
+    },
+    "original_authority_key_hash_proof": {
+      "wall_seconds": 0.09938755398616195,
+      "host_peak_bytes": 698273792
+    },
+    "original_pilot_recursive_owned_freeze": {
+      "wall_seconds": 0.1491007839795202,
+      "host_peak_bytes": 717176832
+    },
+    "new_full_target_read": {
+      "wall_seconds": 4.1518532750196755,
+      "host_peak_bytes": 2831020032
+    },
+    "new_full_target_complete_validator": {
+      "wall_seconds": 16.471596090006642,
+      "host_peak_bytes": 3122483200
+    },
+    "new_full_target_recursive_frozenset_proof": {
+      "wall_seconds": 5.014813591027632,
+      "host_peak_bytes": 3122483200
+    }
+  },
+  "unmeasured_full_path_work": [
+    "production authority context mint/check as an authenticated object",
+    "remaining validate_reservation body, actual GPU allocation parsing/current lease and complete expected source/output/job binding",
+    "native model load/targets/update+backward/evaluations/controls/parity/checkpoint/restore/serialization",
+    "production expected full target inventory reconstruction and its digest; second target complete validator invocation inside mask_pilot; fresh first pilot-inventory reconstruction",
+    "target-host/cache/concurrent workload differences"
+  ]
+}

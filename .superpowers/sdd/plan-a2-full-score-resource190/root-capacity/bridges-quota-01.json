@@ -1,0 +1,20 @@
+{
+  "at_utc": "2026-11-06T19:57:19.655595+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -c 'import os,json,subprocess,time\np='\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1'\"'\"'\ncommands=[['\"'\"'lfs'\"'\"','\"'\"'quota'\"'\"','\"'\"'-u'\"'\"',str(os.getuid()),'\"'\"'/ocean'\"'\"'],['\"'\"'lfs'\"'\"','\"'\"'quota'\"'\"','\"'\"'-g'\"'\"',str(os.stat(p).st_gid),'\"'\"'/ocean'\"'\"'],['\"'\"'lfs'\"'\"','\"'\"'project'\"'\"','\"'\"'-d'\"'\"',p]]\nresults=[]\nfor c in commands:\n try:\n  r=subprocess.run(c,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True,timeout=10);results.append({'\"'\"'command'\"'\"':c,'\"'\"'returncode'\"'\"':r.returncode,'\"'\"'output'\"'\"':r.stdout})\n except subprocess.TimeoutExpired:results.append({'\"'\"'command'\"'\"':c,'\"'\"'timeout'\"'\"':True})\nprint(json.dumps({'\"'\"'at_unix'\"'\"':time.time(),'\"'\"'path'\"'\"':p,'\"'\"'results'\"'\"':results},sort_keys=True))\n'"
+  ],
+  "returncode": 0,
+  "output": "{\"at_unix\": 1793995039.6396995, \"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1\", \"results\": [{\"command\": [\"lfs\", \"quota\", \"-u\", \"105853\", \"/ocean\"], \"output\": \"Disk quotas for usr 105853 (uid 105853):\\n     Filesystem  kbytes   quota   limit   grace   files   quota   limit   grace\\n         /ocean 35903336       0       0       -   82456       0       0       -\\nuid 105853 is using default block quota setting\\nuid 105853 is using default file quota setting\\n\", \"returncode\": 0}, {\"command\": [\"lfs\", \"quota\", \"-g\", \"28343\", \"/ocean\"], \"output\": \"Disk quotas for grp 28343 (gid 28343):\\n     Filesystem  kbytes   quota   limit   grace   files   quota   limit   grace\\n         /ocean 35903408       0       0       -   82474       0       0       -\\ngid 28343 is using default block quota setting\\ngid 28343 is using default file quota setting\\n\", \"returncode\": 0}, {\"command\": [\"lfs\", \"project\", \"-d\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1\"], \"output\": \"560453 P /ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1\\n\", \"returncode\": 0}]}\n"
+}

@@ -1,0 +1,42 @@
+{
+  "status": "handed-back",
+  "verdict": "ACCEPT_NARROW_EIGHT_ALIAS_SOURCE_CORRECTION",
+  "manifest_sha256": "bd3533cc18025d7d2bf97515060a46f793abd4f4a43609e8dc6c9626d8a6e6e2",
+  "manifest_members_match": true,
+  "changed_prior_host_function_AST": [
+    "check_config"
+  ],
+  "cleanup_deadline_and_main_AST_preserved": true,
+  "independent_alias_tests": {
+    "passed": 2,
+    "exit_code": 0,
+    "reported_seconds": 0.743
+  },
+  "raw_frozen_log_tails": {
+    "green-alias-base.log": [
+      "----------------------------------------------------------------------",
+      "Ran 10 tests in 1.293s",
+      "",
+      "OK"
+    ],
+    "green-alias-mgnp.log": [
+      "----------------------------------------------------------------------",
+      "Ran 10 tests in 1.225s",
+      "",
+      "OK"
+    ],
+    "red-alias-base.log": [
+      "----------------------------------------------------------------------",
+      "Ran 2 tests in 0.472s",
+      "",
+      "FAILED (failures=1)"
+    ],
+    "red-alias-mgnp.log": [
+      "----------------------------------------------------------------------",
+      "Ran 1 test in 0.004s",
+      "",
+      "FAILED (failures=1)"
+    ]
+  },
+  "final_config_and_actual_deployment": false
+}

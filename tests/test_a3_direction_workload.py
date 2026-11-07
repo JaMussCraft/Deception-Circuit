@@ -429,7 +429,7 @@ def test_selected_validation_provenance_and_blocked_seed_gate(fault):
 def test_serialization_count_is_derived_from_actual_payload_inventory():
     d,p,_=fixture(); p['workload']['serialization_batches']=0
     inv=w.build_inventory(d,p,stage='fit-select')
-    required=len(inv['captures'])+len(inv['shards'])+len({c for s in inv['shards'] for c in s['control_ids']})+len(inv['jobs'])
+    required=len(inv['captures'])+len(inv['shards'])+len({c for s in inv['shards'] for c in s['control_ids']})+len(inv['jobs'])+sum(s['profile']['axis_tile_size']>1 for s in inv['shards'])
     assert inv['operation_counts']['serialization']==required
     assert 'serialization' not in inv['forward_counts']
 
@@ -602,3 +602,112 @@ def test_terminal_same_admission_lineage_cannot_hide_reserved_consumption(state,
     assert entry['id'] not in l['fit_validation_envelope']['entry_ids']
     with pytest.raises(ValueError,match='admission|lineage|envelope'):
         w.project_cost(receipts(inv),inv,l)
+
+
+def test_runtime_train_singletons_and_explicit_scoring_tail_geometry():
+    d,p,s=fixture()
+    # A third assessment row forces one execution-only tail alias in batch two.
+    for task in d['tasks']:
+        old=d['tasks'][task]['assessment_ids'][0]
+        new=task+'a2'; d['tasks'][task]['assessment_ids'].append(new)
+        d['access_rows'][task].extend(dict(copy.deepcopy(r),instance_id=new) for r in list(d['access_rows'][task]) if r['instance_id']==old)
+    p['workload']['train_microbatch_size']=1
+    p['workload']['pad_tail_batches']=True
+    s['identity']=w.inventory_identity(d,p)
+    inv=w.build_inventory(d,p,stage='remaining',selected=s)
+    tail=next(x for x in inv['shards'] if x['split']=='assessment' and x['expected_keys'][0][2]=='far_v2' and len(x['instance_ids'])==1)
+    assert tail['profile']['physical_batch_size']==p['workload']['microbatch_size']*p['workload']['axis_tile_size']
+    assert len(tail['execution_ids'])==2 and len(tail['dummy_sources'])==1
+    assert all('a3-dummy:' not in k[9] for k in inv['expected_keys'])
+    assert tail['dummy_positive_forward_count']==3
+    assert inv['bytes']['execution_dummy_rows']>0
+
+
+def test_runtime_tail_measurement_inputs_include_actual_execution_aliases():
+    d,p,s=fixture();p['workload']['pad_tail_batches']=True
+    # Frozen microbatch two with one validation utility recipient.
+    d['ioi_validation']=d['ioi_validation'][:1]
+    s['identity']=w.inventory_identity(d,p)
+    inv=w.build_inventory(d,p,stage='remaining',selected=s)
+    requirement=next(x for x in inv['requirements'] if x['profile'].get('source_task')=='ioi'
+        and x['operation']=='patched' and x['timing_inputs'])
+    assert len(requirement['timing_inputs'])==2
+    alias=next(x for x in requirement['timing_inputs'] if x['instance_id'].startswith('a3-dummy:'))
+    assert alias['record']['execution_dummy']['duplicate_of']==d['ioi_validation'][0]['instance_id']
+    assert alias['record']['streams']==d['ioi_validation'][0]['streams']
+
+
+from tests.test_a3_direction_runner import fake
+
+
+def test_intact_capture_lanes_have_separate_scope_bound_measurement(fake):
+    from tests.test_a3_direction_runner import identity,batch,SITE
+    from component_analysis import a3_direction_runtime as runtime
+    from dataclasses import replace
+    profile=identity(2)['numeric_profile'];b=replace(batch('corrupt'),task='ioi',condition='IOI')
+    for i,row in enumerate(b.records):
+        n=int(b.attention_mask[i].sum())
+        row['streams']={'corrupt':dict(tokens=b.input_ids[i,:n].tolist(),readout=int(b.readout[i]))}
+    chunks=[];run=runtime.runner._capture_readouts(object(),[b],sites=[SITE],sink=chunks.append,identity={'numeric_profile':profile},measuring=True)
+    inputs=runtime._timing_inputs_from_batches([b],profile);m=dict(profile=profile,timing_inputs=inputs)
+    evidence=runtime.capture_lane_evidence(run,chunks,[b],inputs)
+    assert w._capture_lane_evidence(evidence,m)==w.digest(evidence)
+    with pytest.raises(ValueError):w._packing_evidence(evidence,m)
+    evidence['timing_inputs_sha256']='b'*64
+    with pytest.raises(ValueError):w._capture_lane_evidence(evidence,m)
+
+
+def test_completed_inventory_json_roundtrip_preserves_exact_reconstruction():
+    import json
+    inv=inventory('fit-select')
+    restored=json.loads(json.dumps(inv))
+    w._validate_inventory(restored)
+    restored['requirements'][0]['batches']+=1
+    with pytest.raises(ValueError):w._validate_inventory(restored)
+
+
+def test_runtime_inventory_costs_live_guards_without_inventing_forwards():
+    d,p,_=fixture();p['workload'].update(train_microbatch_size=1,pad_tail_batches=True,account_runtime_guards=True)
+    inv=w.build_inventory(d,p,stage='fit-select')
+    guards=[r for r in inv['requirements'] if r['operation']=='guard_refresh']
+    assert len(guards)==1 and guards[0]['batches']>=5*len(inv['shards'])+len(inv['captures'])
+    assert 'guard_refresh' not in inv['forward_counts']
+    captures=[s for r in inv['requirements'] if r['operation']=='serialization' for s in r['profile']['serialization_shapes'] if s['kind']=='readout_capture']
+    assert all(s['numeric_bytes']>=p['workload']['head_width']*p['workload']['hidden_size']*4 for s in captures)
+    assert inv['storage_requirements']['components']['authority_key_proof_host_bytes']>0
+
+
+def test_reference_proof_costs_are_nonauthorizing_and_conflicting_digest_rejects():
+    inv=inventory();rr=receipts(inv);receipt=rr[0];proofs={};ref_entries={}
+    for pid,evidence in receipt['packing_evidence'].items():
+        m=next(x for x in receipt['measurements'] if x.get('packing_id')==pid)
+        proof=w._validate_packing_proof(evidence,m)
+        proofs[pid]=proof;ref_entries[pid]={'kind':'a3_packing_proof_reference_v1','evidence_sha256':proof.source_digest}
+    receipt['packing_evidence']=ref_entries;sha=w.digest(receipt)
+    table={(sha,pid):proof for pid,proof in proofs.items()}
+    result=w.project_cost(rr,inv,ledger(inv),packing_proofs=table)
+    assert result['execution_authorized'] is False
+    pid=next(iter(ref_entries));receipt['packing_evidence'][pid]['evidence_sha256']='f'*64
+    table={(w.digest(receipt),key):proof for key,proof in proofs.items()}
+    with pytest.raises(ValueError,match='packing reference'):w.project_cost(rr,inv,ledger(inv),packing_proofs=table)
+    with pytest.raises((TypeError,ValueError)):proofs[pid].source_digest='f'*64
+    with pytest.raises(ValueError):w._PackingProof(None,{})
+
+
+def test_legacy_same_packing_id_different_receipt_payload_is_independently_validated():
+    inv=inventory();first=receipts(inv)[0];second=copy.deepcopy(first)
+    m=next(x for x in second['measurements'] if x.get('packing_id'))
+    evidence=second['packing_evidence'][m['packing_id']];raw=evidence['runner_receipt']
+    raw['scope']['profile']=dict(raw['scope']['profile'])
+    raw['scope']['profile']['backend']='other'
+    raw['scope_sha256']=w.digest(raw['scope']);raw['receipt_sha256']=w.digest({k:v for k,v in raw.items() if k!='receipt_sha256'})
+    with pytest.raises(ValueError,match='profile'):w.project_cost([first,second],inv,ledger(inv))
+
+
+def test_packing_lookup_and_explicit_live_boundary_counts_are_priced_not_forwards():
+    inv=inventory();lookups=[r for r in inv['requirements'] if r['operation']=='packing_lookup']
+    assert sum(r['batches'] for r in lookups)==sum(s['profile']['axis_tile_size']>1 for s in inv['shards'])
+    assert 'packing_lookup' not in inv['forward_counts']
+    if any(r['operation']=='guard_refresh' for r in inv['requirements']):
+        guard=next(r for r in inv['requirements'] if r['operation']=='guard_refresh')
+        assert guard['batches']==10*len(inv['shards'])+3*len(inv['captures'])+2*len(inv['jobs'])

@@ -1,0 +1,36 @@
+{
+  "status": "CORRECTION_RED_EXPECTED",
+  "argv": [
+    "/u/swong2/.conda/envs/mgnp/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--import-mode=importlib",
+    "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/baseline-suite",
+    "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/baseline-suite",
+    "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/jobs/job-50319331/child/execution/baseline-red/tmp",
+    "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/jobs/job-50319331/child/execution/baseline-red/junit.xml",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch"
+  ],
+  "normal_completion": true,
+  "expected_cases": 5,
+  "model_loaded": false,
+  "execution_authorized": false,
+  "pytest_exit_code": 1,
+  "termination_signal": null,
+  "observed_cases": 5,
+  "failures": 5,
+  "errors": 0,
+  "skipped": 0,
+  "exit_code": 0,
+  "per_function_case_counts": {
+    "test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader": 2,
+    "test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects": 1,
+    "test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch": 2
+  },
+  "wall_seconds": 414.0650098323822
+}

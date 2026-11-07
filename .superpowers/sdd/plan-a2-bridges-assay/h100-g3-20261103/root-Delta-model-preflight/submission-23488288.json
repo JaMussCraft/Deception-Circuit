@@ -1,0 +1,27 @@
+{
+  "job_id": "23488288",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--hold",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=16G",
+    "--time=01:00:00",
+    "--no-requeue",
+    "--job-name=lad-a2-phasecpu",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-Delta-model-preflight/bootstrap-%j.log",
+    "--wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-standing-cpu-instructions-r3/dispatch.sh"
+  ],
+  "stdout": "23488288\n",
+  "stderr": "",
+  "submitted_unix": 1793745753.1631734,
+  "held": true,
+  "release_not_before_H100_alignment_review": true
+}

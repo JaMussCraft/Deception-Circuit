@@ -1,0 +1,58 @@
+{
+  "verdict": "ACCEPT_EXACT_R4_DIAGNOSTIC_PACKET_ONLY",
+  "packet_manifest_sha256": "bf8beb34fe2db3d64a40c71a8fa85ec7de8305971073d602f4ff49ece7f39a81",
+  "packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r4",
+  "review_findings": [],
+  "accepted_scope": "One separately root-bound actual five-minute CPU diagnostic only. The v1 selector requests /sys/fs/cgroup:/sys/fs/cgroup:ro instead of absent destination /sys/fs/cgroup/memory. v2 selector unchanged. No genuine proof adapter acceptance amendment.",
+  "unchanged": {
+    "cgroup_probe_sha256": "f1e74318020223321cf02fc23bd548461f16c845600a6d4193896cccb0849e68",
+    "allocation_helper_sha256": "c08c99de710a08dde1082d2954c3c535576840b911570b4665c5284520094c6f",
+    "exact_job_component_checks": true,
+    "fresh_owned_non_symlink_output_confinement": true,
+    "native_v1_path": "/sys/fs/cgroup/memory/<actual-membership>",
+    "native_v2_path": "/sys/fs/cgroup/<actual-membership>",
+    "samefile_native_worker_path_check": true,
+    "actual_host_and_container_membership_mountinfo_counter_observations": true,
+    "missing_counter_or_mount_failclosed": true,
+    "no_counter_injection": true,
+    "no_graph_or_model": true
+  },
+  "exact_delta": "Only v1 cgroup_bind path and affected test assertion differ after mechanical preflight-r3->r4 / root-cgroup199-r3->r4 namespace substitutions. Allocation helper and cgroup probe are byte-identical.",
+  "evidence": {
+    "all8_packet_members_match": true,
+    "all8_actual50311480_fetched_files_match_root_receipt": true,
+    "actual50311480": "FAILED2:0 after5seconds; host_exit0; container_exit255 before Python; absent destination fatal mount error. Not successful visibility evidence.",
+    "bash_n_exit": 0,
+    "host_Python36_grammar_API_scan": "PASS; no actual Python3.6 runtime locally",
+    "host_tests_expected_each": 9,
+    "host_tests_observed_base": 9,
+    "host_tests_observed_mgnp": 9,
+    "independent_tests_expected_each": 4,
+    "independent_tests_observed_base": 4,
+    "independent_tests_observed_mgnp": 4,
+    "all4_test_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "independent_test_sha256": "8838fd27a37692fd4edc2365d873d50c784566c475e04b84458177ceb1b783bc"
+  },
+  "root_prerequisites": [
+    "Bind and stage this exact r4 manifest and every member; actual account/allocation/profile/SIF/cache/source paths and fresh owned root-cgroup199-r4/execution namespace remain required.",
+    "Run only separately authorized root diagnostic; inspect actual host_exit/container_exit, own-job membership, unchanged native path and samefile evidence, all required counters, actual command and terminal accounting.",
+    "Parent :ro syntax is an intended mount option, not an observation of effective readonly nested v1 memory controller. Inspect actual container memory_mount_lines per-mount options before the separator; superblock rw,memory after the separator is distinct. Preserve and reject or separately resolve missing/ambiguous/unexpected mount evidence before any genuine-proof use.",
+    "Any genuine adapter successor still needs explicit exact source/binding review. Existing proof-adapter-r2 remains unchanged and held on its original external prerequisites; r4 diagnostic acceptance does not change its r3-pinned gate."
+  ],
+  "not_claimed": [
+    "Actual corrected container visibility or effective readonly nested memory mount",
+    "Genuine full graph/resource result, model/scoring/effects, transfer closure or GPU admission",
+    "Bridges installed Apptainer version equivalence to current upstream source"
+  ],
+  "remote_actions": false,
+  "scheduler_actions": false,
+  "implementation_edits": false,
+  "last_live_usage_percent": 18,
+  "next_checkpoint_percent": 33,
+  "ordinary_cap_percent": 80
+}

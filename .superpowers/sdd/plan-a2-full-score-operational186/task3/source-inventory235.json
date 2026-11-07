@@ -1,0 +1,54 @@
+{
+  "inventory": "Task 3 root producer source/API and current producer-consumer schema inventory",
+  "scope": "Read-only inspection; no imports of native project code, no tests, jobs, scheduler or remote calls.",
+  "plan": ".superpowers/sdd/plan-a2-full-score-operational186/plan.md",
+  "reusable_sources": [
+    {
+      "path": ".superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5-r2/helper.py",
+      "sha256": "096e0216d9ddce55a38ff401e3759fa021a6208ecb4e58405991248337c0a392",
+      "functions": ["construct_request", "check_request_fresh", "validate_complete", "validate_heldout", "validate_usage", "validate_budget", "call", "physical", "inspection_program", "remote_publish_program", "usage", "check_manifest", "verify_runtime_pins", "load_bindings", "Transport.cache_check", "Transport.inspect", "Transport.fetch", "Transport.stage", "Transport.publish"],
+      "reuse": "Request construction and finite freshness structure; immutable CPU completion validation pattern; read-only usage/status logic as algorithmic reference; path mapping, transport staging/inspection, atomic pending-to-final publication and runtime pin checking structure. Adapt APIs and retain compatible method names where plan requires."
+    },
+    {
+      "path": ".superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-model-phase-release-helper/r5-r2/cache_gate.py",
+      "sha256": "55d6517228832e0254c10086d03d3b5e3534ad91bf8ddbe54d96e9913fa3fa06",
+      "functions": ["file_sha", "check_cache"],
+      "reuse": "Plan says retain accepted cache algorithm unchanged: verify pinned proof/reference, exact revision and physical HF bind, refs/main, hash metadata and sizes, weight sizes and resolved content-addressed blob names; do not rehash full weights, load model, or download. Task 3 result wrapper may need consumer-compatible metadata but the algorithm is unchanged."
+    }
+  ],
+  "current_task1_waiting_schema": {
+    "source": ".superpowers/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:gpu_release",
+    "phase": "full_score",
+    "fields": ["phase", "job_id", "requested_at", "publication_deadline", "source_commit", "bound_config_sha256", "groups_file_sha256", "bank_file_sha256", "bank_manifest_sha256", "bank_internal_payload_sha256", "launch_packet_manifest_sha256", "resources"],
+    "rules": "One actual GPU job; immutable bound config/source/G3/bank/launch-packet/resource identity. publication_deadline is min(requested_at+300s, GPU work deadline minus reviewed minimum_entry_seconds); producer must use exact WAITING bytes/hash and this single finite window. Existing release must not predate WAITING."
+  },
+  "current_task2_cpu_complete_consumer_schema": {
+    "source": ".superpowers/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:validate_release and candidate/cpu/supervisor.py:validate_child_completion",
+    "proof_ref_in_composite": ["actual_CPU_COMPLETE.path", "actual_CPU_COMPLETE.sha256"],
+    "required_fields": ["kind", "complete", "status", "phase", "source_commit", "actual_CPU_job_id", "actual_future_GPU_job_id", "standing_packet_manifest_sha256", "final_GPU_bound_config_sha256", "GPU_packet_manifest_sha256", "groups_file_sha256", "bank_file_sha256", "bank_manifest_sha256", "full_rows", "full_controls", "full_domain_support_audit_complete", "support_reason_mask_sha256", "waiting_sha256", "bound_gpu_config_sha256", "launch_packet_manifest_sha256", "request_sha256", "timely_window", "actual_Delta_owning_guards_passed", "stable_Delta_catalogues_before_after", "immutable_CPU_proof_not_rewritten", "catalogues", "ledger_sha256", "supervisor_finished_unix", "deadline_unix", "automatic_retry", "model_loaded", "GPU_admitted", "freeze_executed"],
+    "exact_acceptance": "complete=true, status=PASS, phase=full_score; full_rows=59652 and full_controls=3396; support audit true; timely true; CPU proof is read-only and must retain immutable original bytes. The nested proof must bind actual CPU/GPU jobs, request/WAITING hashes, source50e, groups, both bank hashes and GPU packet hash. GPU validate_release checks catalogues and ledger hash through the root composite as well."
+  },
+  "current_root_release_consumer_schema": {
+    "source": ".superpowers/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:validate_release",
+    "fixed_required_fields": ["phase", "full_scoring_admitted", "actual_job_id", "reservation_id", "source_commit", "main_root", "bound_config_sha256", "resources", "current_usage_pass", "delta_fresh_preflight_passed", "waiting_sha256", "catalogues", "delta_preflight_receipt", "delta_preflight_receipt_sha256", "ledger_sha256"],
+    "identity_fields_from_current_config": "Every config member ending _sha256 is compared to the release's same-named field.",
+    "nested_delta_preflight_fields": ["complete", "phase", "source_commit", "actual_GPU_job_id", "actual_Delta_owning_guards_passed", "stable_Delta_catalogues_before_after", "immutable_CPU_proof_not_rewritten", "catalogues", "ledger_sha256", "actual_CPU_COMPLETE"],
+    "rejections": ["phase other than full_score", "missing full_scoring_admitted=true", "old bank_and_prefix4_only or pilot_root fields", "changed actual job/reservation/source/MAIN/config/resources", "missing fresh usage or Delta preflight", "WAITING hash/config mismatch", "catalogue closure not exactly the four minimum registry paths", "CPU COMPLETE not matching the full-only source/GPU/G3/bank/control/domain/WAITING/packet contract", "expired, renewed, duplicate or late release"]
+  },
+  "obsolete_historical_assumptions_to_replace": [
+    "phase bank or prefix4 and R5/R5-R2 packet authority; Task 3 is full_score only and must reject old bank/prefix proof or release",
+    "CPU3/H100 packet names and prior source/packet pins; bind current source50e, accepted full-score G3, Task1 GPU packet/config and Task2 CPU packet/request/proof",
+    "WAITING freshness up to 270s and historical request/release age rules; current trigger is at most 15s old and actual GPU WAITING publication window is fixed, nonrenewable, and at most 300s",
+    "fixed GPU reservation of 60 minutes / 3600 GPU seconds / one hour, fixed CPU 4 / RAM 64G / one-hour expectations, historical H100 placement/QOS/partition checks, historical minimum 1950s score floor and 300s finish reserve; Task3 must use reviewed proof-bound resources and actual Bridges placement, with no inherited defaults",
+    "historic usage pause at conservative 99%, old cached/reset-bound exception assumptions and telemetry semantics; use live codex-usage --pause-at 80 plus targeted actual session status, current reset/cap behavior, checkpoint projection and fail-closed unknown/freeze/reset mismatch rules in accepted Task3 plan",
+    "old budget validator's exact owned A2 1.0-hour row and historical reservation phase/cluster assumptions; use current native ledger/mapping chain, preserve all old immutable rows/charges, exact Decimal requested GPU seconds plus native rounded charges, A1/A2/A3/global caps 25/60/40/125, concurrency limit 99, and resource proof equality; no refund or reinterpretation",
+    "empty held-out closure accepted by validate_heldout; any nonempty protected closure requires owning closure plus independent review and otherwise stops",
+    "historical Delta/GPU copied catalogue snapshot treated as current; stable-capture current four catalogues and verify actual Delta bytes again before publication",
+    "historical remote resource command requiring its old QoS, partition, username assumptions, exact 4-CPU/64GiB/time tuple; replace with Python3.6-compatible exact actual Slurm identity/resource/deadline checks from current reviewed bindings"
+  ],
+  "known_dependencies_and_unresolved": {
+    "known": ["Accepted plan Task 3 APIs and scope are explicit; candidate Task1 GPU common.py supplies exact WAITING, root-release, and CPU COMPLETE consumer checks; Task2 supplies request/CPU COMPLETE producer behavior; old helper and cache gate are pinned reference bytes.", "Plan specifies native reader-quiescence/cutover, new reservation plus completed native successor mapping within no-reader interval, and current root-authoritative source/ledger/catalogue/cache/usage checks."],
+    "genuinely_unresolved_or_gated": ["Actual resource tuple and resource proof remain unbound pending accepted full-shape/resource proof181, independent resource review, capacity and placement; no historical timing can fill these nulls.", "Actual job/source/G3/bank/config/admission, transfer evidence, current mapping successor and release are deliberately not bound or created by this inventory.", "Plan notes one validation observer-failure oracle correction remains before actual GREEN; this read-only inventory did not validate its live acceptance state.", "Nonempty held-out closure, if observed, requires owning review; inventory did not inspect or resolve that scientific protection state."]
+  },
+  "source_status_note": "User brief describes Task1 GPU common.py as accepted at 97 tests and Task2 CPU implementation as static-closed at 224 tests with real WAITING/consumer mappings; actual GREEN is still pending the observer-failure oracle correction. This inventory relies on those supplied statuses and reads current candidate source only."
+}

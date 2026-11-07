@@ -1,0 +1,24 @@
+test_B1_known_effective_ro_stack_is_falsely_rejected (__main__.Independent) ... ok
+test_B2_expired_after_log_open_still_launches (__main__.Independent) ... ok
+test_B3_cleanup_error_restarts_cleanup_budget (__main__.Independent) ... ok
+test_each_declared_target_writable_rejected (__main__.Independent) ... ok
+test_effective_writable_mount_rejected (__main__.Independent) ... ok
+test_post_reap_shortened_end_is_correctly_clamped (__main__.Independent) ... ok
+test_primary_and_cleanup_errors_both_recorded (__main__.Independent) ... ok
+test_real_owned_group_is_reaped_after_leader_exit (__main__.Independent) ... ok
+test_unrelated_writable_controller_is_allowed (__main__.Independent) ... FAIL
+
+======================================================================
+FAIL: test_unrelated_writable_controller_is_allowed (__main__.Independent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3/test_regressions.py", line 27, in test_unrelated_writable_controller_is_allowed
+    inner.main();execute.assert_called_once()
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3/inner.py", line 22, in main
+    assert all(flag & os.ST_RDONLY for flag in flags.values()),flags
+AssertionError: {'/sys/fs/cgroup': 1, '/sys/fs/cgroup/cpu': 0, '/sys/fs/cgroup/memory': 1}
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.208s
+
+FAILED (failures=1)

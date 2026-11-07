@@ -1,0 +1,108 @@
+{
+  "worktree": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+  "runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime",
+  "commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/snapshot.json",
+  "snapshot_sha256": "396aa7ea86c1782e7ffda720906ae3f528a543c32d08ca7611ec99165dba6d46",
+  "source_plan": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/154-a2-timing-audit-evidence/full-scoring-resource-proposal.json",
+  "source_plan_sha256": "3d14df0b00d9fdd19e03c405212e60f567e97211116f1b3a8e28db4dc6d05df2",
+  "main_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2",
+  "pilot_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2-timing-limit4",
+  "groups": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2/groups.json",
+  "groups_file_sha256": "efe92038365ad010dbd5a889c6696d7a1b86a1ccb889564a65eca55005849f73",
+  "groups_receipt_sha256": "e334e93b930e2517f398661a079bf2db7a4ed9018eeba0ed1ebb09afd2446a5d",
+  "a1_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+  "a1_selected": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+  "registry": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+  "score_command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/scripts/jobs/specificity_a2.sh",
+    "--design",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json",
+    "--selected",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/ladder-5f450dc/selected.json",
+    "--commit",
+    "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+    "--batch-size",
+    "8",
+    "--registry",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+    "--stage",
+    "score",
+    "--work-dir",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2"
+  ],
+  "expected_score_rows": 59652,
+  "group_aliases": 9,
+  "bank_H_ids_per_task": 400,
+  "batch_size": 8,
+  "scope": {
+    "far_v2": {
+      "bank_original_H_ids": 400,
+      "bank_keys": 123,
+      "bank_head_keys": 120,
+      "bank_whole_MLP_keys": 3,
+      "bank_fp32_vector_bytes": 110592,
+      "assessment_ids": 100,
+      "compute_memberships": 3,
+      "aliases": [
+        "far_v2_seed123_DminusI",
+        "far_v2_seed1_DminusI",
+        "far_v2_seed42_DminusI"
+      ]
+    },
+    "sdr_v2": {
+      "bank_original_H_ids": 400,
+      "bank_keys": 122,
+      "bank_head_keys": 118,
+      "bank_whole_MLP_keys": 4,
+      "bank_fp32_vector_bytes": 125952,
+      "assessment_ids": 100,
+      "compute_memberships": 3,
+      "aliases": [
+        "sdr_v2_seed123_DminusI",
+        "sdr_v2_seed1_DminusI",
+        "sdr_v2_seed42_DminusI"
+      ]
+    },
+    "ser_v2": {
+      "bank_original_H_ids": 400,
+      "bank_keys": 145,
+      "bank_head_keys": 138,
+      "bank_whole_MLP_keys": 7,
+      "bank_fp32_vector_bytes": 185344,
+      "assessment_ids": 100,
+      "compute_memberships": 3,
+      "aliases": [
+        "ser_v2_seed123_DminusI",
+        "ser_v2_seed1_DminusI",
+        "ser_v2_seed42_DminusI"
+      ]
+    }
+  },
+  "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+  "dtype": "torch.bfloat16",
+  "attention_backend": "sdpa",
+  "gpu_family": "H200",
+  "minimum_gpu_total_bytes": 137438953472,
+  "minimum_gpu_free_bytes": 68719476736,
+  "gpus": 1,
+  "cpus": 4,
+  "host_memory_GiB": 64,
+  "maximum_minutes": 450,
+  "finish_reserve_seconds": 300,
+  "canonical_ledger": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/ledger.json",
+  "mapping_origin": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1/mapping",
+  "experiment_limits": {
+    "A1": 25,
+    "A2": 60,
+    "A3": 40
+  },
+  "global_limit": 125,
+  "maximum_reserved_gpu_hours": 7.5,
+  "scope_name": "all9groups full scoring only, existing genuine G2 bank",
+  "bank_file_sha256": "9c874e387a45d26fa966d69eda64ee9398a836f1c1681aa1c049ff5532702660",
+  "bank_manifest_sha256": "8a1a06fe1bfa606c45432bc97552263598e0329c725d23d4caadfc1c8645eb8a",
+  "expected_gpu_name": "NVIDIA H200",
+  "expected_bank_dtype": "torch.bfloat16"
+}

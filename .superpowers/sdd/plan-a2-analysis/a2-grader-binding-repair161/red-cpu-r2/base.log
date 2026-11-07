@@ -1,0 +1,176 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+______ test_a2_catalogue_unrelated_live_change_allowed[foreign_metadata] _______
+
+a2_catalogue_context = namespace(receipt={'a1_ancestor_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a1_design_sha256': '4229685edf55...a2-analysis/a2-grader-binding-repair161/red-cpu-r2/pytest-23478850-base/test_a2_catalogue_unrelated_li0/sources.json'))
+change = 'foreign_metadata'
+
+    @pytest.mark.parametrize("change", ["foreign_metadata", "empty_row", "updated"])
+    def test_a2_catalogue_unrelated_live_change_allowed(a2_catalogue_context, change):
+        c = a2_catalogue_context
+        frozen = copy.deepcopy(c.receipt["grader_registry"])
+        for path in c.catalogues:
+            def edit(data):
+                if change == "foreign_metadata":
+                    data["directions"][1].update(status="active", title="changed")
+                elif change == "empty_row":
+                    data["directions"].append(dict(id="new-empty", title="new",
+                        do_not_touch=[], archive=[], legacy_scratch=[], frozen_grader_sha256=None))
+                else:
+                    data["updated"] = "2026-11-04"
+            _catalogue_edit(path, edit)
+        before = len(c.calls)
+>       a2._validate_live(c.args, c.receipt, c.prepared)
+
+tests/test_a2_pipeline.py:1025: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+component_analysis/a2_pipeline.py:1121: in _validate_live
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'grader registry snapshot drift'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: grader registry snapshot drift
+
+dataset/user_inversion_pipeline.py:32: ValueError
+---------------------------- Captured stdout setup -----------------------------
+freeze: complete
+__________ test_a2_catalogue_unrelated_live_change_allowed[empty_row] __________
+
+a2_catalogue_context = namespace(receipt={'a1_ancestor_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a1_design_sha256': '4229685edf55...a2-analysis/a2-grader-binding-repair161/red-cpu-r2/pytest-23478850-base/test_a2_catalogue_unrelated_li1/sources.json'))
+change = 'empty_row'
+
+    @pytest.mark.parametrize("change", ["foreign_metadata", "empty_row", "updated"])
+    def test_a2_catalogue_unrelated_live_change_allowed(a2_catalogue_context, change):
+        c = a2_catalogue_context
+        frozen = copy.deepcopy(c.receipt["grader_registry"])
+        for path in c.catalogues:
+            def edit(data):
+                if change == "foreign_metadata":
+                    data["directions"][1].update(status="active", title="changed")
+                elif change == "empty_row":
+                    data["directions"].append(dict(id="new-empty", title="new",
+                        do_not_touch=[], archive=[], legacy_scratch=[], frozen_grader_sha256=None))
+                else:
+                    data["updated"] = "2026-11-04"
+            _catalogue_edit(path, edit)
+        before = len(c.calls)
+>       a2._validate_live(c.args, c.receipt, c.prepared)
+
+tests/test_a2_pipeline.py:1025: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+component_analysis/a2_pipeline.py:1121: in _validate_live
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'grader registry snapshot drift'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: grader registry snapshot drift
+
+dataset/user_inversion_pipeline.py:32: ValueError
+---------------------------- Captured stdout setup -----------------------------
+freeze: complete
+___________ test_a2_catalogue_unrelated_live_change_allowed[updated] ___________
+
+a2_catalogue_context = namespace(receipt={'a1_ancestor_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a1_design_sha256': '4229685edf55...a2-analysis/a2-grader-binding-repair161/red-cpu-r2/pytest-23478850-base/test_a2_catalogue_unrelated_li2/sources.json'))
+change = 'updated'
+
+    @pytest.mark.parametrize("change", ["foreign_metadata", "empty_row", "updated"])
+    def test_a2_catalogue_unrelated_live_change_allowed(a2_catalogue_context, change):
+        c = a2_catalogue_context
+        frozen = copy.deepcopy(c.receipt["grader_registry"])
+        for path in c.catalogues:
+            def edit(data):
+                if change == "foreign_metadata":
+                    data["directions"][1].update(status="active", title="changed")
+                elif change == "empty_row":
+                    data["directions"].append(dict(id="new-empty", title="new",
+                        do_not_touch=[], archive=[], legacy_scratch=[], frozen_grader_sha256=None))
+                else:
+                    data["updated"] = "2026-11-04"
+            _catalogue_edit(path, edit)
+        before = len(c.calls)
+>       a2._validate_live(c.args, c.receipt, c.prepared)
+
+tests/test_a2_pipeline.py:1025: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+component_analysis/a2_pipeline.py:1121: in _validate_live
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'grader registry snapshot drift'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: grader registry snapshot drift
+
+dataset/user_inversion_pipeline.py:32: ValueError
+---------------------------- Captured stdout setup -----------------------------
+freeze: complete
+__________ test_a2_catalogue_existing_stage_read_requires_no_rewrite ___________
+
+a2_catalogue_context = namespace(receipt={'a1_ancestor_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a1_design_sha256': '4229685edf55...a2-analysis/a2-grader-binding-repair161/red-cpu-r2/pytest-23478850-base/test_a2_catalogue_existing_sta0/sources.json'))
+
+    def test_a2_catalogue_existing_stage_read_requires_no_rewrite(a2_catalogue_context):
+        c = a2_catalogue_context
+        payload = dict(kind="software-stage", execution_provenance=None, counts={})
+        manifest = a2._manifest(c.args, c.receipt, payload)
+        stage = c.output / "software-stage"
+        a2._publish_stage(stage, "payload.json", payload, manifest)
+        original = {p.name: p.read_bytes() for p in stage.iterdir()}
+        groups_bytes = (c.output / "groups.json").read_bytes()
+        for path in c.catalogues:
+            _catalogue_edit(path, lambda data: data["directions"][1].update(status="done"))
+        before = len(c.calls)
+>       assert a2.read_stage(stage, "payload.json", "bank", c.args, c.receipt) == payload
+
+tests/test_a2_pipeline.py:1041: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+component_analysis/a2_pipeline.py:1166: in read_stage
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'stale A2 completion manifest link'
+
+    def require(condition, message):
+        if not condition:
+>           raise ValueError(message)
+E           ValueError: stale A2 completion manifest link
+
+dataset/user_inversion_pipeline.py:32: ValueError
+---------------------------- Captured stdout setup -----------------------------
+freeze: complete
+_______ test_a2_catalogue_freeze_has_new_binding_and_legacy_is_rejected ________
+
+a2_catalogue_context = namespace(receipt={'a1_ancestor_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a1_design_sha256': '4229685edf55...a2-analysis/a2-grader-binding-repair161/red-cpu-r2/pytest-23478850-base/test_a2_catalogue_freeze_has_n0/sources.json'))
+
+    def test_a2_catalogue_freeze_has_new_binding_and_legacy_is_rejected(a2_catalogue_context):
+        c = a2_catalogue_context
+>       assert "grader_binding" in c.receipt
+E       AssertionError: assert 'grader_binding' in {'a1_ancestor_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a1_design_sha256': '4229685edf556beb4f4a319568f93b...bc320505d01916079c24be9073050c6c373d', 'a2_training_execution_commit': '6bd8bf5334f2e83613a129d2fcfeacf83e762191', ...}
+E        +  where {'a1_ancestor_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a1_design_sha256': '4229685edf556beb4f4a319568f93b...bc320505d01916079c24be9073050c6c373d', 'a2_training_execution_commit': '6bd8bf5334f2e83613a129d2fcfeacf83e762191', ...} = namespace(receipt={'a1_ancestor_commit': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a1_design_sha256': '4229685edf55...a2-analysis/a2-grader-binding-repair161/red-cpu-r2/pytest-23478850-base/test_a2_catalogue_freeze_has_n0/sources.json')).receipt
+
+tests/test_a2_pipeline.py:1049: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+freeze: complete
+=============================== warnings summary ===============================
+../../../../../../../../../../../../u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_a2_pipeline.py::test_a2_catalogue_unrelated_live_change_allowed[foreign_metadata]
+FAILED tests/test_a2_pipeline.py::test_a2_catalogue_unrelated_live_change_allowed[empty_row]
+FAILED tests/test_a2_pipeline.py::test_a2_catalogue_unrelated_live_change_allowed[updated]
+FAILED tests/test_a2_pipeline.py::test_a2_catalogue_existing_stage_read_requires_no_rewrite
+FAILED tests/test_a2_pipeline.py::test_a2_catalogue_freeze_has_new_binding_and_legacy_is_rejected
+5 failed, 84 deselected, 1 warning in 6.74s
+EXPECTED_FIVE_RED_CONTRACT_FAILURES_CONFIRMED

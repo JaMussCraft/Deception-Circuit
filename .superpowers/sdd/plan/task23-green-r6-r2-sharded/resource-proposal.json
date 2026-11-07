@@ -1,0 +1,51 @@
+{
+  "status": "UNBOUND_NOT_RUNNABLE",
+  "revision": "r6-r2-sharded",
+  "allocation_seconds": 4800,
+  "stage_caps_seconds": {
+    "baseline": 610,
+    "oracle": 90,
+    "suite": 3600
+  },
+  "final_reserve_seconds": 120,
+  "shared_failure_cleanup": {
+    "term_seconds": 15,
+    "kill_reap_seconds": 5,
+    "total_seconds": 20
+  },
+  "nonstage_overhead_seconds": 360,
+  "environments": {
+    "base": {
+      "python": "/sw/external/python/anaconda3/bin/python3.9",
+      "cluster": "delta",
+      "cpus": 2,
+      "memory_gib": 32,
+      "shards": [
+        0,
+        1
+      ]
+    },
+    "mgnp": {
+      "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "cluster": "bridges2",
+      "cpus": 18,
+      "memory_gib": 32,
+      "shards": [
+        0,
+        1
+      ]
+    }
+  },
+  "actual_job": null,
+  "actual_config": null,
+  "actual_account": null,
+  "actual_partition": null,
+  "actual_qos": null,
+  "actual_output": null,
+  "expected_bindings": null,
+  "execution_authorized": false,
+  "full_suite_accepted": false,
+  "no_retry": true,
+  "output_layout": "job-<actual-job>/child/execution",
+  "host_receipt_layout": "job-<actual-job>/<stage>-terminal.json outside child subtree"
+}

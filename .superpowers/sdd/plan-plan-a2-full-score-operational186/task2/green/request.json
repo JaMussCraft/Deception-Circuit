@@ -1,0 +1,33 @@
+{
+  "status": "PROPOSAL_ROOT_CPU_FIXTURE_DISPATCH_ONLY",
+  "nodes": 1,
+  "ntasks": 1,
+  "CPUs": 2,
+  "RAM_GiB": 8,
+  "GPUs": 0,
+  "walltime_seconds": 240,
+  "partition": [
+    "cpu",
+    "cpu-interactive"
+  ],
+  "requeue": false,
+  "per_environment_timeout_seconds": 90,
+  "expected_cases_per_environment": 204,
+  "interpreters": [
+    "/sw/external/python/anaconda3/bin/python3.9",
+    "/u/swong2/.conda/envs/mgnp/bin/python"
+  ],
+  "pins_sha256": "52858183652f0ad2aa3a8ec1b264838245d2e34fb0d0bd7f5d7c9688938ad933",
+  "no_native_import": true,
+  "no_model": true,
+  "no_GPU": true,
+  "scientific_execution_authorized": false,
+  "command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green/launch_cpu_green.sh",
+    "--pins-sha256",
+    "52858183652f0ad2aa3a8ec1b264838245d2e34fb0d0bd7f5d7c9688938ad933",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green/root-green-01"
+  ]
+}

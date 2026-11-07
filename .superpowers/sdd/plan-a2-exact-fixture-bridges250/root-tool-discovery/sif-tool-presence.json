@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import subprocess,json,time\nimage='\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif'\"'\"'\nrows=[]\nfor cmd in [['\"'\"'/usr/bin/readelf'\"'\"','\"'\"'--version'\"'\"'],['\"'\"'/usr/bin/ldd'\"'\"','\"'\"'--version'\"'\"'],['\"'\"'/usr/bin/getconf'\"'\"','\"'\"'GNU_LIBC_VERSION'\"'\"']]:\n a=['\"'\"'apptainer'\"'\"','\"'\"'exec'\"'\"','\"'\"'--cleanenv'\"'\"','\"'\"'--contain'\"'\"','\"'\"'--no-home'\"'\"',image]+cmd;r=subprocess.run(a,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=15);rows.append({'\"'\"'argv'\"'\"':a,'\"'\"'exit_code'\"'\"':r.returncode,'\"'\"'stdout'\"'\"':r.stdout[:1500],'\"'\"'stderr'\"'\"':r.stderr[:1500]})\nprint(json.dumps({'\"'\"'tool_presence_only'\"'\"':True,'\"'\"'runtime_slice_compatibility_claimed'\"'\"':False,'\"'\"'results'\"'\"':rows,'\"'\"'observed_unix'\"'\"':time.time()}))\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"tool_presence_only\": true, \"runtime_slice_compatibility_claimed\": false, \"results\": [{\"argv\": [\"apptainer\", \"exec\", \"--cleanenv\", \"--contain\", \"--no-home\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif\", \"/usr/bin/readelf\", \"--version\"], \"exit_code\": 255, \"stdout\": \"\", \"stderr\": \"WARNING: Error changing the container working directory. Using '/' instead: chdir /jet/home/swong2: no such file or directory\\nFATAL:   stat /usr/bin/readelf: no such file or directory\\n\"}, {\"argv\": [\"apptainer\", \"exec\", \"--cleanenv\", \"--contain\", \"--no-home\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif\", \"/usr/bin/ldd\", \"--version\"], \"exit_code\": 0, \"stdout\": \"ldd (Ubuntu GLIBC 2.35-0ubuntu3.15) 2.35\\nCopyright (C) 2022 Free Software Foundation, Inc.\\nThis is free software; see the source for copying conditions.  There is NO\\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\\nWritten by Roland McGrath and Ulrich Drepper.\\n\", \"stderr\": \"WARNING: Error changing the container working directory. Using '/' instead: chdir /jet/home/swong2: no such file or directory\\n\"}, {\"argv\": [\"apptainer\", \"exec\", \"--cleanenv\", \"--contain\", \"--no-home\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif\", \"/usr/bin/getconf\", \"GNU_LIBC_VERSION\"], \"exit_code\": 0, \"stdout\": \"glibc 2.35\\n\", \"stderr\": \"WARNING: Error changing the container working directory. Using '/' instead: chdir /jet/home/swong2: no such file or directory\\n\"}], \"observed_unix\": 1794030475.1862016}\n",
+  "stderr": "",
+  "observed_unix": 1794030475.205006
+}

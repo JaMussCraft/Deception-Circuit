@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "packet_pins_sha256": "9a5129f6c3fae0455c706a6077ac04047c5062f7abbea0f98018113da1f7e571",
+  "test_sha256": "b480636a8712de573916a4e9b438a82983156cebf180d36d0ed7429a4648ab03",
+  "changed_test_functions": [
+    "test_whole_chain_normal_native_full_publication",
+    "test_transfer_failure_cannot_cross_score_boundary"
+  ],
+  "original_assertions_decorators_module_statements_preserved": true,
+  "total_cases": 33,
+  "production_components_unchanged": 17,
+  "packet_members": 9,
+  "original_observer_bytes_unchanged": true,
+  "actual_red": [
+    {
+      "environment": "base39",
+      "passed": 31,
+      "failed": 2,
+      "errors": 0,
+      "skips": 0,
+      "observer_elapsed": 751.4245367629919,
+      "pytest_seconds": 750.776,
+      "timeout_margin": 898.5754632370081
+    },
+    {
+      "environment": "mgnp",
+      "passed": 31,
+      "failed": 2,
+      "errors": 0,
+      "skips": 0,
+      "observer_elapsed": 776.2622501199949,
+      "pytest_seconds": 770.632,
+      "timeout_margin": 873.7377498800051
+    }
+  ],
+  "extracted_original_guards_reproduced": [
+    "base39",
+    "mgnp"
+  ],
+  "exclusive_claim_bytes_preserved": true,
+  "native_imports": false,
+  "pytest_runs": 0,
+  "new_full_path_measured": false,
+  "resource_proposal": {
+    "CPUs": 2,
+    "RAM_bytes": 17179869184,
+    "wall_seconds": 3600,
+    "environment_cap": 1650,
+    "dual_cap": 3300,
+    "nominal_observer_headroom": 300
+  },
+  "metadata_qualification": "Inherited memory_qualification says failed run never retained full score graphs. Actual normal full score was constructed/published/audited before failure; only mutation-copy plus reloaded-score coexistence and three subsequent audits remain unmeasured. MGNP pending-at-diagnosis context is historical; final runtime is recorded here."
+}

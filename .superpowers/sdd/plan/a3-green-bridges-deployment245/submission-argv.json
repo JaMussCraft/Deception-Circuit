@@ -1,0 +1,21 @@
+[
+  "sbatch",
+  "--parsable",
+  "--account=cis260361p",
+  "--partition=RM-shared",
+  "--qos=rm",
+  "--nodes=1",
+  "--ntasks=1",
+  "--cpus-per-task=18",
+  "--mem=32G",
+  "--time=00:59:00",
+  "--no-requeue",
+  "--export=ALL,CUDA_VISIBLE_DEVICES=",
+  "--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3",
+  "--job-name=lad-A3-mgnp-r5",
+  "--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-%j.log",
+  "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/launch.sh",
+  "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-deployment245/config.json",
+  "6e1e7858314f7ee426a60dfd646cd1612e8648a9e652281550e61940b9666f62",
+  "bd3533cc18025d7d2bf97515060a46f793abd4f4a43609e8dc6c9626d8a6e6e2"
+]

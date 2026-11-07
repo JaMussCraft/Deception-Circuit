@@ -1,0 +1,1101 @@
+"""
+analysis.py — circuit analysis & reporting utilities (model-agnostic).
+
+Combines two pieces of functionality used by the two-phase pipeline:
+
+  * NODE analysis  — `analyze_and_finalize_circuit` enforces hierarchical
+    gate consistency, sets the model to deterministic "final circuit" mode,
+    and returns per-granularity + prunable-parameter compression statistics.
+    Works for both GPT-2 and Llama (see `_get_model_info`).
+
+  * EDGE analysis  — extract surviving nodes from a node-pruned model, count
+    the dense edges between them, and report active edges after edge pruning.
+
+Vendored and de-duplicated from the original `utils.py` (node side) and
+`edge_pruning/utils.py` (edge side).
+"""
+
+import json
+import os
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from typing import Dict, List, Set, Tuple, Optional
+from tqdm import tqdm
+
+from l0 import HardConcreteGate
+
+
+# ##############################################################################
+# NODE-LEVEL ANALYSIS (GPT-2 / Llama)
+# ##############################################################################
+
+def _get_model_info(model):
+    """
+    Extract model-type-agnostic information from either GPT-2 or Llama models.
+    Returns a dict with normalized keys regardless of architecture.
+    """
+    config = model.config
+    model_type = getattr(config, 'model_type', 'gpt2')
+    
+    if model_type == 'llama':
+        return {
+            'model_type': 'llama',
+            'hidden_size': config.hidden_size,
+            'num_heads': config.num_attention_heads,
+            'head_dim': config.hidden_size // config.num_attention_heads,
+            'num_layers': config.num_hidden_layers,
+            'intermediate_size': config.intermediate_size,
+            'num_kv_heads': config.num_key_value_heads,
+            'layers': model.model.layers,
+            # Llama uses separate q/k/v/o projections (no bias)
+            'attn_has_bias': False,
+            'mlp_has_bias': False,
+            # Llama SwiGLU has gate_proj + up_proj -> down_proj
+            'num_mlp_projections': 3,
+        }
+    else:  # GPT-2
+        return {
+            'model_type': 'gpt2',
+            'hidden_size': config.hidden_size,
+            'num_heads': config.n_head,
+            'head_dim': config.hidden_size // config.n_head,
+            'num_layers': config.n_layer,
+            'intermediate_size': config.n_inner if config.n_inner is not None else 4 * config.hidden_size,
+            'num_kv_heads': config.n_head,  # GPT-2 has MHA (no GQA)
+            'layers': model.transformer.h,
+            'attn_has_bias': True,
+            'mlp_has_bias': True,
+            'num_mlp_projections': 2,
+        }
+
+
+def analyze_prunable_compression(model, layer_report_data, config, verbose=True):
+    """
+    Calculate compression based ONLY on prunable parameters:
+    - Exclude: embeddings, positional embeddings, layer norms, LM head
+    - Include: Only attention and MLP weight matrices that can be pruned
+    Supports both GPT-2 and Llama models.
+    """
+    
+    info = _get_model_info(model)
+    hidden_size = info['hidden_size']
+    num_heads = info['num_heads']
+    head_dim = info['head_dim']
+    intermediate_size = info['intermediate_size']
+    num_layers = info['num_layers']
+    num_kv_heads = info['num_kv_heads']
+    
+    # --- CALCULATE TOTAL PRUNABLE PARAMETERS ---
+    total_prunable_params = 0
+    bias_size = lambda n: n if info['attn_has_bias'] else 0
+    mlp_bias = lambda n: n if info['mlp_has_bias'] else 0
+    
+    # Per layer prunable parameters
+    for layer_idx in range(num_layers):
+        if info['model_type'] == 'llama':
+            # Llama: separate q_proj, k_proj, v_proj, o_proj (no bias)
+            q_params = hidden_size * (num_heads * head_dim)
+            k_params = hidden_size * (num_kv_heads * head_dim)
+            v_params = hidden_size * (num_kv_heads * head_dim)
+            o_params = (num_heads * head_dim) * hidden_size
+            total_attention_params = q_params + k_params + v_params + o_params
+            
+            # Llama SwiGLU: gate_proj, up_proj, down_proj (no bias)
+            gate_params = hidden_size * intermediate_size
+            up_params = hidden_size * intermediate_size
+            down_params = intermediate_size * hidden_size
+            total_mlp_params = gate_params + up_params + down_params
+        else:
+            # GPT-2: c_attn (combined QKV), c_proj
+            attention_qkv_params = hidden_size * 3 * hidden_size + bias_size(3 * hidden_size)
+            attention_proj_params = hidden_size * hidden_size + bias_size(hidden_size)
+            total_attention_params = attention_qkv_params + attention_proj_params
+            
+            # GPT-2: c_fc, c_proj
+            mlp_fc_params = hidden_size * intermediate_size + mlp_bias(intermediate_size)
+            mlp_proj_params = intermediate_size * hidden_size + mlp_bias(hidden_size)
+            total_mlp_params = mlp_fc_params + mlp_proj_params
+        
+        total_prunable_params += total_attention_params + total_mlp_params
+    
+    if verbose:
+        print(f"\n📍 PRUNABLE PARAMETER BREAKDOWN:")
+        print(f"  - Layers: {num_layers}")
+        print(f"  - Attention params per layer: {total_attention_params:,}")
+        print(f"  - MLP params per layer: {total_mlp_params:,}")
+        print(f"  - Total per layer: {total_attention_params + total_mlp_params:,}")
+        print(f"  - TOTAL PRUNABLE: {total_prunable_params:,}")
+    
+    # --- CALCULATE ACTIVE PRUNABLE PARAMETERS ---
+    active_prunable_params = 0
+    
+    for i, report in enumerate(layer_report_data):
+        if not report['layer_active']:
+            continue  # Skip entirely pruned layers
+            
+        block = info['layers'][i]
+        layer_active_params = 0
+        
+        # Active attention parameters (no block gate = implicitly active)
+        if report.get('attn_block', 'Active') == 'Active':
+            if hasattr(block.attn, 'neuron_gates') and block.attn.neuron_gates!=None:
+                active_attention_neurons = (block.attn.neuron_gates() > 0.5).sum().item()
+            else:
+                active_attention_neurons = hidden_size
+            
+            # QKV: hidden_size → 3 * active_attention_neurons
+            active_qkv_params = hidden_size * 3 * active_attention_neurons + 3 * active_attention_neurons
+            
+            # Output projection: active_attention_neurons → hidden_size
+            active_proj_params = active_attention_neurons * hidden_size + hidden_size
+            
+            layer_attention_params = active_qkv_params + active_proj_params
+            layer_active_params += layer_attention_params
+            
+            if verbose:
+                print(f"  Layer {i} Attention: {active_attention_neurons}/{hidden_size} neurons → {layer_attention_params:,} params")
+        
+        # Active MLP parameters (no block gate = implicitly active)
+        if report.get('mlp_block', 'Active') == 'Active':
+            if hasattr(block.mlp, 'hidden_gates') and block.mlp.hidden_gates!=None:
+                active_hidden_neurons = (block.mlp.hidden_gates() > 0.5).sum().item()
+            else:
+                active_hidden_neurons = intermediate_size
+                
+            if hasattr(block.mlp, 'output_gates') and block.mlp.output_gates!=None:
+                active_output_neurons = (block.mlp.output_gates() > 0.5).sum().item()
+            else:
+                active_output_neurons = hidden_size
+            
+            # FC: hidden_size → active_hidden_neurons
+            active_fc_params = hidden_size * active_hidden_neurons + active_hidden_neurons
+            
+            # Projection: active_hidden_neurons → active_output_neurons
+            active_mlp_proj_params = active_hidden_neurons * active_output_neurons + active_output_neurons
+            
+            layer_mlp_params = active_fc_params + active_mlp_proj_params
+            layer_active_params += layer_mlp_params
+            
+            if verbose:
+                print(f"  Layer {i} MLP: {active_hidden_neurons}/{intermediate_size} hidden, {active_output_neurons}/{hidden_size} output → {layer_mlp_params:,} params")
+        
+        active_prunable_params += layer_active_params
+        
+        if verbose and layer_active_params > 0:
+            print(f"  Layer {i} TOTAL: {layer_active_params:,} params")
+    
+    # --- CALCULATE COMPRESSION METRICS ---
+    pruned_params = total_prunable_params - active_prunable_params
+    compression_ratio = total_prunable_params / active_prunable_params if active_prunable_params > 0 else float('inf')
+    reduction_percentage = (pruned_params / total_prunable_params) * 100
+    
+    # Calculate effective model compression including fixed params
+    total_model_params = sum(p.numel() for p in model.parameters())
+    fixed_params = total_model_params - total_prunable_params
+    effective_model_params = fixed_params + active_prunable_params
+    effective_compression = total_model_params / effective_model_params if effective_model_params > 0 else float('inf')
+    
+    if verbose:
+        print(f"\n" + "="*80)
+        print("  PRUNABLE PARAMETER COMPRESSION ANALYSIS")
+        print("="*80)
+        print(f"Total prunable parameters: {total_prunable_params:,}")
+        print(f"Active prunable parameters: {active_prunable_params:,}")
+        print(f"Pruned parameters: {pruned_params:,}")
+        print(f"Compression ratio: {compression_ratio:.2f}x")
+        print(f"Parameter reduction: {reduction_percentage:.1f}%")
+        
+        print(f"\n📍 MODEL BREAKDOWN:")
+        print(f"  - Total model parameters: {total_model_params:,}")
+        print(f"  - Fixed parameters (embeddings, norms, etc.): {fixed_params:,} ({fixed_params/total_model_params*100:.1f}%)")
+        print(f"  - Prunable parameters: {total_prunable_params:,} ({total_prunable_params/total_model_params*100:.1f}%)")
+        print(f"  - Active prunable parameters: {active_prunable_params:,} ({active_prunable_params/total_model_params*100:.1f}%)")
+        
+        print(f"\n🎯 EFFECTIVE MODEL COMPRESSION:")
+        print(f"  - Effective model size: {effective_model_params:,} parameters")
+        print(f"  - Overall compression: {effective_compression:.2f}x")
+        print(f"  - Overall reduction: {(total_model_params - effective_model_params)/total_model_params*100:.1f}%")
+    
+    return {
+        'total_prunable_params': total_prunable_params,
+        'active_prunable_params': active_prunable_params,
+        'compression_ratio': compression_ratio,
+        'reduction_percentage': reduction_percentage,
+        'total_model_params': total_model_params,
+        'fixed_params': fixed_params,
+        'effective_model_params': effective_model_params,
+        'effective_compression': effective_compression
+    }
+
+
+def analyze_and_finalize_circuit(model: nn.Module, verbose: bool = True):
+    """
+    Analyzes a trained model with HardConcreteGates, pedantically enforces hierarchical
+    consistency, prints detailed pruning statistics, and keeps the model in its
+    final, hard-pruned inference mode. FOCUSED ON PRUNABLE PARAMETERS.
+    """
+    print("\n" + "="*80)
+    print("  ANALYZING AND FINALIZING THE DISCOVERED CIRCUIT (PEDANTIC MODE)")
+    print("="*80)
+
+    model.eval()
+    # Set to final mode to read and enforce deterministic 0/1 gate values
+    model.set_final_circuit_mode(True)
+
+    # --- 1. INITIALIZATION (model-agnostic) ---
+    info = _get_model_info(model)
+    config = model.config
+    hidden_size = info['hidden_size']
+    num_heads = info['num_heads']
+    head_dim = info['head_dim']
+    num_layers = info['num_layers']
+    intermediate_size = info['intermediate_size']
+    layers = info['layers']
+
+    granularity_stats = {
+        'embedding': {'total': 1, 'active': 0},
+        'layer_level': {'total': num_layers, 'active': 0},
+        'attention_blocks': {'total': 0, 'active': 0},
+        'mlp_blocks': {'total': 0, 'active': 0},
+        'attention_heads': {'total': 0, 'active': 0},
+        'attention_neurons': {'total': 0, 'active': 0},
+        'mlp_hidden': {'total': 0, 'active': 0},
+        'mlp_output': {'total': 0, 'active': 0}
+    }
+    layer_report_data = []
+
+    with torch.no_grad():
+        # --- 2. HIERARCHICAL CONSISTENCY ENFORCEMENT ---
+        # This section modifies the gates in-place to ensure strict hierarchy.
+        
+        layer_gates_status = [True] * num_layers
+        if hasattr(model, 'layer_gates') and model.layer_gates is not None:
+            for i, layer_gate in enumerate(model.layer_gates):
+                if layer_gate is not None and (layer_gate() < 0.5).item():
+                    layer_gates_status[i] = False
+
+        for i, block in enumerate(layers):
+            if not layer_gates_status[i]:
+                # If layer is pruned, force everything inside it to be pruned
+                if hasattr(block, 'attention_block_gate') and block.attention_block_gate is not None:
+                    block.attention_block_gate.log_alpha.data.fill_(-1e6)
+                if hasattr(block, 'mlp_block_gate') and block.mlp_block_gate is not None:
+                    block.mlp_block_gate.log_alpha.data.fill_(-1e6)
+                if hasattr(block.attn, 'head_gates') and block.attn.head_gates is not None:
+                    block.attn.head_gates.log_alpha.data.fill_(-1e6)
+                if hasattr(block.attn, 'neuron_gates') and block.attn.neuron_gates is not None:
+                    block.attn.neuron_gates.log_alpha.data.fill_(-1e6)
+                if hasattr(block.mlp, 'hidden_gates') and block.mlp.hidden_gates is not None:
+                    block.mlp.hidden_gates.log_alpha.data.fill_(-1e6)
+                if hasattr(block.mlp, 'output_gates') and block.mlp.output_gates is not None:
+                    block.mlp.output_gates.log_alpha.data.fill_(-1e6)
+                continue
+
+            # Top-Down: Block -> Children
+            if hasattr(block, 'attention_block_gate') and block.attention_block_gate is not None and (block.attention_block_gate() < 0.5).item():
+                if hasattr(block.attn, 'head_gates') and block.attn.head_gates is not None:
+                    block.attn.head_gates.log_alpha.data.fill_(-1e6)
+                if hasattr(block.attn, 'neuron_gates') and block.attn.neuron_gates is not None:
+                    block.attn.neuron_gates.log_alpha.data.fill_(-1e6)
+            
+            if hasattr(block, 'mlp_block_gate') and block.mlp_block_gate is not None and (block.mlp_block_gate() < 0.5).item():
+                if hasattr(block.mlp, 'hidden_gates') and block.mlp.hidden_gates is not None:
+                    block.mlp.hidden_gates.log_alpha.data.fill_(-1e6)
+                if hasattr(block.mlp, 'output_gates') and block.mlp.output_gates is not None:
+                    block.mlp.output_gates.log_alpha.data.fill_(-1e6)
+
+            # Top-Down: Head -> Neurons
+            if (hasattr(block.attn, 'head_gates') and block.attn.head_gates is not None and 
+                hasattr(block.attn, 'neuron_gates') and block.attn.neuron_gates is not None):
+                head_gates_mask = block.attn.head_gates() < 0.5
+                if head_gates_mask.any():
+                    neuron_log_alpha = block.attn.neuron_gates.log_alpha.view(num_heads, head_dim)
+                    neuron_log_alpha[head_gates_mask, :] = -1e6
+
+            # Bottom-Up: Neurons -> Head -> Block
+            if (hasattr(block.attn, 'head_gates') and block.attn.head_gates is not None and 
+                hasattr(block.attn, 'neuron_gates') and block.attn.neuron_gates is not None):
+                neuron_mask_by_head = (block.attn.neuron_gates() < 0.5).view(num_heads, head_dim)
+                all_neurons_pruned_mask = neuron_mask_by_head.all(dim=1)
+                if all_neurons_pruned_mask.any():
+                    block.attn.head_gates.log_alpha.data[all_neurons_pruned_mask] = -1e6
+            
+            if (hasattr(block.attn, 'head_gates') and block.attn.head_gates is not None and 
+                (block.attn.head_gates() < 0.5).all().item()):
+                if hasattr(block, 'attention_block_gate') and block.attention_block_gate is not None:
+                    block.attention_block_gate.log_alpha.data.fill_(-1e6)
+
+            # Bottom-Up: MLP Neurons -> Block
+            if (hasattr(block, 'mlp_block_gate') and block.mlp_block_gate is not None and 
+                hasattr(block.mlp, 'hidden_gates') and block.mlp.hidden_gates is not None and 
+                hasattr(block.mlp, 'output_gates') and block.mlp.output_gates is not None):
+                all_mlp_pruned = (block.mlp.hidden_gates() < 0.5).all() and (block.mlp.output_gates() < 0.5).all()
+                if all_mlp_pruned:
+                    block.mlp_block_gate.log_alpha.data.fill_(-1e6)
+
+        # --- 2.5. LAYER-LEVEL BOTTOM-UP CONSISTENCY ---
+        # Check if both attention and MLP blocks are pruned, then prune the entire layer
+        if hasattr(model, 'layer_gates') and model.layer_gates is not None:
+            for i, block in enumerate(layers):
+                if i >= len(model.layer_gates) or model.layer_gates[i] is None:
+                    continue
+                    
+                attention_block_pruned = False
+                mlp_block_pruned = False
+                
+                # Check if attention block is pruned
+                if hasattr(block, 'attention_block_gate') and block.attention_block_gate is not None:
+                    attention_block_pruned = (block.attention_block_gate() < 0.5).item()
+                else:
+                    # If no attention block gate, consider it active (fallback)
+                    attention_block_pruned = False
+                
+                # Check if MLP block is pruned  
+                if hasattr(block, 'mlp_block_gate') and block.mlp_block_gate is not None:
+                    mlp_block_pruned = (block.mlp_block_gate() < 0.5).item()
+                else:
+                    # If no MLP block gate, consider it active (fallback)
+                    mlp_block_pruned = False
+                
+                # If both major components are pruned, prune the entire layer
+                if attention_block_pruned and mlp_block_pruned:
+                    model.layer_gates[i].log_alpha.data.fill_(-1e6)
+                    layer_gates_status[i] = False
+                    if verbose:
+                        print(f"  🔧 Layer {i}: Both attention and MLP blocks pruned → Pruning entire layer")
+
+        # --- 3. STATISTICS GATHERING (POST-ENFORCEMENT) ---
+        if getattr(model, 'embedding_gate', None) is None:
+            embedding_gate_status = "N/A"
+        elif (model.embedding_gate() > 0.5).item():
+            granularity_stats['embedding']['active'] = 1
+            embedding_gate_status = "Active"
+        else:
+            embedding_gate_status = "Pruned"
+        
+        granularity_stats['layer_level']['active'] = int(sum(layer_gates_status))
+
+        for i, block in enumerate(layers):
+            layer_stats = {'layer': i, 'layer_active': layer_gates_status[i]}
+            
+            if hasattr(block, 'attention_block_gate') and block.attention_block_gate is not None:
+                granularity_stats['attention_blocks']['total'] += 1
+                is_active = (block.attention_block_gate() > 0.5).item()
+                layer_stats['attn_block'] = "Active" if is_active else "Pruned"
+                if is_active: granularity_stats['attention_blocks']['active'] += 1
+
+            if hasattr(block, 'mlp_block_gate') and block.mlp_block_gate is not None:
+                granularity_stats['mlp_blocks']['total'] += 1
+                is_active = (block.mlp_block_gate() > 0.5).item()
+                layer_stats['mlp_block'] = "Active" if is_active else "Pruned"
+                if is_active: granularity_stats['mlp_blocks']['active'] += 1
+            
+            if hasattr(block.attn, 'head_gates') and block.attn.head_gates is not None:
+                active_count = (block.attn.head_gates() > 0.5).sum().item()
+                layer_stats['attn_heads'] = f"{int(active_count)}/{num_heads}"
+                granularity_stats['attention_heads']['total'] += num_heads
+                if layer_gates_status[i]: granularity_stats['attention_heads']['active'] += active_count
+            
+            if hasattr(block.attn, 'neuron_gates') and block.attn.neuron_gates is not None:
+                active_count = (block.attn.neuron_gates() > 0.5).sum().item()
+                total_count = len(block.attn.neuron_gates.log_alpha)
+                layer_stats['attn_neurons'] = f"{int(active_count)}/{total_count}"
+                granularity_stats['attention_neurons']['total'] += total_count
+                if layer_gates_status[i]: granularity_stats['attention_neurons']['active'] += active_count
+            
+            if hasattr(block.mlp, 'hidden_gates') and block.mlp.hidden_gates is not None:
+                active_count = (block.mlp.hidden_gates() > 0.5).sum().item()
+                layer_stats['mlp_hidden'] = f"{int(active_count)}/{intermediate_size}"
+                granularity_stats['mlp_hidden']['total'] += intermediate_size
+                if layer_gates_status[i]: granularity_stats['mlp_hidden']['active'] += active_count
+
+            if hasattr(block.mlp, 'output_gates') and block.mlp.output_gates is not None:
+                active_count = (block.mlp.output_gates() > 0.5).sum().item()
+                layer_stats['mlp_output'] = f"{int(active_count)}/{hidden_size}"
+                granularity_stats['mlp_output']['total'] += hidden_size
+                if layer_gates_status[i]: granularity_stats['mlp_output']['active'] += active_count
+            
+            layer_report_data.append(layer_stats)
+
+    # --- 4. PRUNABLE PARAMETER COMPRESSION ANALYSIS ---
+    prunable_stats = analyze_prunable_compression(model, layer_report_data, config, verbose)
+
+    # --- 5. REPORTING ---
+    if verbose:
+        print("\n" + "="*80)
+        print("  HIERARCHICAL PRUNING REPORT (Consistency Enforced)")
+        print("="*80)
+        
+        print(f"\n📍 GLOBAL COMPONENTS:")
+        print(f"  - Embedding Gate: {embedding_gate_status}")
+        
+        if granularity_stats['layer_level']['total'] > 0:
+            active = granularity_stats['layer_level']['active']
+            total = granularity_stats['layer_level']['total']
+            print(f"\n📍 LAYER-LEVEL PRUNING:")
+            print(f"  - Active Layers: {active}/{total} ({(active/total)*100:.1f}%)")
+            if active < total:
+                print(f"  - Pruned Layer Indices: {' '.join([str(i) for i, act in enumerate(layer_gates_status) if not act])}")
+        
+        print(f"\n📍 DETAILED LAYER REPORT:")
+        header = f"{'Layer':<6} | {'Status':<8} | {'Attn Block':<11} | {'MLP Block':<10} | {'Attn Heads':<12} | {'Attn Neurons':<15} | {'MLP Hidden':<15} | {'MLP Output':<15}"
+        print(header)
+        print("-" * len(header))
+        
+        for stats in layer_report_data:
+            layer_status = "Active" if stats.get('layer_active', True) else "PRUNED"
+            attn_block = stats.get('attn_block', 'N/A')
+            mlp_block = stats.get('mlp_block', 'N/A')
+            attn_heads = stats.get('attn_heads', 'N/A')
+            attn_neurons = stats.get('attn_neurons', 'N/A')
+            mlp_hidden = stats.get('mlp_hidden', 'N/A')
+            mlp_output = stats.get('mlp_output', 'N/A')
+            
+            if layer_status == "PRUNED":
+                print(f"\033[90m{stats['layer']:<6} | {layer_status:<8} | {'---':<11} | {'---':<10} | {'---':<12} | {'---':<15} | {'---':<15} | {'---':<15}\033[0m")
+            else:
+                print(f"{stats['layer']:<6} | {layer_status:<8} | {attn_block:<11} | {mlp_block:<10} | {attn_heads:<12} | {attn_neurons:<15} | {mlp_hidden:<15} | {mlp_output:<15}")
+
+    print("\n" + "="*80)
+    print("  PRUNING SUMMARY BY GRANULARITY")
+    print("="*80)
+    
+    for G, S in granularity_stats.items():
+        if S['total'] > 0:
+            name = G.replace('_', ' ').title()
+            pruned_pct = (S['total'] - S['active']) / S['total'] * 100 if S['total'] > 0 else 0
+            print(f"\n{name}:")
+            print(f"  - Active: {S['active']:,} / {S['total']:,}  ({(100-pruned_pct):.1f}%)")
+            print(f"  - Pruned: {S['total'] - S['active']:,} ({pruned_pct:.1f}%)")
+
+    print(f"\n🎯 PRUNABLE PARAMETER BOTTOM LINE:")
+    print(f"  - Circuit uses {prunable_stats['active_prunable_params']:,} out of {prunable_stats['total_prunable_params']:,} prunable parameters")
+    print(f"  - Prunable compression: {prunable_stats['compression_ratio']:.1f}x")
+    print(f"  - Prunable reduction: {prunable_stats['reduction_percentage']:.1f}%")
+    
+    # Compare with component statistics for sanity check
+    # print(f"\n🔍 SANITY CHECK (should align):")
+    # print(f"  - Active layers: {granularity_stats['layer_level']['active']}/{granularity_stats['layer_level']['total']} ({granularity_stats['layer_level']['active']/granularity_stats['layer_level']['total']*100:.1f}%)")
+    # print(f"  - Active attention neurons: {granularity_stats['attention_neurons']['active']}/{granularity_stats['attention_neurons']['total']} ({granularity_stats['attention_neurons']['active']/granularity_stats['attention_neurons']['total']*100:.1f}%)")
+    # total_mlp_neurons = granularity_stats['mlp_hidden']['total'] + granularity_stats['mlp_output']['total']
+    # active_mlp_neurons = granularity_stats['mlp_hidden']['active'] + granularity_stats['mlp_output']['active']
+    # print(f"  - Active MLP neurons: {active_mlp_neurons}/{total_mlp_neurons} ({active_mlp_neurons/total_mlp_neurons*100:.1f}%)")
+    
+    print("="*80)
+    print("\n✅ Model remains in 'Final Circuit Mode' for evaluation.")
+    
+    return {
+        'granularity_stats': granularity_stats,
+        'layer_report': layer_report_data,
+        'prunable_compression': prunable_stats
+    }
+
+
+# ##############################################################################
+# EDGE-LEVEL ANALYSIS
+# ##############################################################################
+
+# ==============================================================================
+# NODE EXTRACTION
+# ==============================================================================
+
+def _locate_layers(node_pruned_model):
+    if hasattr(node_pruned_model, 'transformer'):
+        return node_pruned_model.transformer.h
+    if hasattr(node_pruned_model, 'model') and hasattr(node_pruned_model.model, 'layers'):
+        return node_pruned_model.model.layers
+    raise ValueError("Cannot locate transformer layers in the model")
+
+
+def _gate_binary_list(gate) -> List[int]:
+    """Hard 0/1 mask for a HardConcreteGate (expects eval / final mode)."""
+    return [int(v > 0.5) for v in gate().detach().cpu().view(-1).tolist()]
+
+
+def extract_active_nodes(node_pruned_model) -> Tuple[Dict[int, List[int]], Set[int]]:
+    """
+    Extract active attention heads and MLP blocks from a node-pruned model
+    (after analyze_and_finalize_circuit has been called).
+
+    Returns:
+        active_heads: {layer_idx: [head_indices]} for active attention heads
+        active_mlps:  set of layer indices with active MLP blocks
+    """
+    node_pruned_model.eval()
+
+    active_heads = {}
+    active_mlps = set()
+    layers = _locate_layers(node_pruned_model)
+
+    with torch.no_grad():
+        for l, block in enumerate(layers):
+            # -- Attention block --
+            attn_active = True
+            if hasattr(block, 'attention_block_gate') and block.attention_block_gate is not None:
+                attn_active = (block.attention_block_gate() > 0.5).item()
+
+            if attn_active and hasattr(block.attn, 'head_gates') and block.attn.head_gates is not None:
+                mask = block.attn.head_gates() > 0.5
+                heads = mask.nonzero(as_tuple=True)[0].tolist()
+                if heads:
+                    active_heads[l] = heads
+
+            # -- MLP block --
+            mlp_active = True
+            if hasattr(block, 'mlp_block_gate') and block.mlp_block_gate is not None:
+                mlp_active = (block.mlp_block_gate() > 0.5).item()
+            if mlp_active:
+                active_mlps.add(l)
+
+    return active_heads, active_mlps
+
+
+def extract_node_masks(node_pruned_model) -> dict:
+    """
+    Extract post-finalize binary 0/1 masks for every node gate that exists.
+
+    Keys are omitted when the corresponding gate module was never created.
+    Per-layer vector gates use full width (including zeros), keyed by layer
+    string (same convention as active_heads in active_nodes.json).
+    """
+    node_pruned_model.eval()
+    layers = _locate_layers(node_pruned_model)
+    masks = {}
+
+    with torch.no_grad():
+        if getattr(node_pruned_model, 'embedding_gate', None) is not None:
+            masks['embedding'] = _gate_binary_list(node_pruned_model.embedding_gate)[0]
+
+        layer_gates = getattr(node_pruned_model, 'layer_gates', None)
+        if layer_gates is not None:
+            masks['layers'] = [
+                _gate_binary_list(g)[0] if g is not None else 1 for g in layer_gates
+            ]
+
+        attention_blocks, mlp_blocks = [], []
+        have_attn_block = have_mlp_block = False
+        attention_heads, attention_neurons = {}, {}
+        mlp_hidden, mlp_output = {}, {}
+
+        for l, block in enumerate(layers):
+            key = str(l)
+            if getattr(block, 'attention_block_gate', None) is not None:
+                have_attn_block = True
+                attention_blocks.append(_gate_binary_list(block.attention_block_gate)[0])
+            if getattr(block, 'mlp_block_gate', None) is not None:
+                have_mlp_block = True
+                mlp_blocks.append(_gate_binary_list(block.mlp_block_gate)[0])
+
+            attn = block.attn
+            if getattr(attn, 'head_gates', None) is not None:
+                attention_heads[key] = _gate_binary_list(attn.head_gates)
+            if getattr(attn, 'neuron_gates', None) is not None:
+                attention_neurons[key] = _gate_binary_list(attn.neuron_gates)
+
+            mlp = block.mlp
+            if getattr(mlp, 'hidden_gates', None) is not None:
+                mlp_hidden[key] = _gate_binary_list(mlp.hidden_gates)
+            if getattr(mlp, 'output_gates', None) is not None:
+                mlp_output[key] = _gate_binary_list(mlp.output_gates)
+
+        if have_attn_block:
+            masks['attention_blocks'] = attention_blocks
+        if have_mlp_block:
+            masks['mlp_blocks'] = mlp_blocks
+        if attention_heads:
+            masks['attention_heads'] = attention_heads
+        if attention_neurons:
+            masks['attention_neurons'] = attention_neurons
+        if mlp_hidden:
+            masks['mlp_hidden'] = mlp_hidden
+        if mlp_output:
+            masks['mlp_output'] = mlp_output
+
+    return masks
+
+
+# ==============================================================================
+# NODE MASK LOADING (the inverse of extract_node_masks)
+# ==============================================================================
+
+# log_alpha magnitude that pins a gate hard open / hard closed. The eval-mode
+# gate is `sigmoid(log_alpha) * 1.2 - 0.1 > 0.5`, i.e. `log_alpha > 0` strictly,
+# so ±GATE_BIG reproduces a trained gate exactly — and matches the -1e6 that
+# analyze_and_finalize_circuit already writes when it enforces the hierarchy.
+GATE_BIG = 1e6
+
+
+def _mask_slots(model):
+    """Every node gate in the model, in `extract_node_masks`' traversal order.
+
+    Returns [(key, index, gate)] where `index` locates the gate's entry inside
+    masks[key]: None for the scalar 'embedding', an int for the list-valued keys
+    ('layers', 'attention_blocks', 'mlp_blocks'), and the layer string for the
+    per-layer dict keys. Keeping the two traversals identical is what makes
+    apply_node_masks and extract_node_masks exact inverses.
+    """
+    slots = []
+
+    if getattr(model, 'embedding_gate', None) is not None:
+        slots.append(('embedding', None, model.embedding_gate))
+
+    layer_gates = getattr(model, 'layer_gates', None)
+    if layer_gates is not None:
+        for i, g in enumerate(layer_gates):
+            if g is not None:
+                slots.append(('layers', i, g))
+
+    n_attn_block = n_mlp_block = 0
+    for l, block in enumerate(_locate_layers(model)):
+        key = str(l)
+        if getattr(block, 'attention_block_gate', None) is not None:
+            slots.append(('attention_blocks', n_attn_block, block.attention_block_gate))
+            n_attn_block += 1
+        if getattr(block, 'mlp_block_gate', None) is not None:
+            slots.append(('mlp_blocks', n_mlp_block, block.mlp_block_gate))
+            n_mlp_block += 1
+
+        attn, mlp = block.attn, block.mlp
+        if getattr(attn, 'head_gates', None) is not None:
+            slots.append(('attention_heads', key, attn.head_gates))
+        if getattr(attn, 'neuron_gates', None) is not None:
+            slots.append(('attention_neurons', key, attn.neuron_gates))
+        if getattr(mlp, 'hidden_gates', None) is not None:
+            slots.append(('mlp_hidden', key, mlp.hidden_gates))
+        if getattr(mlp, 'output_gates', None) is not None:
+            slots.append(('mlp_output', key, mlp.output_gates))
+
+    return slots
+
+
+def _mask_entry(masks, key, index):
+    if index is None:
+        return masks[key]
+    try:
+        return masks[key][index]
+    except (KeyError, IndexError, TypeError):
+        raise ValueError(
+            f"masks[{key!r}] has no entry {index!r} — the saved masks do not "
+            f"describe this model's gate layout.")
+
+
+def _set_gates_final_mode(model, enabled=True):
+    """set_final_circuit_mode without the per-call print (this runs ~100x)."""
+    for module in model.modules():
+        if isinstance(module, HardConcreteGate):
+            module.final_mode = enabled
+
+
+def apply_node_masks(model, masks: dict, *, strict: bool = True,
+                     big: float = GATE_BIG) -> dict:
+    """Pin every node gate of `model` to the binary mask in `masks`.
+
+    `masks` is the object written by `extract_node_masks` (and stored under the
+    "masks" key of active_nodes.json). Accepts python lists or numpy arrays.
+
+    The key check is bidirectional on purpose. The reverse direction is the
+    load-bearing one: if the model has, say, mlp_output gates and `masks` lacks
+    that key, those gates keep their uniform(2.5, 3.5) init — wide open — and
+    you would silently evaluate a far larger circuit than the one you loaded.
+
+    Leaves the model in eval + final-circuit mode. Returns
+    {granularity: {"active": int, "total": int}}.
+    """
+    slots = _mask_slots(model)
+    model_keys = {k for k, _, _ in slots}
+    mask_keys = set(masks)
+
+    if strict and model_keys != mask_keys:
+        missing = sorted(model_keys - mask_keys)
+        extra = sorted(mask_keys - model_keys)
+        raise ValueError(
+            "saved masks do not match the model's gate layout"
+            + (f"\n  gates with no mask (would stay OPEN): {missing}" if missing else "")
+            + (f"\n  masks with no gate: {extra}" if extra else "")
+            + "\n  Build the model with NodePruningConfig(**config.json['node_config']).")
+
+    counts = {}
+    with torch.no_grad():
+        for key, index, gate in slots:
+            if key not in masks:
+                continue                      # strict=False: leave the gate as-is
+            t = torch.as_tensor(_mask_entry(masks, key, index)).reshape(-1)
+
+            n = gate.log_alpha.numel()
+            if t.numel() != n:
+                raise ValueError(
+                    f"masks[{key!r}] entry {index!r} has {t.numel()} values but "
+                    f"the gate has {n}")
+            if not bool(((t == 0) | (t == 1)).all()):
+                raise ValueError(
+                    f"masks[{key!r}] entry {index!r} is not binary (values must "
+                    f"be 0 or 1)")
+
+            gate.log_alpha.data.copy_(torch.where(t.bool(), big, -big))
+
+            slot = counts.setdefault(key, {"active": 0, "total": 0})
+            slot["active"] += int(t.sum())
+            slot["total"] += n
+
+    model.eval()
+    _set_gates_final_mode(model, True)
+    return counts
+
+
+def open_all_gates(model, big: float = GATE_BIG) -> None:
+    """Pin every HardConcreteGate wide open.
+
+    With all gates open the dual-stream forward is bit-identical to the plain
+    HuggingFace model, so this is both the "full model" anchor row and the
+    harness's strongest self-test.
+    """
+    with torch.no_grad():
+        for module in model.modules():
+            if isinstance(module, HardConcreteGate):
+                module.log_alpha.data.fill_(big)
+    model.eval()
+    _set_gates_final_mode(model, True)
+
+
+def assert_masks_equal(a: dict, b: dict, max_report: int = 10) -> None:
+    """Raise AssertionError unless two mask objects are element-wise identical."""
+    if set(a) != set(b):
+        raise AssertionError(
+            f"mask keys differ: only in first {sorted(set(a) - set(b))}, "
+            f"only in second {sorted(set(b) - set(a))}")
+
+    problems = []
+    for key in sorted(a):
+        va, vb = a[key], b[key]
+        if isinstance(va, dict) or isinstance(vb, dict):
+            if not isinstance(va, dict) or not isinstance(vb, dict):
+                problems.append(f"{key}: type mismatch ({type(va).__name__} vs {type(vb).__name__})")
+                continue
+            if set(va) != set(vb):
+                problems.append(f"{key}: layer keys differ")
+                continue
+            entries = [(f"{key}[{k}]", va[k], vb[k]) for k in sorted(va, key=int)]
+        else:
+            entries = [(key, va, vb)]
+
+        for label, x, y in entries:
+            tx = torch.as_tensor(x).reshape(-1)
+            ty = torch.as_tensor(y).reshape(-1)
+            if tx.numel() != ty.numel():
+                problems.append(f"{label}: length {tx.numel()} vs {ty.numel()}")
+            elif not bool(torch.equal(tx.long(), ty.long())):
+                n_diff = int((tx.long() != ty.long()).sum())
+                problems.append(f"{label}: {n_diff} of {tx.numel()} entries differ")
+            if len(problems) >= max_report:
+                break
+        if len(problems) >= max_report:
+            problems.append("... (truncated)")
+            break
+
+    if problems:
+        raise AssertionError("masks differ:\n  " + "\n  ".join(problems))
+
+
+def save_active_nodes(active_heads, active_mlps, path, masks=None):
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    payload = {
+        "active_heads": {str(k): v for k, v in active_heads.items()},
+        "active_mlps": sorted(active_mlps),
+    }
+    if masks is not None:
+        payload["masks"] = masks
+    with open(path, "w") as f:
+        json.dump(payload, f, indent=2)
+    print(f"Saved active nodes to {path}")
+
+
+def load_active_nodes(path):
+    with open(path) as f:
+        data = json.load(f)
+    active_heads = {int(k): v for k, v in data["active_heads"].items()}
+    active_mlps = set(data["active_mlps"])
+    print(f"Loaded active nodes from {path}")
+    print(f"  Active heads: {sum(len(v) for v in active_heads.values())} across {len(active_heads)} layers")
+    print(f"  Active MLPs: {len(active_mlps)} layers")
+    return active_heads, active_mlps
+
+
+# ==============================================================================
+# DENSE EDGE COUNTING (no edge pruning, just surviving nodes)
+# ==============================================================================
+
+def count_dense_edges(
+    active_heads: Dict[int, List[int]],
+    active_mlps: Set[int],
+    num_layers: int = 12,
+    num_heads_per_layer: int = 12,
+    num_key_value_groups: int = 1,
+    verbose: bool = True,
+) -> dict:
+    """
+    Count edges assuming dense connections between all surviving nodes.
+    Mirrors the logic in edgepercent.py.
+
+    Under grouped query attention (GQA), K and V edges are shared across the
+    query heads in a KV group: k_proj/v_proj read a single residual mixture per
+    KV head, so K/V edges are counted once per KV head (not per query head).
+    ``num_key_value_groups`` = num_query_heads // num_kv_heads (1 for MHA).
+
+    Edge counts are exact: ``dense_total`` equals ``EdgePrunable*.total_edges``
+    for the same surviving nodes (with output edges included), and ``full_total``
+    is the same count for a fully dense model. Edges are split for reporting into:
+      * "original": inter-layer edges (sources in strictly earlier layers) plus
+        every surviving node -> output.
+      * "extra": embedding-sourced edges (emb -> Q/K/V/MLP/output) and same-layer
+        head -> MLP edges.
+
+    Returns dict with total/category edge counts for both full and pruned models.
+    """
+    num_kv_heads_per_layer = num_heads_per_layer // num_key_value_groups
+
+    def _tally(head_counts, kv_counts, mlp_set):
+        total_heads = sum(head_counts.values())
+        total_kv = sum(kv_counts.values())
+        total_mlps = len(mlp_set)
+
+        # Cumulative active sources (heads + mlps) strictly before each layer.
+        src_before = {}
+        cum = 0
+        for l in range(num_layers):
+            src_before[l] = cum
+            cum += head_counts.get(l, 0)
+            if l in mlp_set:
+                cum += 1
+
+        # Inter-layer edges (sources in earlier layers only; no emb, no same-layer).
+        q = k = v = mlp = 0
+        for l in range(num_layers):
+            n = src_before[l]
+            q += head_counts.get(l, 0) * n     # Q: per query head
+            k += kv_counts.get(l, 0) * n       # K: per KV head
+            v += kv_counts.get(l, 0) * n       # V: per KV head
+            if l in mlp_set:
+                mlp += n
+
+        output = total_heads + total_mlps      # every surviving node -> output
+        original = output + mlp + q + k + v
+
+        # Extra: embedding source + same-layer head -> MLP.
+        same_layer_mlp = sum(head_counts.get(l, 0) for l in mlp_set)
+        extra = (
+            1                 # emb -> output
+            + total_mlps      # emb -> each MLP
+            + same_layer_mlp  # same-layer heads -> MLP
+            + total_heads     # emb -> Q  (per query head)
+            + total_kv        # emb -> K  (per KV head)
+            + total_kv        # emb -> V  (per KV head)
+        )
+        return {
+            "total": original + extra,
+            "original": original,
+            "extra": extra,
+            "output": output,
+            "mlp": mlp,
+            "q": q,
+            "k": k,
+            "v": v,
+        }
+
+    # -- Full (fully dense) model --
+    full = _tally(
+        {l: num_heads_per_layer for l in range(num_layers)},
+        {l: num_kv_heads_per_layer for l in range(num_layers)},
+        set(range(num_layers)),
+    )
+
+    # -- Pruned model edges (dense between survivors) --
+    head_counts = {l: len(active_heads.get(l, [])) for l in range(num_layers)}
+    kv_counts = {
+        l: len({h // num_key_value_groups for h in active_heads.get(l, [])})
+        for l in range(num_layers)
+    }
+    dense = _tally(head_counts, kv_counts, set(active_mlps))
+
+    total_full = full["total"]
+    total_rem = dense["total"]
+    rem_output, rem_mlp = dense["output"], dense["mlp"]
+    rem_q, rem_k, rem_v, rem_extra = dense["q"], dense["k"], dense["v"], dense["extra"]
+
+    result = {
+        "full_total": total_full,
+        "full_original": full["original"],
+        "full_extra": full["extra"],
+        "dense_total": total_rem,
+        "dense_original": dense["original"],
+        "dense_extra": rem_extra,
+        "dense_output": rem_output,
+        "dense_mlp": rem_mlp,
+        "dense_q": rem_q,
+        "dense_k": rem_k,
+        "dense_v": rem_v,
+    }
+
+    if verbose:
+        print("\n" + "=" * 60)
+        print("  DENSE EDGE COUNT (between surviving nodes)")
+        print("=" * 60)
+        print(f"Full model edges:  {total_full:,}")
+        print(f"Dense edges:       {total_rem:,} / {total_full:,} ({total_rem / total_full:.2%})")
+        print(f"  To output:  {rem_output}")
+        print(f"  To MLP:     {rem_mlp}")
+        print(f"  To Q:       {rem_q}")
+        print(f"  To K:       {rem_k}")
+        print(f"  To V:       {rem_v}")
+        print(f"  Extra:      {rem_extra}")
+
+    return result
+
+
+# ==============================================================================
+# EDGE CIRCUIT ANALYSIS
+# ==============================================================================
+
+def analyze_edge_circuit(model, verbose=True) -> dict:
+    """
+    Analyze edge pruning results. Sets model to final mode, counts active edges
+    per category, and prints a detailed report.
+    """
+    model.eval()
+    model.set_final_circuit_mode(True)
+
+    stats = {
+        "q_edges": {"total": 0, "active": 0},
+        "k_edges": {"total": 0, "active": 0},
+        "v_edges": {"total": 0, "active": 0},
+        "mlp_edges": {"total": 0, "active": 0},
+        "output_edges": {"total": 0, "active": 0},
+    }
+    per_receiver = {}  # key -> {q_active, k_active, v_active, total}
+
+    with torch.no_grad():
+        for key, gate in model.attn_q_gates.items():
+            m = gate()
+            n, a = m.numel(), int((m > 0.5).sum().item())
+            stats["q_edges"]["total"] += n
+            stats["q_edges"]["active"] += a
+            per_receiver.setdefault(key, {})["q"] = f"{a}/{n}"
+
+        for key, gate in model.attn_k_gates.items():
+            m = gate()
+            n, a = m.numel(), int((m > 0.5).sum().item())
+            stats["k_edges"]["total"] += n
+            stats["k_edges"]["active"] += a
+            per_receiver.setdefault(key, {})["k"] = f"{a}/{n}"
+
+        for key, gate in model.attn_v_gates.items():
+            m = gate()
+            n, a = m.numel(), int((m > 0.5).sum().item())
+            stats["v_edges"]["total"] += n
+            stats["v_edges"]["active"] += a
+            per_receiver.setdefault(key, {})["v"] = f"{a}/{n}"
+
+        for key, gate in model.mlp_edge_gates.items():
+            m = gate()
+            n, a = m.numel(), int((m > 0.5).sum().item())
+            stats["mlp_edges"]["total"] += n
+            stats["mlp_edges"]["active"] += a
+            per_receiver[key] = {"mlp": f"{a}/{n}"}
+
+        if model.output_edge_gates is not None:
+            m = model.output_edge_gates()
+            n, a = m.numel(), int((m > 0.5).sum().item())
+            stats["output_edges"]["total"] = n
+            stats["output_edges"]["active"] = a
+
+    total_edges = sum(s["total"] for s in stats.values())
+    active_edges = sum(s["active"] for s in stats.values())
+
+    if verbose:
+        print("\n" + "=" * 70)
+        print("  EDGE PRUNING ANALYSIS")
+        print("=" * 70)
+
+        print(f"\nTotal edges:  {total_edges:,}")
+        print(f"Active edges: {active_edges:,}")
+        if total_edges > 0:
+            print(f"Edge reduction: {(total_edges - active_edges) / total_edges * 100:.1f}%")
+            print(f"Edge compression: {total_edges / active_edges:.2f}x" if active_edges > 0 else "Edge compression: inf")
+
+        print(f"\nBy category:")
+        for cat, s in stats.items():
+            name = cat.replace("_", " ").title()
+            pct = f"{s['active'] / s['total'] * 100:.1f}%" if s["total"] > 0 else "N/A"
+            print(f"  {name}: {s['active']:,} / {s['total']:,} ({pct})")
+
+        print(f"\nPer-receiver detail:")
+        for key in sorted(per_receiver.keys()):
+            info = per_receiver[key]
+            parts = [f"{k.upper()}={v}" for k, v in sorted(info.items())]
+            print(f"  {key}: {', '.join(parts)}")
+
+    return {
+        "stats": stats,
+        "per_receiver": per_receiver,
+        "total_edges": total_edges,
+        "active_edges": active_edges,
+    }
+
+
+# ==============================================================================
+# COMBINED REPORT
+# ==============================================================================
+
+def print_combined_report(
+    node_stats: dict,
+    dense_edge_stats: dict,
+    edge_stats: dict,
+):
+    """Print the three-level compression report."""
+    print("\n" + "=" * 70)
+    print("  COMBINED COMPRESSION REPORT")
+    print("=" * 70)
+
+    # 1. Node compression
+    if "granularity_stats" in node_stats:
+        gs = node_stats["granularity_stats"]
+        ah = gs.get("attention_heads", {})
+        mb = gs.get("mlp_blocks", {})
+        print(f"\n1. NODE COMPRESSION (from node pruning):")
+        if ah.get("total", 0) > 0:
+            print(f"   Attention heads: {ah['active']}/{ah['total']} active")
+        if mb.get("total", 0) > 0:
+            print(f"   MLP blocks:      {mb['active']}/{mb['total']} active")
+        if "prunable_compression" in node_stats:
+            pc = node_stats["prunable_compression"]
+            print(f"   Parameter reduction: {pc['reduction_percentage']:.1f}%")
+
+    # 2. Dense edges
+    print(f"\n2. DENSE EDGE COUNT (surviving nodes, no edge pruning):")
+    print(f"   Dense edges: {dense_edge_stats['dense_total']:,} / {dense_edge_stats['full_total']:,} "
+          f"({dense_edge_stats['dense_total'] / dense_edge_stats['full_total']:.2%} of full model)")
+
+    # 3. Edge compression
+    print(f"\n3. EDGE COMPRESSION (after edge pruning):")
+    te = edge_stats["total_edges"]
+    ae = edge_stats["active_edges"]
+    print(f"   Active edges: {ae:,} / {te:,}")
+    if te > 0:
+        print(f"   Edge reduction: {(te - ae) / te * 100:.1f}%")
+    if ae > 0:
+        print(f"   Edge compression: {te / ae:.2f}x")
+    # Relative to full model
+    full = dense_edge_stats["full_total"]
+    print(f"   vs full model:  {ae:,} / {full:,} ({ae / full:.2%})")
+
+    print("=" * 70)
+
+
+# ==============================================================================
+# DROPOUT UTILITY
+# ==============================================================================
+
+def disable_dropout(model: nn.Module):
+    for module in model.modules():
+        if isinstance(module, nn.Dropout):
+            module.p = 0.0

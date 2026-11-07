@@ -1,0 +1,23 @@
+{
+  "status": "PREPARATION_ONLY_FINAL_ACCEPTED_SOURCE_PENDING",
+  "preserved_original_files": [
+    "cpu-fresh-g3-readiness.py",
+    "cpu-fresh-g3-parameters.template.json"
+  ],
+  "revised_files": {
+    "cpu-fresh-g3-readiness-r2.py": "0400289183525dd024ab017f6eb153148f4e20d5990ffde61ee1bac853c8662f",
+    "cpu-fresh-g3-parameters-r2.template.json": "40b55ae20a18cb1b0e2951b2cb563ced6834bf594d5648c87192cf066fb041f1"
+  },
+  "checks": [
+    "accepted_source_snapshot pins source_commit/runtime_root/source_sha256/input_links",
+    "exact511ordinary inventory and exact4literal aliases, before and after owning CPU commands",
+    "full actual filesystem file/link sets equal accepted export; code links forbidden",
+    "origin families component_analysis/models/dataset/evaluation/scripts/config",
+    "child PYTHONPATH explicitly accepted runtime"
+  ],
+  "no_source_changes": true,
+  "CPU_only": true,
+  "GPU_admission": false,
+  "run_observed": false,
+  "verification": "AST and template JSON parse only; actual accepted export proof must run on Slurm CPU"
+}

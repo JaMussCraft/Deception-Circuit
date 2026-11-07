@@ -1,0 +1,79 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/source-before-review198/common.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py
+@@ -157,7 +157,7 @@
+         path = Path(c[key])
+         require(path == expected and path.is_file() and not path.is_symlink()
+                 and not path.parent.is_symlink() and inside(path, root), 'immutable original path: ' + key)
+-        require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
++        require(sha(path) == c['groups_file_sha256' if key == 'groups' else key + '_sha256'], 'stale pinned ' + key)
+     artifact = read(c['bank_file'])
+     require(set(artifact) == {'payload', 'sha256'}, 'native bank envelope')
+     bank = artifact['payload']
+@@ -495,7 +495,8 @@
+     return r
+ 
+ 
+-def entry_release(r, phase):
++def _entry_identity(r, phase):
++    """Cheap initial rejection and the repeated final immutable barrier."""
+     require(phase == 'full_score' and r['phase'] == phase, 'only full_score may enter')
+     require(not Path(r['_release_path']).is_symlink() and sha(r['_release_path']) == r['_release_sha256'], 'release changed after acquisition')
+     require(r['actual_job_id'] == os.environ['SLURM_JOB_ID'] == C['actual_job_id']
+@@ -507,11 +508,35 @@
+         require(sha(r['_waiting_path']) == r['_waiting_sha256'], 'WAITING changed after owning preflight')
+     for row in r['catalogues']:
+         require(sha(row['virtual_path']) == row['sha256'], 'catalogue changed at entry')
+-    verify_existing_bank(C)
+-    deadlines = current_deadlines(C, allocation(release=r)['facts'])
++
++
++def _entry_eligibility(r, phase):
++    """Observe external allocation first; authenticate immutable bytes last."""
++    observed = allocation(release=r)
++    _entry_identity(r, phase)
++    # Actual allocation() always supplies this metadata. Retain the capture-age
++    # bound after hashing too; test I/O doubles may supply only the actual facts.
++    if 'host_capture_unix' in observed:
++        require(0 <= time.time() - observed['host_capture_unix'] <= C['maximum_allocation_capture_age_seconds'],
++                'allocation aged during final immutable checks')
++    deadlines = current_deadlines(C, observed['facts'])
+     require(deadlines['remaining_work_seconds'] >= C['resources']['minimum_entry_seconds'], 'fresh final entry floor/deadline')
+     _lease(r)
+-    r['_entry_work_deadline'] = deadlines['work_deadline']
++    return deadlines
++
++
++def entry_release(r, phase):
++    _entry_identity(r, phase)
++    # Whole-bank hashing/decoding must finish before the immutable barrier.
++    verify_existing_bank(C)
++    before_consume = _entry_eligibility(r, phase)
+     write(Path(C['evidence_root']) / 'CONSUMED-full_score.json',
+           dict(phase=phase, job_id=C['actual_job_id'], release_sha256=r['_release_sha256'],
+                consumed_at=time.time(), one_original_CLI_stage_only=True))
++    # Evidence I/O can be slow. Permission stays spent if this second fresh
++    # observation fails; never remove CONSUMED, renew, retry or extend a bound.
++    after_consume = _entry_eligibility(r, phase)
++    r['_entry_work_deadline'] = min(before_consume['work_deadline'], after_consume['work_deadline'])
++    require(r['_entry_work_deadline'] - time.time() >= C['resources']['minimum_entry_seconds'],
++            'consume/evidence I/O exhausted reviewed entry floor')
++    _lease(r)
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/source-before-review198/controller.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/gpu/controller.py
+@@ -162,11 +162,12 @@
+         with (out / 'full-score.stdout').open('x') as stdout, (out / 'full-score.stderr').open('x') as stderr:
+             require(context['work_deadline'] - time.time() > 0, 'work deadline elapsed during costly preflight')
+             entry_release(r, 'full_score')
++            common._lease(r)
++            now = time.time()
+             deadline = min(context['work_deadline'], r.get('_entry_work_deadline', context['work_deadline']),
+-                           time.time() + c['resources']['child_cap_seconds'])
+-            remaining = deadline - time.time()
+-            common._lease(r)
+-            require(remaining > 0, 'fresh final remaining deadline exhausted')
++                           now + c['resources']['child_cap_seconds'])
++            remaining = deadline - now
++            require(remaining >= c['resources']['minimum_entry_seconds'], 'fresh Popen remaining below reviewed entry floor')
+             child = subprocess.Popen(command, cwd=c['runtime'], env=context['environment'],
+                                      stdout=stdout, stderr=stderr, start_new_session=True)
+             record['original_CLI_entries'] = 1

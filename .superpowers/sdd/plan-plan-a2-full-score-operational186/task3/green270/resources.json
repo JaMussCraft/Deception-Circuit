@@ -1,0 +1,43 @@
+{
+  "cpus": 2,
+  "memory": "8G",
+  "walltime": "00:07:00",
+  "GPUs": 0,
+  "full_timeout_seconds": 150,
+  "baseline_timeout_seconds": 20,
+  "expected_baseline_cases": 98,
+  "accepted_Task1_Task2_cases": 226,
+  "new_case_counts": {
+    "test_full_score_release.py": 64,
+    "test_full_score_usage.py": 23,
+    "test_full_score_cache.py": 11,
+    "test_full_score_root_integration.py": 42
+  },
+  "expected_GREEN_cases": 366,
+  "interpreters": [
+    {
+      "label": "base39",
+      "python": "/sw/external/python/anaconda3/bin/python3.9",
+      "pytest": "8.3.3",
+      "python_minor": [
+        3,
+        9
+      ]
+    },
+    {
+      "label": "mgnp",
+      "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "pytest": "9.1.1",
+      "python_minor": [
+        3,
+        12
+      ]
+    }
+  ],
+  "prior_226_case_seconds": [
+    35.692,
+    34.586
+  ],
+  "fixture_only": true,
+  "actual_resources_or_admission_bound": false
+}

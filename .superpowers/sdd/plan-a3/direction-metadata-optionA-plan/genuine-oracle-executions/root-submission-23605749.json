@@ -1,0 +1,26 @@
+{
+  "command": [
+    "sbatch",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=192G",
+    "--time=01:00:00",
+    "--no-requeue",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--job-name=lad-A3-base-ref",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01-%j.log",
+    "--wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-cpu-r2/oracle_cpu.sh --packet-sha256 21122c2077c367c7ccf9b08f8b865f263b7dcba66bf0480af25e14757973ed4d --config /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-cpu-r2/config.template.json --config-sha256 77ec8f936b216bd5cd5a6e0e1945bf0b5e2be8903dc43b1b1cb6594387fc791e --mode original --environment base --output /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01"
+  ],
+  "output": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r2-01",
+  "mode": "original",
+  "environment": "base",
+  "no_retry": true,
+  "job_id": "23605749",
+  "submission_stdout": "Submitted batch job 23605749\n",
+  "submitted_unix": 1793982282.4903085
+}

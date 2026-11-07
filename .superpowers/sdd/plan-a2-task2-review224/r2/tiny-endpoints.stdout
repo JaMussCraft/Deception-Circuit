@@ -1,0 +1,14 @@
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_review224_actual_Task1_marker_is_accepted_without_renaming[1140.0-1125.0] _
+test_full_score_cpu.py:530: in test_review224_actual_Task1_marker_is_accepted_without_renaming
+    assert need(m,'validate_request')(c,r,waiting,now=1010.)['actual_future_GPU_job_id'] == gpu_c['actual_job_id']
+../cpu/supervisor.py:83: in validate_request
+    require(re.fullmatch('[0-9]+',r['actual_future_GPU_job_id']) is not None,'actual GPU job identity')
+../cpu/supervisor.py:28: in require
+    if not ok: raise ValueError(message)
+E   ValueError: actual GPU job identity
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task2-review224/r2/tiny-endpoints.xml -
+=========================== short test summary info ============================
+FAILED test_full_score_cpu.py::test_review224_actual_Task1_marker_is_accepted_without_renaming[1140.0-1125.0]
+1 failed, 2 passed in 0.84s

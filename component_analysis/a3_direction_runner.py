@@ -121,7 +121,7 @@ def _digest(value):
     ).hexdigest()
 
 
-def _geometry(batch, identity, *, measuring=False):
+def _geometry(batch, identity, *, measuring=False, reuse_context=None):
     ladder.validate_batch(batch)
     p = identity["numeric_profile"]
     tile = p["axis_tile_size"]
@@ -136,11 +136,17 @@ def _geometry(batch, identity, *, measuring=False):
         "integer tokens/readouts required",
     )
     if tile > 1 and not measuring:
-        _packing_receipt(identity, batch)
+        _packing_receipt(identity, batch, reuse_context=reuse_context)
     return tile
 
 
-def _packing_receipt(identity, batch):
+def _packing_receipt(identity, batch, *, reuse_context=None):
+    # Distinct target examples require a separate byte-checked attestation.
+    # The exact measured-scope API below remains unchanged and fail-closed.
+    if "profile_reuse" in identity:
+        _require("packed_equivalence" not in identity, "ambiguous exact/reused packing evidence")
+        from component_analysis.a3_direction_runtime import validate_profile_reuse
+        return validate_profile_reuse(identity, batch, context=reuse_context)
     receipt = identity.get("packed_equivalence", {})
     body = {k: v for k, v in receipt.items() if k != "receipt_sha256"}
     _require(
@@ -402,6 +408,7 @@ def _capture_readouts(model, batches, *, sites, sink, identity, measuring=False)
         "unique head sites required",
     )
     count = chunks = total_bytes = 0
+    lane_receipts = []
     seen = set()
     geometry = hooks.geometry(model)
     width = geometry["head_dim"]
@@ -436,6 +443,30 @@ def _capture_readouts(model, batches, *, sites, sink, identity, measuring=False)
                 ),
                 "packed intact lanes disagree",
             )
+        references=[]; comparisons=[]
+        for site in sites:
+            for i,rid in enumerate(batch.ids):
+                reference=capture.outputs[site][i,int(batch.readout[i])].detach().float().cpu()
+                head_hash=_digest(reference)
+                references.append(dict(site=list(site),instance_id=rid,readout=int(batch.readout[i]),
+                    vector_sha256=head_hash,vector_shape=list(reference.shape),dtype='torch.float32'))
+                for lane in range(1,tile):
+                    j=lane*n+i;value=capture.outputs[site][j,int(packed.readout[j])].detach().float().cpu()
+                    _require(torch.allclose(reference,value,atol=1e-5,rtol=1e-5),'packed intact head lanes disagree')
+                    comparisons.append(dict(site=list(site),instance_id=rid,lane=lane,readout=int(packed.readout[j]),
+                        reference_sha256=head_hash,lane_sha256=_digest(value),head_allclose=True,
+                        max_abs_head_error=float((reference-value).abs().max()),reference_max_abs_head=float(reference.abs().max()),
+                        max_abs_margin_error=abs(float(stats['margin'][i]-stats['margin'][j])),
+                        reference_margin=float(stats['margin'][i]),argmax_equal=bool(stats['argmax'][i]==stats['argmax'][j])))
+        lane_receipt=dict(kind='a3_intact_lane_consistency_v1',valid=True,serial_comparison_performed=False,
+            numeric_profile=identity['numeric_profile'],profile_id=pid,source_sha256=identity['numeric_profile']['source_sha256'],
+            operation='readout_capture',source_task=batch.task,condition=batch.condition,stream=batch.stream,
+            replicated_lanes=tile,physical_batch_size=n*tile,batch_sha256=_digest([_recipient_digest(batch,i) for i in range(n)]),
+            readout_map=[dict(instance_id=rid,source_readout=int(batch.readout[i]),
+                execution_readouts=[int(packed.readout[lane*n+i]) for lane in range(tile)]) for i,rid in enumerate(batch.ids)],
+            head_references=references,comparisons=comparisons)
+        lane_receipt['receipt_sha256']=_digest(lane_receipt)
+        lane_receipts.append(lane_receipt)
         rows = []
         for i, rid in enumerate(batch.ids):
             key = (pid, batch.task, batch.condition, batch.stream, rid)
@@ -484,6 +515,7 @@ def _capture_readouts(model, batches, *, sites, sink, identity, measuring=False)
                 profile_id=pid,
                 rows=rows,
                 projections=projections,
+                lane_consistency=lane_receipt,
             )
         )
         count += len(rows)
@@ -493,6 +525,7 @@ def _capture_readouts(model, batches, *, sites, sink, identity, measuring=False)
         rows=count,
         chunks=chunks,
         readout_bytes=total_bytes,
+        lane_consistency_receipts=lane_receipts,
         complete=False,
     )
 
@@ -789,7 +822,7 @@ def _mapping(cell, batch, i, index, pid, site):
 
 
 def _score_direction_cells(
-    model, batches, *, cells, capture_index, axes, sink, identity, measuring=False
+    model, batches, *, cells, capture_index, axes, sink, identity, measuring=False, reuse_context=None
 ):
     """Score fixed axis tiles, including dummy lanes, and flush raw scalar rows.
 
@@ -803,7 +836,7 @@ def _score_direction_cells(
     count = chunks = 0
     max_error = 0.0
     for batch in batches:
-        tile = _geometry(batch, identity, measuring=measuring)
+        tile = _geometry(batch, identity, measuring=measuring, reuse_context=reuse_context)
         selected = [
             c
             for c in cells
@@ -822,7 +855,7 @@ def _score_direction_cells(
             "MMLU has no native donor interchange",
         )
         if tile > 1 and not measuring:
-            covered = _packing_receipt(identity, batch)
+            covered = _packing_receipt(identity, batch, reuse_context=reuse_context)
             actual = [_cell_scope(batch, c, axes, capture_index) for c in selected]
             _require(
                 actual == covered,
@@ -1089,7 +1122,7 @@ def capture_readouts(model, batches, *, sites, sink, identity):
 
 
 def score_direction_cells(
-    model, batches, *, cells, capture_index, axes, sink, identity
+    model, batches, *, cells, capture_index, axes, sink, identity, reuse_context=None
 ):
     return _score_direction_cells(
         model,
@@ -1099,6 +1132,7 @@ def score_direction_cells(
         axes=axes,
         sink=sink,
         identity=identity,
+        reuse_context=reuse_context,
     )
 
 

@@ -1,0 +1,42 @@
+{
+  "verdict": "ONE_DIAGNOSTIC_PROBE_READY_ONLY",
+  "packet_manifest_sha256": "4a096d2c1eb020da99853959a3c26e4948a9c240618958accea0b80e553997d5",
+  "preserved_r2_manifest_sha256": "9b538a5cedd5b26cd689edfc5ca156b82d3d172405306daf8f8e83b790efce6f",
+  "actual_previous_job": "50309188",
+  "previous_state": "FAILED",
+  "previous_elapsed_seconds_root_reported": 9,
+  "actual_host_exit": 0,
+  "actual_container_exit": 1,
+  "actual_failure": "Host v1 own-job counters visible; container failed actual memory mount mapping. No genuine graph/model executed.",
+  "delta": "Select actual host job-scoped controller with samefile frozen-worker path; bind fixed controller root read-only at identical container path. Container independently reads actual proc/mount/kernel counter files; no host values copied or inferred. Mapping/read failures retain membership/relevant mounts/candidate path errors with visibility false.",
+  "allowed_binds": [
+    "/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro",
+    "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  ],
+  "unchanged_guards": "All old exact job-component and fresh UID-owned ordinary confined-output guard AST unchanged; allocation_helper byteidentical and genuine main remains unexecuted/unapproved.",
+  "compatibility": "Production host/probe/guards/helper parse under Python3.6 grammar; API inventory and shell syntax checked.",
+  "tests": {
+    "base_observed": 9,
+    "base_expected": 9,
+    "mgnp_observed": 9,
+    "mgnp_expected": 9,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "RED_observation_expected_failures": 1,
+    "RED_observation_observed_failures": 1,
+    "RED_bind_log": "ImportError missing new helper; not semantic success evidence."
+  },
+  "root_probe_requirements": [
+    "Exact tiny manifest/all members remote SHA/readback; preserve all failed evidence.",
+    "Precreate physical root-cgroup199-r3 as ordinary UID-owned directory with ordinary resolved ancestry; execution leaf must be absent.",
+    "Actual Bridges cis260361p/RM-shared/rm,26CPU48GiB5min/noGPU/norequeue, original physical runtime WorkDir; runtime verifies actual job/UID/host/resources.",
+    "Fresh actual SIF/profile/packed activation/path/bind identities; same read-only project/original/work-cache binds and dedicated evidenceRW mount.",
+    "One deliberate diagnostic only, no automatic retry; retain raw host/container membership/mounts/counters, command, normal/nonzero result and terminal accounting.",
+    "Container counter visibility must actually pass before considering genuine proof. Later genuine adapter must use same real-kernel bind mechanism, correct strict deadlines and independently reviewed actual allocation/path/cgroup facts; never fake Delta facts or execute stale blocked helper main."
+  ],
+  "proof194_or_genuine_adapter_or_model_or_GPU_admitted": false,
+  "reviewer_remote_job_or_code_actions": false,
+  "status_after_handback": "held after a HOLD"
+}

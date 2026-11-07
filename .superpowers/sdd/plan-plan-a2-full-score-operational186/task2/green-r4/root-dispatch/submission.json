@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "sbatch",
+    "--parsable",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=2",
+    "--mem=8G",
+    "--time=00:06:00",
+    "--no-requeue",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--job-name=lad-A2-t2-r4",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r4/green-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r4/launch_cpu_green.sh",
+    "--pins-sha256",
+    "ddee7e6df8220e06212c56b4bf79e6e5fa659fb2cfd9e4ead1131c164d5456b4",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green-r4/root-green-01"
+  ],
+  "exit_code": 0,
+  "stdout": "23621774\n",
+  "stderr": "",
+  "observed_unix": 1794021804.7522318
+}

@@ -1,0 +1,86 @@
+{
+  "status": "handed-back",
+  "verdict": "REVISE_THREE_NARROW_PRODUCTION_CONTRACT_GAPS_AND_GREEN_SELECTION",
+  "findings": [
+    {
+      "id": "R224-A",
+      "severity": "blocking",
+      "site": "candidate/cpu/supervisor.py:77-100, supervise_once marker acquisition",
+      "problem": "Actual Task1 GPU WAITING writes launch_packet_manifest_sha256/publication_deadline, but Task2 reads packet_manifest_sha256/deadline_unix. Direct execution of the original Task1 write statement followed by real CPU consumers raises both KeyErrors. Separate marker hash/read also permits an unbound decoded buffer to supply a later deadline while the on-disk marker SHA remains unchanged.",
+      "minimal_correction": "Consume exact accepted Task1 field names from one hash-authenticated raw marker buffer; use its publication_deadline throughout finite deadline checks. Preserve requested_at/trigger/job/source/config/bank bindings and periodic immutable marker checks. Never rename or renew actual GPU marker bytes.",
+      "required_regressions": [
+        "Direct unchanged Task1-produced WAITING -> Task2 request and deadline acceptance.",
+        "Original fixed deadline shortened by actual Task1 allocation is retained; <=300s, trigger<=15s and missed window still reject.",
+        "Mutate/swap marker between hash/read; no CPU Popen or extended parameter deadline."
+      ],
+      "evidence": [
+        "pure-interface-results.json",
+        "marker-acquisition-result.json"
+      ]
+    },
+    {
+      "id": "R224-B",
+      "severity": "blocking",
+      "site": "candidate/cpu/validate-phase.py:164-181",
+      "problem": "verify_input_closure requires exactly5 aliases, copied from earlier389-input proof. The immutable422 manifest ff11c97d... declares11 namespace aliases and rejects immediately before data reads.",
+      "minimal_correction": "Preserve the original422 manifest and validate every declared literal alias/target from its authenticated complete mapping. Report actual alias count; do not prune/resign to the synthetic five-alias fixture. Retain exact418 immutable plus4 current catalogue roles.",
+      "required_regressions": [
+        "Use actual original manifest metadata with all11 declared alias identities and tiny filesystem I/O seam.",
+        "Missing/changed one of the six additional aliases rejects; ordinary state.json/current catalogue checks remain."
+      ],
+      "evidence": [
+        "pure-interface-results.json"
+      ]
+    },
+    {
+      "id": "R224-C",
+      "severity": "blocking interface",
+      "site": "candidate/cpu/supervisor.py validate_child_completion/supervise_once output; candidate/gpu/common.py validate_release actual_CPU_COMPLETE consumer",
+      "problem": "Task2 COMPLETE lacks nine mandatory fields read by the accepted Task1 CPU consumer: bank_file_sha256, bank_manifest_sha256, bound_gpu_config_sha256, full_controls, full_domain_support_audit_complete, full_rows, launch_packet_manifest_sha256, timely_window, waiting_sha256. Current rows/positive_controls/final_GPU_bound_config_sha256/GPU_packet_manifest_sha256 do not satisfy those existing keys.",
+      "minimal_correction": "Publish those established actual_CPU_COMPLETE fields from already validated source/bank/domain/request/WAITING/window facts in the immutable Task2 supervisor COMPLETE. Preserve child receipt and proof hash. Keep Task3 as owner of later composite/current-root checks; do not relabel a root reconstruction as actual CPU COMPLETE or weaken accepted Task1.",
+      "required_regressions": [
+        "Pass actual Task2-produced COMPLETE through real accepted Task1 validate_release CPU consumer with only external resource/transport seams.",
+        "Wrong bank/GPU config/packet/marker/domain/timely fields reject; no science counts or boolean audit flag invented without completed guard evidence."
+      ],
+      "evidence": [
+        "pure-interface-results.json"
+      ]
+    },
+    {
+      "id": "R224-D",
+      "severity": "blocking verification packet",
+      "site": "task2/green/run_cpu_green.py:35-38",
+      "problem": "GREEN declares204 cases=107new+97accepted, but selects only CPU107 and controller82, omitting entry198.py15; effective scope is189. This also omits the accepted final-entry race/floor regressions.",
+      "minimal_correction": "Include test_full_score_entry198.py as well as both currently selected files. Freeze new exact pins/expected named counts after correction regressions; preserve cancelled unrun packet.",
+      "required_regressions": [
+        "Command/inventory test ensures all accepted97 Task1 cases and original107 Task2 cases plus new cases appear in each environment."
+      ],
+      "evidence": [
+        "pure-interface-results.json"
+      ]
+    }
+  ],
+  "pins_sha256": "52858183652f0ad2aa3a8ec1b264838245d2e34fb0d0bd7f5d7c9688938ad933",
+  "raw_members_checked": 210,
+  "original107_tests_sha256": "4ffdb6b0adba7680247f05d07af8316ab9053fb4c280c923f186c50bc1db1f3e",
+  "author_handback_read": false,
+  "actual_GREEN_observed": false,
+  "GREEN_job": "23620336",
+  "GREEN_terminal": "CANCELLED while unstarted; zero runtime",
+  "accepted_RED_job": "23618388",
+  "accepted_RED_expected_each": 107,
+  "accepted_RED_observed_each": 107,
+  "scope_sound": [
+    "Uses original source50e score argv without limit; native context/live/groups/geometry/bank-reader/bank-contract/tokenizer/saved-layout/live ordering is preserved.",
+    "Checks original H100 BF16 numerical environment for all bank tasks; does not pretend CPU proves loaded GPU geometry.",
+    "Source511+4 and G2/G3 science checks, exact current four catalogue binding, unique full row/control keys and support/reason mask checks are present.",
+    "Domain reconstruction retains native operation filter, singleton rows, donor-presence and utility calibration distinctions. Actual native full preparation remains unrun here.",
+    "Normal zero-exit reap precedes completion, elapsed-time strict inequality and final publication checks reject late observations; no retry or request renewal."
+  ],
+  "Task3_separate": [
+    "Root producer/composite/current catalogue/cache/usage/ledger/release implementation and whole-packet integration are still later tasks.",
+    "These do not excuse direct Task2 WAITING/CPU COMPLETE incompatibility with already accepted Task1 endpoints."
+  ],
+  "resource_or_GPU_admitted": false,
+  "no_source_model_native_suite_git_RS_scheduler_SSH_or_agents": true
+}

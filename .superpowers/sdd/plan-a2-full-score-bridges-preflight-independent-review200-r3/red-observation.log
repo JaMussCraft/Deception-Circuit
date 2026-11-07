@@ -1,0 +1,18 @@
+test_mapping_failure_still_returns_membership_evidence (red_observation.ExistingFailure) ... FAIL
+
+======================================================================
+FAIL: test_mapping_failure_still_returns_membership_evidence (red_observation.ExistingFailure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r3/red_observation.py", line 6, in test_mapping_failure_still_returns_membership_evidence
+    out=collect('123','5:memory:/slurm/job_123/step_batch',Path('/not-real'),'23 1 0:22 / /x rw - tmpfs tmpfs rw')
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r3/cgroup_probe.py", line 27, in collect
+    elif 'memory' in f[1].split(','):kind='v1';base=controller_path(kind,f[2],mountinfo,cgroup_root);names=('memory.usage_in_bytes','memory.max_usage_in_bytes','memory.failcnt','memory.oom_control');kind='v1'
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r3/cgroup_probe.py", line 18, in controller_path
+    assert candidates,'actual cgroup memory mount unavailable'
+AssertionError: actual cgroup memory mount unavailable
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=1)

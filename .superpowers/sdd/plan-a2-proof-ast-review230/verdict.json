@@ -1,0 +1,113 @@
+{
+  "verdict": "ACCEPT_AST_COMPAT_SUCCESSOR_SOURCE_AND_ONE_SAME_RESOURCE_CPU_PROPOSAL_ONLY",
+  "packet_manifest_sha256": "94a104fa5db26251b1f565baea61cf59b6e632ea453a0232ace01903ef8fecc0",
+  "dispatcher_sha256": "da3fd6aac9356a685410afd3800c824988ac90c4e0a60dfcbe63707382f9cddb",
+  "dispatcher_test_sha256": "0e16685fd3e44a68b8ee94e8ff16ea0c0fe14f0e96ea5269feeb5fbdafb41978",
+  "proof_schema_sha256": "b4110eca6d4e8adf0d970d85957f0239272aee530f1a4769599ce26c76aa8c43",
+  "accepted_predecessor_packet_manifest_sha256": "4e4b4bcf1ddcd6481fac1eccd966a2a1cbfa385b2bd16a9a00504cfaa05def3f",
+  "source_safety_findings": [],
+  "source_scope": "Exact AST metadata compatibility successor and target-pin dispatcher. No actual deployment/binding/release acceptance or resource result.",
+  "verified": {
+    "all32_packet_members_match": true,
+    "worker_proofguards_inputpins_nativecontract_request_exact_bytes": true,
+    "catalogue_alias_source_nativeowning_cgroup_effectiveRO_deadline_resource_logic_unchanged": true,
+    "only_changed_schema_function": "verify_function_pins adds normalize_empty_type_params before unchanged full AST dump hash",
+    "only_added_schema_function": "normalize_empty_type_params",
+    "normalizes_only_empty_list_type_params_known_FunctionDef_AsyncFunctionDef_ClassDef": true,
+    "rejects_nonempty_invalid_missing_or_unknown_owner_representation": true,
+    "other_AST_semantic_fields_unchanged_or_still_hashed": true,
+    "original20pins_not_regenerated": true,
+    "all20pins_reproduced_py39": true,
+    "all20pins_reproduced_normalized_py312": true,
+    "raw_py312_pin_matches": 0,
+    "sole_raw_difference": "22 inserted empty type_params lists across20function dumps",
+    "frozen_native5_source_file_hashes_match": true,
+    "original_pin_generation_command_or_interpreter_provenance_found": false,
+    "dispatcher_body_identical_after_only_packetpath_and_SHA_substitution": true,
+    "host_modules_Python36_grammar_and_reachability_unchanged": true,
+    "schema_not_newly_imported_by_host_supervisor_or_proofguards": true,
+    "bash_n_pass": true
+  },
+  "observed_tests": {
+    "packet_cases_expected_each": 34,
+    "base_cases": 34,
+    "base_pass": 33,
+    "base_skips": 1,
+    "base_skip": "actual generic syntax requiresPython3.12",
+    "mgnp_cases": 34,
+    "mgnp_pass": 34,
+    "mgnp_skips": 0,
+    "packet_exit_codes": [
+      0,
+      0
+    ],
+    "dispatcher_expected_each": 9,
+    "dispatcher_observed_pass_each": 9,
+    "dispatcher_exit_codes": [
+      0,
+      0
+    ],
+    "independent_expected_each": 4,
+    "independent_observed_pass_each": 4,
+    "independent_exit_codes": [
+      0,
+      0
+    ],
+    "mutation_coverage": [
+      "real body insertion",
+      "real branch condition inversion",
+      "real Python3.12 generic function",
+      "nonempty or wrongly typed type_params",
+      "undeclared or unknown-owner field",
+      "unrecognized semantic field remains in dump"
+    ],
+    "stdlib_only_under30sec_per_command": true,
+    "no_native_context_graph_model_remote": true,
+    "initial_reviewer_comparator_failure": "Path-updated test_catalogues incorrectly classified byte-identical; original checker and failed logs preserved. Only r4->r3 path normalization allowed in corrected comparator; four checks repeated, not passing suites."
+  },
+  "actual_failed_run": {
+    "job": "50313499",
+    "fetched_files_verified": 14,
+    "terminal": "FAILED1:0after451seconds",
+    "failure": "verify_function_pins a2_pipeline.py:_groups_for_compute",
+    "reached_after_native_owning_return": "Code path/traces confirm AST gate reached; no later graph/resource proof completed.",
+    "MODEL_LOADED": false,
+    "NUMERICAL_CONTROLS_TESTED": false,
+    "GPU_ADMITTED": false,
+    "preserve_original_receipts": true
+  },
+  "non_authoritative_metadata_note": "r4/verification.json is inherited27-case metadata and still worker_schema_unchanged=true. It does not describe r4 AST change or34-case checks. Actual source hashes and freshly persisted reviewer logs are authoritative for this scoped verdict.",
+  "one_renewed_CPU_proposal": {
+    "accepted_as_separately_root_bound_proposal": true,
+    "cluster": "bridges2",
+    "account": "cis260361p",
+    "partition": "RM-shared",
+    "qos": "rm",
+    "nodes": 1,
+    "ntasks": 1,
+    "cpus": 26,
+    "memory_GiB": 48,
+    "minutes": 45,
+    "gpus": 0,
+    "child_seconds": 2400,
+    "termination_grace_seconds": 15,
+    "automatic_retry": false,
+    "resource_fit_or_normal_completion_guaranteed": false,
+    "qualification": "Same bounded historical resources; no cap increase, scientific/admission change, reduced guard or automatic retry. A distinct actual job and fresh evidence are still required."
+  },
+  "remaining_root_gates": [
+    "Stage exact new32member packet plus manifest and exact new dispatcher/tests; independent remote readback and actual host import checks.",
+    "Use a distinct fresh actual held CPU job; preserve50313499 failure and all sealed historical bindings unchanged. No silent reuse or requeue.",
+    "Fresh stable four-catalogue capture/remotehash/Delta-reread snapshot, complete immutable/alias/source/SIF/Python/cache/space closure, and new packet/job-bound witness and independent source review reference.",
+    "Seal and readback exact new perjob bindings+separate expected digest, actual spooled accepted dispatcher and absent owned output; separate bounded release audit remains.",
+    "Retain genuine running allocation/native numeric/source/input/protection/bank/cgroup readonly and strict timing/publication guards, ordinary usage/cadence gates.",
+    "After actual normal proof, independently interpret memory/serialization/hash cost and terminal evidence before full-score resource/GPU/scientific decisions."
+  ],
+  "implementation_edits": false,
+  "scheduler_actions": false,
+  "remote_actions": false,
+  "ordinary_cap_percent": 80,
+  "cadence_points": 40,
+  "tool_next_checkpoint_index": 3,
+  "tool_next_at_plus_points_since_registration": 120
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="12" time="1.350" timestamp="2026-11-07T01:17:18.306004-06:00" hostname="dt-login04.delta.ncsa.illinois.edu"><testcase classname="" name="test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2" time="0.286"><failure message="task3_helper.Rejected: unknown phase">../red259/tests/test_full_score_release.py:82: in test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2
+    m = module(); r = request(m, chain)
+                      ^^^^^^^^^^^^^^^^^
+../red259/tests/test_full_score_release.py:77: in request
+    return m.construct_request(x.w, x.c, x.g, t1.sha(x.guard.CONFIG),
+../red259/historical-root/helper.py:39: in construct_request
+    need(w['phase'] in ('bank','prefix4'),'unknown phase');need(w['job_id']==g['actual_job_id'] and w['source_commit']==SOURCE and w['bound_config_sha256']==gsha,'WAITING identity')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../red259/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: unknown phase</failure></testcase><testcase classname="" name="test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain" time="0.263"><failure message="task3_helper.Rejected: CPU immutable bindings">../red259/tests/test_full_score_release.py:115: in test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain
+    m.validate_complete(chain.complete, chain.r, 'a'*64, chain.g, t1.sha(chain.guard.CONFIG),1202.)
+../red259/historical-root/helper.py:49: in validate_complete
+    need(q['standing_packet_manifest_sha256']==CPU3 and q['H100_packet_manifest_sha256']==R5 and q['final_GPU_bound_config_sha256']==gsha and q['request_sha256']==rsha,'CPU immutable bindings')
+../red259/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable bindings</failure></testcase><testcase classname="" name="test_existing_composite_schema_passes_actual_Task1_consumer" time="0.273" /><testcase classname="" name="test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration" time="0.013"><failure message="task3_helper.Rejected: owned exact60min1GPUh charge">../red259/tests/test_full_score_release.py:186: in test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration
+    before = copy.deepcopy((ledger,mapping)); result=m.validate_budget(ledger,mapping,g)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../red259/historical-root/helper.py:115: in validate_budget
+    need(row['gpus']==1 and row['requested_minutes']==60 and row['reserved_gpu_hours']==g['maximum_reserved_gpu_hours']==1.0 and g['exact_requested_GPU_seconds']==3600,'owned exact60min1GPUh charge')
+../red259/historical-root/helper.py:16: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: owned exact60min1GPUh charge</failure></testcase><testcase classname="" name="test_actual_generated_remote_program_publishes_full_only_reviewed_resources" time="0.026"><failure message="AssertionError">../red259/tests/test_full_score_release.py:231: in test_actual_generated_remote_program_publishes_full_only_reviewed_resources
+    execute_remote(m,p,fields,monkeypatch)
+../red259/tests/test_full_score_release.py:226: in execute_remote
+    with contextlib.redirect_stdout(io.StringIO()): exec(compile(program,'fake-remote','exec'),{})
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+fake-remote:8: in &lt;module&gt;
+    ???
+E   AssertionError</failure></testcase><testcase classname="" name="test_ordinary80_cannot_be_bypassed_by_old_exception[active-80]" time="0.013"><failure message="Failed: DID NOT RAISE any of (Rejected, ValueError, AssertionError)">../red259/tests/test_full_score_usage.py:41: in test_ordinary80_cannot_be_bypassed_by_old_exception
+    with pytest.raises(rejects(m)):invoke(m,monkeypatch,live=live,cached=79,exception=exception)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (Rejected, ValueError, AssertionError)</failure></testcase><testcase classname="" name="test_ordinary80_cannot_be_bypassed_by_old_exception[active-80.001]" time="0.013"><failure message="Failed: DID NOT RAISE any of (Rejected, ValueError, AssertionError)">../red259/tests/test_full_score_usage.py:41: in test_ordinary80_cannot_be_bypassed_by_old_exception
+    with pytest.raises(rejects(m)):invoke(m,monkeypatch,live=live,cached=79,exception=exception)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (Rejected, ValueError, AssertionError)</failure></testcase><testcase classname="" name="test_ordinary80_cannot_be_bypassed_by_old_exception[active-95]" time="0.013"><failure message="Failed: DID NOT RAISE any of (Rejected, ValueError, AssertionError)">../red259/tests/test_full_score_usage.py:41: in test_ordinary80_cannot_be_bypassed_by_old_exception
+    with pytest.raises(rejects(m)):invoke(m,monkeypatch,live=live,cached=79,exception=exception)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE any of (Rejected, ValueError, AssertionError)</failure></testcase><testcase classname="" name="test_ordinary80_cannot_be_bypassed_by_old_exception[expired-80]" time="0.013" /><testcase classname="" name="test_ordinary80_cannot_be_bypassed_by_old_exception[expired-80.001]" time="0.012" /><testcase classname="" name="test_ordinary80_cannot_be_bypassed_by_old_exception[expired-95]" time="0.012" /><testcase classname="" name="test_metadata_hashed_every_weight_sized_and_blob_bound_no_full_rehash" time="0.067" /></testsuite></testsuites>

@@ -1,0 +1,29 @@
+{
+  "commands": [
+    {
+      "python": "/sw/external/python/anaconda3/bin/python3.9",
+      "packet_cases": 27,
+      "packet_seconds": 1.448,
+      "independent_cases": 5,
+      "independent_seconds": 0.295,
+      "exit_codes": [
+        0,
+        0
+      ]
+    },
+    {
+      "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "packet_cases": 27,
+      "packet_seconds": 1.548,
+      "independent_cases": 5,
+      "independent_seconds": 0.181,
+      "exit_codes": [
+        0,
+        0
+      ]
+    }
+  ],
+  "packet_command": "PYTHON -B -m unittest discover -s /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3 -p 'test_*.py' -v",
+  "independent_command": "PYTHON -B /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-final-proof-adapter-review219/independent_checks.py",
+  "no_broad_native_suite_graph_or_model": true
+}

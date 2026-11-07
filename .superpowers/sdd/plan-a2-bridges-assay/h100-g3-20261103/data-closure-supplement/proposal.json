@@ -1,0 +1,39 @@
+{
+  "status": "READY_FOR_ROOT_DELTA_CPU_AUDIT_REVIEW_ONLY",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "G3_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+  "root_command_argv": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/data-closure-supplement/launch.sh"
+  ],
+  "resources_proposed": {
+    "CPUs": 4,
+    "memory": "16G",
+    "minutes": 15,
+    "GPUs": 0,
+    "no_requeue": true
+  },
+  "limits": {
+    "owning_read_seconds": 720,
+    "owning_kill_grace_seconds": 15,
+    "collection_seconds": 90,
+    "collection_kill_grace_seconds": 5
+  },
+  "root_cause": "Old audit discarded relative opens; old JSON-key walker only added absolute keys. Owning source/selection hash dicts use relative keys read at accepted runtime cwd.",
+  "trace": "strace -f -yy actual OS successful read-opens plus Python audit with event-time cwd; no monkeypatch/source/model injection",
+  "owning_calls": [
+    "accepted _load_context",
+    "a1.read_artifact exact existing G3",
+    "accepted _validate_live before/after",
+    "owning model_geometry_receipt",
+    "owning load_tokenizer and full validate_tokenization"
+  ],
+  "not_done": [
+    "No source/G3/validator changes or second freeze",
+    "No model/GPU/admission/release/retry",
+    "No remote mutation or job submission by author"
+  ],
+  "root_next": "Submit bounded CPU audit; require COMPLETE PASS/no existinginput drift and exact G3 proof; independently review resulting ordinary supplement and aliases, then stage only verified missing original inputs. Preserve failedBridge receipts.",
+  "source_contract": "Exact reviewed source_export before/after: closed511ordinary+4literalalias actual inventory, no leafsource symlink or pathescape, pinned snapshot/commit/runtime and exactsamehashmap; no weaker guard.",
+  "G2_comparison": "Read exact root-bound historical G2 via owningreader; strict29old/30newkeys and all22sciencefields equality, preserveoriginalreceipts; bothG3andhistoricalG2 excluded from supplement as separatelyrootbound artifacts."
+}

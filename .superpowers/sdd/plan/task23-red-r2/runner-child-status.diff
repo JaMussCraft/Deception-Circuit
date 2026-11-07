@@ -1,0 +1,47 @@
+--- failed/run_packet.py
++++ proposed/run_packet.py
+@@ -114,14 +114,34 @@
+             (sub / 'oracle.stdout').write_text(oracle.stdout); (sub / 'oracle.stderr').write_text(oracle.stderr)
+             assert oracle.returncode == 0, name + ' oracle preflight failed'
+             argv = command(python, sub); check_pins()
+-            result = subprocess.run(argv, env=env, cwd=str(PACKET), capture_output=True, text=True, timeout=360)
++            row = dict(python=python, argv=argv, status='PYTEST_STARTED',
++                pytest_exit_code=None, normal_completion=False)
++            manifest['results'][name] = row; save()
++            try:
++                result = subprocess.run(argv, env=env, cwd=str(PACKET), capture_output=True, text=True, timeout=360)
++            except subprocess.TimeoutExpired as error:
++                def decoded(value): return value.decode(errors='replace') if isinstance(value, bytes) else value or ''
++                (sub / 'pytest.stdout').write_text(decoded(error.stdout))
++                (sub / 'pytest.stderr').write_text(decoded(error.stderr))
++                row.update(status='PYTEST_TIMEOUT', timed_out=True, timeout_seconds=360,
++                    stdout_path=str(sub / 'pytest.stdout'), stderr_path=str(sub / 'pytest.stderr'))
++                save(); raise RuntimeError('pytest timed out; no RED evidence') from error
+             (sub / 'pytest.stdout').write_text(result.stdout); (sub / 'pytest.stderr').write_text(result.stderr)
++            row.update(status='PYTEST_EXITED', pytest_exit_code=result.returncode,
++                termination_signal=-result.returncode if result.returncode < 0 else None,
++                stdout_path=str(sub / 'pytest.stdout'), stderr_path=str(sub / 'pytest.stderr'))
++            save()  # Preserve raw child status BEFORE source checks or XML parsing.
+             check_pins()
++            junit = sub / 'junit.xml'
++            if not junit.is_file():
++                row.update(status='MISSING_JUNIT', junit_present=False,
++                    fixture_preflight_manifest=str(sub / 'fixture-preflight/run_manifest.json'))
++                save(); raise RuntimeError('pytest exited %s without JUnit; no RED evidence' % result.returncode)
+             cases = ET.parse(sub / 'junit.xml').getroot().findall('.//testcase')
+             failures = [case for case in cases if case.find('failure') is not None]
+             errors = [case for case in cases if case.find('error') is not None]
+             skipped = [case for case in cases if case.find('skipped') is not None]
+-            row = dict(python=python, argv=argv, pytest_exit_code=result.returncode,
++            row.update(python=python, argv=argv, pytest_exit_code=result.returncode,
+                 observed_cases=len(cases), expected_cases=expected_count(), failures=len(failures),
+                 errors=len(errors), skipped=len(skipped), oracle=json.loads(oracle.stdout),
+                 source_pins_before_after_equal=True)
+@@ -147,6 +167,7 @@
+                         '_validate_prepared_receiver_resources', '_PreparedPilotTarget')), text
+             else:
+                 assert result.returncode == 0 and not failures, row
++            row.update(status=args.mode + '_EXPECTED', normal_completion=True); save()
+         manifest.update(status=args.mode + '_EXPECTED', normal_completion=True, exit_code=0)
+     except BaseException as error:
+         manifest.update(status='FAILED', normal_completion=False, error=repr(error), exit_code=1)

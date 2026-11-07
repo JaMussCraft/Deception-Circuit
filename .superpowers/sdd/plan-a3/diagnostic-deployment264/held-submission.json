@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,sys,subprocess,time,hashlib,os\nfrom pathlib import Path\nx=json.load(sys.stdin);ops=Path(x['\"'\"'ops'\"'\"']);a=x['\"'\"'argv'\"'\"'];assert '\"'\"'--hold'\"'\"' in a\nwith(ops/'\"'\"'submission-intent.json'\"'\"').open('\"'\"'x'\"'\"') as f:json.dump(dict(argv=a,observed_unix=time.time()),f,indent=2)\nr=subprocess.run(a,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=30)\nv=dict(argv=a,exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr,observed_unix=time.time())\nwith(ops/'\"'\"'submission-result.json'\"'\"').open('\"'\"'x'\"'\"') as f:json.dump(v,f,indent=2)\nprint(json.dumps(v));sys.exit(r.returncode)\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"argv\": [\"sbatch\", \"--hold\", \"--parsable\", \"--account=cis260361p\", \"--partition=RM-shared\", \"--qos=rm\", \"--nodes=1\", \"--ntasks=1\", \"--cpus-per-task=18\", \"--mem=32G\", \"--time=00:25:00\", \"--no-requeue\", \"--export=ALL,CUDA_VISIBLE_DEVICES=\", \"--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3\", \"--job-name=lad-A3-diag253\", \"--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-deployment264/slurm-%j.log\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3/launch.sh\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-deployment264/config.json\", \"542ac9de7049ec24e14ac858223cb696a550606f52944a64a56cb80f8de81bab\", \"ded29ff237b436215d80db6408a878d513b79ffbb0ba7c4ba10fd2c7b391ba2a\"], \"exit_code\": 0, \"stdout\": \"50318613\\n\", \"stderr\": \"\", \"observed_unix\": 1794033190.2568266}\n",
+  "stderr": "",
+  "observed_unix": 1794033190.278642
+}

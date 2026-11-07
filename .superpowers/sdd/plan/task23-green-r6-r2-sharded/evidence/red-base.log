@@ -1,0 +1,190 @@
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+______________ test_legacy_output_layout_cannot_expose_host_root _______________
+
+    def test_legacy_output_layout_cannot_expose_host_root():
+        h = host()
+        with pytest.raises((AssertionError, ValueError)):
+>           h.command(configuration(h, good=False), 'suite', 'v1', 4000)
+E           Failed: DID NOT RAISE (<class 'AssertionError'>, <class 'ValueError'>)
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:35: Failed
+_____ test_child_bind_allows_payload_but_excludes_host_and_prior_receipts ______
+
+    def test_child_bind_allows_payload_but_excludes_host_and_prior_receipts():
+        h = host(); c = configuration(h)
+>       root, child, output = h.job_layout(c['output'], c['job_id'])
+E       AttributeError: module 'host_review272' has no attribute 'job_layout'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:40: AttributeError
+________ test_expired_original_clocks_never_spawn_or_renew[100.0-100.0] ________
+
+wall = 100.0, mono = 100.0
+
+    @pytest.mark.parametrize('wall,mono', [(100., 100.), (100., 0.), (0., 100.)])
+    def test_expired_original_clocks_never_spawn_or_renew(wall, mono):
+        h = host(); s = h.supervisor; state, clock = timer(wall, mono)
+        child = mock.Mock(pid=123, returncode=0); child.poll.return_value = 0
+        stack, spawn, cleanup = patches(s, clock, child)
+        with stack:
+>           row = s.execute(['never-real'], None, None, 90, 10000,
+                lambda timeout=15: ({}, 10000), wall_deadline=90, monotonic_deadline=90)
+E           TypeError: execute() got an unexpected keyword argument 'wall_deadline'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:80: TypeError
+_________ test_expired_original_clocks_never_spawn_or_renew[100.0-0.0] _________
+
+wall = 100.0, mono = 0.0
+
+    @pytest.mark.parametrize('wall,mono', [(100., 100.), (100., 0.), (0., 100.)])
+    def test_expired_original_clocks_never_spawn_or_renew(wall, mono):
+        h = host(); s = h.supervisor; state, clock = timer(wall, mono)
+        child = mock.Mock(pid=123, returncode=0); child.poll.return_value = 0
+        stack, spawn, cleanup = patches(s, clock, child)
+        with stack:
+>           row = s.execute(['never-real'], None, None, 90, 10000,
+                lambda timeout=15: ({}, 10000), wall_deadline=90, monotonic_deadline=90)
+E           TypeError: execute() got an unexpected keyword argument 'wall_deadline'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:80: TypeError
+_________ test_expired_original_clocks_never_spawn_or_renew[0.0-100.0] _________
+
+wall = 0.0, mono = 100.0
+
+    @pytest.mark.parametrize('wall,mono', [(100., 100.), (100., 0.), (0., 100.)])
+    def test_expired_original_clocks_never_spawn_or_renew(wall, mono):
+        h = host(); s = h.supervisor; state, clock = timer(wall, mono)
+        child = mock.Mock(pid=123, returncode=0); child.poll.return_value = 0
+        stack, spawn, cleanup = patches(s, clock, child)
+        with stack:
+>           row = s.execute(['never-real'], None, None, 90, 10000,
+                lambda timeout=15: ({}, 10000), wall_deadline=90, monotonic_deadline=90)
+E           TypeError: execute() got an unexpected keyword argument 'wall_deadline'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:80: TypeError
+______ test_final_allocation_query_cannot_spawn_after_either_bound[wall] _______
+
+expired_clock = 'wall'
+
+    @pytest.mark.parametrize('expired_clock', ['wall', 'mono'])
+    def test_final_allocation_query_cannot_spawn_after_either_bound(expired_clock):
+        h = host(); s = h.supervisor; state, clock = timer()
+        def allocation(timeout=15):
+            setattr(state, expired_clock, 100.)
+            return {}, 10000
+        child = mock.Mock(pid=123, returncode=0); child.poll.return_value = 0
+        stack, spawn, cleanup = patches(s, clock, child)
+        with stack:
+>           row = s.execute(['never-real'], None, None, 90, 10000, allocation,
+                wall_deadline=90, monotonic_deadline=90)
+E           TypeError: execute() got an unexpected keyword argument 'wall_deadline'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:95: TypeError
+______ test_final_allocation_query_cannot_spawn_after_either_bound[mono] _______
+
+expired_clock = 'mono'
+
+    @pytest.mark.parametrize('expired_clock', ['wall', 'mono'])
+    def test_final_allocation_query_cannot_spawn_after_either_bound(expired_clock):
+        h = host(); s = h.supervisor; state, clock = timer()
+        def allocation(timeout=15):
+            setattr(state, expired_clock, 100.)
+            return {}, 10000
+        child = mock.Mock(pid=123, returncode=0); child.poll.return_value = 0
+        stack, spawn, cleanup = patches(s, clock, child)
+        with stack:
+>           row = s.execute(['never-real'], None, None, 90, 10000, allocation,
+                wall_deadline=90, monotonic_deadline=90)
+E           TypeError: execute() got an unexpected keyword argument 'wall_deadline'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:95: TypeError
+___________ test_original_remaining_budget_is_usable_without_renewal ___________
+
+    def test_original_remaining_budget_is_usable_without_renewal():
+        h = host(); s = h.supervisor; state, clock = timer(10., 10.)
+        child = mock.Mock(pid=123, returncode=0); child.poll.return_value = 0
+        stack, spawn, cleanup = patches(s, clock, child)
+        with stack:
+>           row = s.execute(['never-real'], None, None, 90, 10000,
+                lambda timeout=15: ({}, 10000), wall_deadline=90, monotonic_deadline=90)
+E           TypeError: execute() got an unexpected keyword argument 'wall_deadline'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:106: TypeError
+___________ test_late_zero_after_final_query_fails_with_one_cleanup ____________
+
+    def test_late_zero_after_final_query_fails_with_one_cleanup():
+        h = host(); s = h.supervisor; state, clock = timer(); calls = []
+        def allocation(timeout=15):
+            calls.append(timeout)
+            if len(calls) > 1:
+                state.wall = state.mono = 90.
+            return {}, 10000
+        child = mock.Mock(pid=123, returncode=0); child.poll.return_value = 0
+        stack, spawn, cleanup = patches(s, clock, child)
+        with stack:
+>           row = s.execute(['never-real'], None, None, 90, 10000, allocation,
+                wall_deadline=90, monotonic_deadline=90)
+E           TypeError: execute() got an unexpected keyword argument 'wall_deadline'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:122: TypeError
+_____________ test_host_command_io_consumes_original_stage_budget ______________
+
+tmp_path = PosixPath('/tmp/a3-r6-r2-red-base/test_host_command_io_consumes_0')
+
+    def test_host_command_io_consumes_original_stage_budget(tmp_path):
+        h = host(); s = h.supervisor; state, clock = timer()
+        c = dict(environment='base', output=str(tmp_path/'job-1/child/execution'), shard=0, job_id='1')
+        root = tmp_path/'job-1'; root.mkdir()
+        original_command = h.command
+        def slow_command(*args):
+            result = original_command(*args)
+            state.wall = state.mono = 100.
+            return result
+        child = mock.Mock(pid=123, returncode=0); child.poll.return_value = 0
+        stack, spawn, cleanup = patches(s, clock, child)
+        with stack, mock.patch.object(h, 'time', clock), mock.patch.object(h, 'check_source'), \
+                mock.patch.object(h, 'allocation', return_value=({}, 10000)), mock.patch.object(h, 'command', side_effect=slow_command):
+>           row, end, ref = h.execute_stage(c, 'oracle', 'v1', root, 10000, 10000)
+E           AttributeError: module 'host_review272' has no attribute 'execute_stage'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:141: AttributeError
+_____ test_repaired_families_are_independent_exact_correction265_literals ______
+
+    def test_repaired_families_are_independent_exact_correction265_literals():
+        p = json.loads((HERE/'partition.json').read_text())
+>       assert p['repaired_families'] == CORRECT_FAMILIES
+E       AssertionError: assert ['test_prepar..._costly_work'] == ['test_prepar..._costly_work']
+E         
+E         At index 0 diff: 'test_prepared_correct_identity_understated_observed_resources_rejects' != 'test_prepared_receiver_resource_identity_and_capacity'
+E         Use -v to get more diff
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:151: AssertionError
+__________ test_self_consistent_but_wrong_repaired_family_is_rejected __________
+
+    def test_self_consistent_but_wrong_repaired_family_is_rejected():
+        a = load('aggregate_review272', HERE/'aggregate.py')
+        p = json.loads((HERE/'partition.json').read_text())
+        p['repaired_families'] = ['test_prepared_correct_identity_understated_observed_resources_rejects',
+                                  'test_prepared_final_barrier_after_all_costly_work']
+        for row in p['shards'].values():
+            row['execution_order'] = sorted(row['members'],
+                key=lambda n: n.split('::')[1].split('[')[0] not in p['repaired_families'])
+        with pytest.raises((AssertionError, ValueError)):
+>           a.validate_partition(p)
+E           Failed: DID NOT RAISE (<class 'AssertionError'>, <class 'ValueError'>)
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py:167: Failed
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_legacy_output_layout_cannot_expose_host_root
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_child_bind_allows_payload_but_excludes_host_and_prior_receipts
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_expired_original_clocks_never_spawn_or_renew[100.0-100.0]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_expired_original_clocks_never_spawn_or_renew[100.0-0.0]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_expired_original_clocks_never_spawn_or_renew[0.0-100.0]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_final_allocation_query_cannot_spawn_after_either_bound[wall]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_final_allocation_query_cannot_spawn_after_either_bound[mono]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_original_remaining_budget_is_usable_without_renewal
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_late_zero_after_final_query_fails_with_one_cleanup
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_host_command_io_consumes_original_stage_budget
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_repaired_families_are_independent_exact_correction265_literals
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_review272.py::test_self_consistent_but_wrong_repaired_family_is_rejected
+12 failed in 0.26s

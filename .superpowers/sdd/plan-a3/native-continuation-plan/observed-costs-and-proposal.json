@@ -1,0 +1,46 @@
+{
+  "kind": "planning_costs_not_executed_or_guaranteed",
+  "observed": {
+    "original_CLI_startup_to_numeric_seconds": 583.167560715985,
+    "redundant_outer_inventory_validation_seconds": 71.22817361302441,
+    "original_case_seconds": 102.63064642000245,
+    "original_case_actual_forward_calls": 11100,
+    "numeric_invocation_seconds": 59.27958186197793,
+    "cold_full_authentication_seconds": 186.89102491596714,
+    "cold_numeric_backing_seconds": 130.616867431032,
+    "numeric_backing_first_bundle_read_seconds": 40.154028757009655,
+    "numeric_backing_load_axes_including_its_read_seconds": 44.84680810698774,
+    "process_tail_after_auth_event_seconds": 16.008926403999794,
+    "slower_numeric_backing_seconds": 183.24889286700636,
+    "peak_process_bytes": 6805737472
+  },
+  "derived": {
+    "lower_API_startup_point_estimate": 511.9393871029606,
+    "warm_full_authentication_proxy_seconds": 101.89018805196974,
+    "warm_proxy_formula": "cold full authentication minus first read_bundle and load_selected_axes; remaining byte/witness work retained, but NOT a measured cache-hit bound",
+    "publication_seconds_allowance": 5.0,
+    "publication_allowance_is_observed": false,
+    "lower_API_one_new_case_seconds": 822.46998484293,
+    "lower_API_one_case_plus_same_process_warm_reauth_seconds": 924.3601728948997,
+    "CLI_one_case_seconds": 893.6981584559544,
+    "slow_IO_sensitivity_seconds": 52.632025435974356,
+    "one_case_plus_warm_with_observed_IO_sensitivity": 976.9921983308741
+  },
+  "proposed": {
+    "new_case_index": 1,
+    "new_case_id": "d5738bfcdec6990c3b6e77b2c7e625d46562ea134457f5de2896af9600db7ceb",
+    "new_case_count": 1,
+    "second_step": "same-process read-only full authentication of the newly completed case, zero additional forwards/publication",
+    "timeout_seconds": 1200,
+    "kill_grace_seconds": 15,
+    "minimum_finite_ancestor_headroom_bytes": 17179869184,
+    "actual_warm_cache_cost_measured": false,
+    "no_further_case_or_aggregate": true
+  },
+  "limitations": [
+    "Only case0 native time is observed; next case has same source/profile/cell-operation counts/group count but another input condition.",
+    "Filesystem/cache latency varies; these estimates are not guaranteed host bounds.",
+    "No process-local validator/cache can be reused from the prior terminal authenticated process.",
+    "Remaining62 cases and atomic full63 aggregate have no supported600/900s completion bound."
+  ]
+}

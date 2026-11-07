@@ -1,0 +1,30 @@
+{
+  "non_attributable_first_attempt": {
+    "path": "local-red",
+    "reason": "Real bank validation failed first with groups_sha256 KeyError; not evidence for R198 ordering."
+  },
+  "R198_attributable_RED": {
+    "path": "local-red-r2",
+    "cases_per_environment": 14,
+    "failures": 12,
+    "positive_passes": 2,
+    "errors": 0
+  },
+  "real_bank_RED": {
+    "path": "real-bank-red",
+    "cases_per_environment": 1,
+    "failure": "groups_sha256 KeyError"
+  },
+  "initial_focused_GREEN": {
+    "path": "local-green",
+    "cases_per_environment": 15
+  },
+  "final_focused_GREEN": {
+    "path": "local-green-r2",
+    "cases_per_environment": 17,
+    "new_cases": 15,
+    "original_tiny_entry_cases": 2
+  },
+  "no_full_suite_or_model_or_native_run": true,
+  "source_test_archives_match_recorded_RED_hashes": true
+}

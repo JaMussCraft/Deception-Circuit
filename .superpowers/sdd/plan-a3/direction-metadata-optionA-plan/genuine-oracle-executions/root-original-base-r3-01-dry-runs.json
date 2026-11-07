@@ -1,0 +1,48 @@
+[
+  {
+    "account": "beto-delta-cpu",
+    "command": [
+      "sbatch",
+      "--account=beto-delta-cpu",
+      "--partition=cpu",
+      "--constraint=projects",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=4",
+      "--mem=192G",
+      "--time=01:15:00",
+      "--no-requeue",
+      "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "--job-name=lad-A3-base75",
+      "--export=ALL,CUDA_VISIBLE_DEVICES=",
+      "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01-%j.log",
+      "--wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/oracle_cpu.sh --packet-sha256 fdebb58e74c75bdd83c3c616a496988e6dfb80a9a1c5fbcddda3a22181a925ef --config /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/config.template.json --config-sha256 6e9c0de2ae7c208b8b0933f5ca3630cedcf6f655e35c7e947a90fee4addca58c --mode original --environment base --output /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "sbatch: Job 23608979 to start at 2026-11-16T12:45:36 a using 4 processors on nodes cn033 in partition cpu\n"
+  },
+  {
+    "account": "bjhz-delta-cpu",
+    "command": [
+      "sbatch",
+      "--account=bjhz-delta-cpu",
+      "--partition=cpu",
+      "--constraint=projects",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=4",
+      "--mem=192G",
+      "--time=01:15:00",
+      "--no-requeue",
+      "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "--job-name=lad-A3-base75",
+      "--export=ALL,CUDA_VISIBLE_DEVICES=",
+      "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01-%j.log",
+      "--wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/oracle_cpu.sh --packet-sha256 fdebb58e74c75bdd83c3c616a496988e6dfb80a9a1c5fbcddda3a22181a925ef --config /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/config.template.json --config-sha256 6e9c0de2ae7c208b8b0933f5ca3630cedcf6f655e35c7e947a90fee4addca58c --mode original --environment base --output /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "sbatch: Job 23608980 to start at 2026-11-17T00:28:36 a using 4 processors on nodes cn033 in partition cpu\n"
+  }
+]

@@ -1,0 +1,19 @@
+test_bind_failures (unittest.loader._FailedTest.test_bind_failures) ... ERROR
+
+======================================================================
+ERROR: test_bind_failures (unittest.loader._FailedTest.test_bind_failures)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_bind_failures
+Traceback (most recent call last):
+  File "/u/swong2/.conda/envs/mgnp/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r3/test_bind_failures.py", line 4, in <module>
+    from guards import cgroup_bind
+ImportError: cannot import name 'cgroup_bind' from 'guards' (/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r3/guards.py)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (errors=1)

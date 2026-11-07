@@ -1,0 +1,45 @@
+{
+  "accepted_identity": {
+    "groups": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1/groups.json",
+    "groups_file_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+    "main_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/bridges-h100-G3-v1",
+    "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525"
+  },
+  "actual_groups_raw_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+  "budget_fixture_keys": [
+    "actual_job_id",
+    "allowed_partitions",
+    "canonical_ledger",
+    "exact_requested_GPU_seconds",
+    "expected_account",
+    "experiment_limits",
+    "global_limit",
+    "main_root",
+    "maximum_reserved_gpu_hours",
+    "reservation_id",
+    "resources"
+  ],
+  "kind": "SOURCE_ONLY_FIXTURE_CONTRACT_DIAGNOSIS",
+  "missing_identity_fields": [
+    "groups_file_sha256"
+  ],
+  "native_collector_config_reads": [
+    "canonical_ledger",
+    "groups_file_sha256",
+    "main_root",
+    "mapping_origin"
+  ],
+  "native_imported": false,
+  "observed_failure": "'groups_file_sha256'",
+  "production_change_required": false,
+  "production_imported": false,
+  "pytest_run": false,
+  "root_cause": "budget-only fixture reused at full scoring identity boundary before native normalization",
+  "source_pins": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/config.template.json": "d6247a0a630d87c9e94d7ea158b9c7fde7e2cccf3a32b27bd757c7c65f2d4e4d",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_release.py": "13414a9c587067ed0fb2d853ba5d813746c072c66db9e223c40b75f39c66c531",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py": "6ac75b9516bb49dd7c433913d3fbf7b27c0663ede04d4d8d8ad9c5cadae13f49"
+  }
+}

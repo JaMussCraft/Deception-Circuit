@@ -1,0 +1,25 @@
+{
+  "job_id": "50189932",
+  "command": [
+    "sbatch",
+    "--account=cis260382p",
+    "--qos=gpu",
+    "--partition=GPU-shared",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=64G",
+    "--gpus-per-node=h100-80:1",
+    "--time=01:00:00",
+    "--no-requeue",
+    "--export=ALL",
+    "--job-name=lad-G3-H100timing",
+    "--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/timing-%j.log",
+    "--wrap=bash /ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/dispatch.sh"
+  ],
+  "held": true,
+  "stdout": "50189932\n",
+  "stderr": "",
+  "submitted_unix": 1793747882.822352
+}

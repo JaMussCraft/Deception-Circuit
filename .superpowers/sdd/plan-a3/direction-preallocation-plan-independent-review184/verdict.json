@@ -1,0 +1,42 @@
+{
+  "accepted_without_redesign": [
+    "Final transport barrier follows costly union and original before_publication, then entry-bound full witness/live deadline/cheap seal/original bounded writer. No numeric witness schedule is cached or weakened.",
+    "Same-buffer exact JSON transport, phase-only target witness and precise lexical alias policy match accepted design.",
+    "PID/seal/context/one requirement graph and rooted original admission extension preserve data-versus-authority boundary.",
+    "Explicit exact source closure, both-environment checks, fresh numerical gate, measurement and paired-cap gates remain separate. No implementation/source publication/GPU authority inferred from plan.",
+    "All listed existing regression node names exist in actual source; candidate workload765 and test846 hashes remain unchanged."
+  ],
+  "author_handback_used": false,
+  "design_manifest_sha256": "397b788d18816b19f700ce1373c12c9cc8c34be9e09d9d8d0a3018ecab5c437e",
+  "findings": [
+    {
+      "id": "R184-A",
+      "minimal_change": "Specify two checks: early authenticated recipe/bounds/capacity check before large read, and post-reader actual observed graph/retention and applicable transient/peak accounting against the same anchored record, followed by fresh actual-capacity/model guard before loader. State how observations are obtained and their measurement scope; preserve original actual capacity and storage tiers, no alias/producer-peak subtraction. Lower reader or loader must expose the observations needed; ordinary resource measurement is not authority.",
+      "problem": "The concrete helper contract specifies pre-read record/capacity validation and return of resource charges, but does not explicitly require comparing actual post-read/freeze retained/transient observations against the anchored bounds before invoking the loader. Test matrix says understated record rejects without distinguishing incorrect record identity from a correct-identity record that understates the actual decoded graph. A matching signed record alone cannot establish actual receiver memory fits.",
+      "required_test": "A root-anchored correctly identified record with enough nominal capacity but understated decoded/frozen retention or observed resource bound must reject AFTER the reader and BEFORE model-loader invocation. Also retain early insufficient-capacity rejection, actual allocation failure and the existing additive-arithmetic fixture. Controlled test observers do not become production clock/model injection.",
+      "severity": "plan correction before implementation acceptance",
+      "site": "contracts.json _validate_prepared_receiver_resources/load_prepared_pilot_target; plan Task2; accepted design175-r2 interfaces loader step3"
+    },
+    {
+      "id": "R184-B",
+      "minimal_change": "Explicitly authorize narrow updates to candidate-only preparation/intake fixture construction and related expected legacy rejection cases in the existing runtime test file, preserving every prior numerical/authority tamper assertion; keep accepted optionA workload/test bytes unchanged. Alternatively replace the listed success node with an explicit prepared production-shaped fixture and retain legacy as a rejection test, recording exactly which original assertions migrate. No source path may bypass new preparation binding to keep an old test green.",
+      "problem": "Plan requires new preparation-origin checks and prepared native intake but treats existing runtime tests as unchanged fixture/regression source. The listed production-shaped success fixture constructs a completed admission/reservation/target/origin with no preparation/resource refs. A correct new-source strict intake must reject that legacy fixture; preserving its success unchanged would encourage a production compatibility bypass.",
+      "required_test": "A production-shaped correctly anchored prepared origin passes original intake; missing/changed/unanchored preparation/resource/source/part refs reject. The old no-preparation origin rejects under the new production source. Preserve original completed-source, mapping, reservation, runtime/numeric backing and per-damage rejection coverage.",
+      "severity": "executable scope/fixture correction before full plan approval",
+      "site": "plan Task3 files and Task4 regressions; verification-scope.json production-shaped intake node; candidate tests/test_a3_direction_runtime.py _production_cost_source_case lines1504-1542 and intake success case1594+"
+    }
+  ],
+  "implementation_authorized_by_this_review": false,
+  "new_tests_run": false,
+  "next_step": "Author a distinct plan revision/addendum closing the two findings, then root can approve sequential implementation. Task1 transport scope itself is sound, but this verdict does not independently authorize starting it. No need for broader design churn or new human policy decision.",
+  "nonblocking_execution_clarifications": [
+    "Task1 three-read count fixture should explicitly exercise lower reader plus phase witness final recheck: entry reader alone includes only the first two reads; Task3 proves complete final-barrier integration. Do not add a redundant full read merely to force Task1 count.",
+    "RED and GREEN pin distinct runtime revisions while retaining the same attributable test assertions; no candidate mutation while either pinned CPU run is active.",
+    "Final barrier timing/metadata must be pre-enveloped and charged once; existing workload.project_cost adds startup_seconds plus proof_validation_seconds, so regression must check actual projection as well as receipt fields."
+  ],
+  "plan_manifest_sha256": "315fc52d7bafac0b82bc4f4938e663de2f61b14553c371273761533c9288e825",
+  "preserved_gates": "Both-environment original/candidate comparison; focused source correctness; genuine receiver cost/RAM; final source+fresh dependent artifacts; source-bound nine prefit cases/full aggregate; measured conservative paired .5GPUh and actual storage/host; root-only GPU admission. Running base23608994 untouched.",
+  "source_changes": false,
+  "status": "handed-back",
+  "verdict": "REVISE_TWO_NARROW_PLAN_GAPS_BEFORE_FULL_IMPLEMENTATION_APPROVAL"
+}

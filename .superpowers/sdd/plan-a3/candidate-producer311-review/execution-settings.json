@@ -1,0 +1,26 @@
+{
+  "axis_tile_size": 2,
+  "backend": "sdpa",
+  "dtype": "torch.bfloat16",
+  "dtype_bytes": 2,
+  "finish_reserve_seconds": 90,
+  "hardware": {
+    "count": 1,
+    "gpu": "h200"
+  },
+  "head_width": 128,
+  "hidden_size": 4096,
+  "jobs": 2,
+  "microbatch_size": 2,
+  "num_layers": 32,
+  "probe_max_bytes": 1073741824,
+  "serialization_batches": 1,
+  "vocabulary_size": 128256,
+  "warmup_batches": 1,
+  "axis_tile_sizes": {
+    "prefit": 2,
+    "fit-select": 2,
+    "selected-pilot": 32,
+    "remaining": 32
+  }
+}

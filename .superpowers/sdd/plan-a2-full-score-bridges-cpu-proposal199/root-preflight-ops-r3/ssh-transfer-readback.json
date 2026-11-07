@@ -1,0 +1,20 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,base64,hashlib,os\nfrom pathlib import Path\nx=json.load(sys.stdin);p=Path(x['\"'\"'path'\"'\"'])\nassert str(p).endswith('\"'\"'/plan-a2-full-score-bridges-cpu-proposal199/preflight-r3'\"'\"') and str(p)==os.path.realpath(str(p)) and p.is_dir() and p.stat().st_uid==os.getuid()\nassert set(q.name for q in p.iterdir())<=set(x['\"'\"'files'\"'\"'])\nrows={}\nfor n,data in x['\"'\"'files'\"'\"'].items():\n assert '\"'\"'/'\"'\"' not in n and n not in ('\"'\"'.'\"'\"','\"'\"'..'\"'\"')\n q=p/n;b=base64.b64decode(data)\n if q.exists():assert q.is_file() and not q.is_symlink() and q.read_bytes()==b,n\n else:\n  with q.open('\"'\"'xb'\"'\"') as f:f.write(b)\n assert q.read_bytes()==b\n rows[n]=hashlib.sha256(b).hexdigest()\nprint(json.dumps({'\"'\"'verified'\"'\"':True,'\"'\"'packet'\"'\"':str(p),'\"'\"'members'\"'\"':rows,'\"'\"'files'\"'\"':len(rows)},sort_keys=True))\n'"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 5, in <module>\nAssertionError\n"
+}

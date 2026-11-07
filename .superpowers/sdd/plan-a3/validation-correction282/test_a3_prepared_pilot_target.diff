@@ -1,0 +1,12 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/suite/test_a3_prepared_pilot_target.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/validation-correction282/tests/test_a3_prepared_pilot_target.py
+@@ -717,7 +717,8 @@
+     proofs = r._cost_packing_proofs(receipts)
+     measured = r.workload.project_cost(receipts, target, budget, packing_proofs=proofs)
+     baseline = copy.deepcopy(receipt); baseline['startup_seconds'] = 0.; baseline['proof_validation_seconds'] = 0.
+-    zero = r.workload.project_cost([baseline], target, budget, packing_proofs=proofs)
++    baseline_proofs = r._cost_packing_proofs([baseline])
++    zero = r.workload.project_cost([baseline], target, budget, packing_proofs=baseline_proofs)
+     assert measured['projected_seconds'] - zero['projected_seconds'] == pytest.approx(
+         len(target['jobs']) * (7. + receipt['proof_validation_seconds']))
+     assert not (c.root / 'new-target-after-model').exists()

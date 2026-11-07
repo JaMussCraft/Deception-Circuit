@@ -1,0 +1,30 @@
+--- r4/guards.py
++++ r5-normalized/guards.py
+@@ -17,7 +17,7 @@
+  return out
+ 
+ def cgroup_bind(kind):
+- if kind=='v1':path='/sys/fs/cgroup'
+- elif kind=='v2':path='/sys/fs/cgroup'
+- else:raise ValueError('unsupported actual memory controller')
+- return path+':'+path+':ro'
++ root='/sys/fs/cgroup:/sys/fs/cgroup:ro'
++ if kind=='v1':return root+',/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro'
++ if kind=='v2':return root
++ raise ValueError('unsupported actual memory controller')
+--- r4/test_bind_failures.py
++++ r5-normalized/test_bind_failures.py
+@@ -5,8 +5,11 @@
+ 
+ class Binding(unittest.TestCase):
+  def test_real_controller_bind_is_readonly_same_path(self):
+-  for kind,path in [('v1','/sys/fs/cgroup'),('v2','/sys/fs/cgroup')]:
+-   self.assertEqual(cgroup_bind(kind),path+':'+path+':ro')
++  root='/sys/fs/cgroup:/sys/fs/cgroup:ro'
++  child='/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro'
++  self.assertEqual(cgroup_bind('v1').split(','),[root,child])
++  self.assertEqual(cgroup_bind('v2').split(','),[root])
++  with self.assertRaises(ValueError):cgroup_bind('other')
+  def test_host_command_uses_actual_readonly_bind(self):
+   source=(Path(__file__).parent/'host_probe.py').read_text()
+   self.assertIn("actual_cgroup_bind=cgroup_bind(valid[0]['controller'])",source)

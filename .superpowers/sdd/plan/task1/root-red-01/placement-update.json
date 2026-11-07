@@ -1,0 +1,50 @@
+{
+  "at_utc": "2026-11-06T19:52:10.667114+00:00",
+  "reason": "Allow short interactive CPU placement after preceding proof terminated; preserve job/test/resources.",
+  "before": {
+    "command": [
+      "scontrol",
+      "show",
+      "job",
+      "23612303",
+      "-o"
+    ],
+    "output": "JobId=23612303 JobName=a3-t1-transport UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A Priority=265 Nice=0 Account=beto-delta-cpu QOS=beto-delta-cpu JobState=PENDING Reason=None Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:00:00 TimeLimit=00:05:00 TimeMin=N/A SubmitTime=2026-11-06T13:50:18 EligibleTime=2026-11-06T13:50:18 AccrueTime=2026-11-06T13:50:18 StartTime=Unknown EndTime=Unknown Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-06T13:50:18 Scheduler=Main Partition=cpu AllocNode:Sid=dt-login04:3659102 ReqNodeList=(null) ExcNodeList=(null) NodeList= NumNodes=1-1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:* ReqTRES=cpu=1,mem=4G,node=1,billing=2048 AllocTRES=(null) Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=1 MinMemoryNode=4G MinTmpDiskNode=0 Features=(null) DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null) Command=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/cpu.sbatch SubmitLine=sbatch --parsable --account=beto-delta-cpu --partition=cpu --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=4G --time=00:05:00 --no-requeue --export=ALL --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-slurm-%j.log /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/cpu.sbatch --mode RED --output /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01 WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder StdErr= StdIn=/dev/null StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-slurm-23612303.log TresPerTask=cpu=1\n",
+    "returncode": 0
+  },
+  "prior_cpu": {
+    "command": [
+      "sacct",
+      "-j",
+      "23612256",
+      "-X",
+      "-n",
+      "-P",
+      "-o",
+      "JobID,State,ExitCode"
+    ],
+    "output": "23612256|COMPLETED|0:0\n",
+    "returncode": 0
+  },
+  "change": {
+    "command": [
+      "scontrol",
+      "update",
+      "JobId=23612303",
+      "Partition=cpu,cpu-interactive"
+    ],
+    "output": "",
+    "returncode": 0
+  },
+  "after": {
+    "command": [
+      "scontrol",
+      "show",
+      "job",
+      "23612303",
+      "-o"
+    ],
+    "output": "JobId=23612303 JobName=a3-t1-transport UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A Priority=1255 Nice=0 Account=beto-delta-cpu QOS=beto-delta-cpu JobState=PENDING Reason=None Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:00:00 TimeLimit=00:05:00 TimeMin=N/A SubmitTime=2026-11-06T13:50:18 EligibleTime=2026-11-06T13:50:18 AccrueTime=Unknown StartTime=Unknown EndTime=Unknown Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-06T13:50:18 Scheduler=Main Partition=cpu,cpu-interactive AllocNode:Sid=dt-login04:3659102 ReqNodeList=(null) ExcNodeList=(null) NodeList= NumNodes=1-1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:* ReqTRES=cpu=1,mem=4G,node=1,billing=2048 AllocTRES=(null) Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=1 MinMemoryNode=4G MinTmpDiskNode=0 Features=(null) DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null) Command=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/cpu.sbatch SubmitLine=sbatch --parsable --account=beto-delta-cpu --partition=cpu --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=4G --time=00:05:00 --no-requeue --export=ALL --chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-slurm-%j.log /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/cpu.sbatch --mode RED --output /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01 WorkDir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder StdErr= StdIn=/dev/null StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-slurm-23612303.log TresPerTask=cpu=1\n",
+    "returncode": 0
+  }
+}

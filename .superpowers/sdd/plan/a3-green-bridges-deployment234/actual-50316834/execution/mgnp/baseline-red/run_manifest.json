@@ -1,0 +1,32 @@
+{
+  "status": "EXITED",
+  "argv": [
+    "/u/swong2/.conda/envs/mgnp/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--import-mode=importlib",
+    "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-suite",
+    "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-suite",
+    "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316834/execution/mgnp/baseline-red/tmp",
+    "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-50316834/execution/mgnp/baseline-red/junit.xml",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-suite/test_a3_prepared_pilot_target.py::test_prepared_completed_intake_rejects_anchored_cgroup_scope_mismatch"
+  ],
+  "normal_completion": false,
+  "expected_cases": 5,
+  "model_loaded": false,
+  "execution_authorized": false,
+  "pytest_exit_code": 1,
+  "termination_signal": null,
+  "observed_cases": 5,
+  "failures": 5,
+  "errors": 0,
+  "skipped": 0,
+  "error": "AssertionError('ValueError: missing required protected registry: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r4/baseline-source/docs/research/held_out.json')",
+  "exit_code": 1,
+  "wall_seconds": 266.7234127521515
+}

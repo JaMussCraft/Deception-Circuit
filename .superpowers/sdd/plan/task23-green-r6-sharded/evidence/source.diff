@@ -1,0 +1,715 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/run_packet.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/run_packet.py
+@@ -69,7 +69,7 @@
+ def command(python, output):
+     suite = PACKET / 'suite'
+     nodes=json.loads((PACKET/'verification-scope.json').read_text())['existing_regression_nodes']
+-    return [python, '-m', 'pytest', '-q', '-p', 'no:cacheprovider','--import-mode=importlib',
++    return [python, '-m', 'pytest', '-q', '-p', 'no:cacheprovider', '-p', 'selector','--import-mode=importlib',
+         '--confcutdir=' + str(suite),'--rootdir=' + str(suite), '--basetemp=' + str(output / 'tmp'),
+         '--junitxml=' + str(output / 'junit.xml'), str(suite / TEST)] + [str(suite / Path(node.split('::')[0]).name)+'::'+node.split('::')[1] for node in nodes]
+ 
+@@ -101,132 +101,105 @@
+         model_loaded=False, execution_authorized=False)
+ 
+ 
++def source_identity():
++    return dict(revision='r6-sharded', runtime_sha256=sha(CANDIDATE/'component_analysis/a3_direction_runtime.py'),
++        fixture_sha256=sha(PACKET/'suite'/TEST), partition_sha256=sha(PACKET/'partition.json'),
++        source_pins_sha256=sha(PACKET/'source-pins.json'))
++
++
+ def main():
+-    parser = argparse.ArgumentParser(); parser.add_argument('--dry-run', action='store_true')
+-    parser.add_argument('--mode', choices=['GREEN'], default='GREEN')
+-    parser.add_argument('--output', type=Path); parser.add_argument('--oracle-proof', action='store_true')
+-    parser.add_argument('--environment',choices=['base','mgnp','both'],default='both')
+-    args = parser.parse_args(); pins = check_pins()
++    from aggregate import validate_partition, verify_events, verify_junit, verify_controls
++    parser=argparse.ArgumentParser()
++    parser.add_argument('--dry-run', action='store_true')
++    parser.add_argument('--oracle-proof', action='store_true')
++    parser.add_argument('--output', type=Path)
++    parser.add_argument('--environment',choices=['base','mgnp'],required=False)
++    parser.add_argument('--shard',type=int,choices=[0,1],required=False)
++    parser.add_argument('--stage',choices=['baseline','oracle','suite'])
++    args=parser.parse_args(); pins=check_pins()
++    partition=json.loads((PACKET/'partition.json').read_text());validate_partition(partition)
+     if args.dry_run:
+-        print(json.dumps(dict(packet=str(PACKET), candidate=str(CANDIDATE), oracle=str(ORACLE),
+-            expected_test_count=expected_count(), environment=PINS,
+-            baseline_context=check_context(PACKET / 'baseline-source', pins['baseline']),
+-            commands={name: shlex.join(command(py, PACKET / ('example-' + name))) for name, py in ENVS.items()},
+-            cpu_only=True, scheduler_calls=0, imports_executed=False), indent=2)); return
++        print(json.dumps(dict(packet=str(PACKET),source=source_identity(),expected_collection=223,
++            shard_counts=[112,111],environment=PINS,baseline_context=check_context(PACKET/'baseline-source',pins['baseline']),
++            commands={name:shlex.join(command(py,PACKET/('example-'+name))) for name,py in ENVS.items()},
++            stage_caps=dict(baseline=610,oracle=90,suite=3600),allocation_seconds=4800,
++            actual_job=None,actual_config=None,scheduler_calls=0,imports_executed=False,full_suite_accepted=False,
++            execution_authorized=False),indent=2));return
+     assert args.output is not None
+     if args.oracle_proof:
+-        print(json.dumps(oracle_proof(args.output), sort_keys=True)); return
+-    output = args.output.resolve(); output.mkdir(parents=True, exist_ok=False)
+-    start = time.time()
+-    manifest = dict(status='STARTED', mode=args.mode, commit='538109e809285b6ddc45d42df8786270a65f7b12',
+-        source_commit_role='accepted worktree baseline; isolated candidate changes identified by source pins',
+-        candidate=str(CANDIDATE), oracle=str(ORACLE), source_pins=pins,
+-        host=socket.gethostname(), platform=platform.platform(), job_id=os.environ.get('SLURM_JOB_ID'),
+-        cluster=os.environ.get('SLURM_CLUSTER_NAME'), started_unix=start, threadpins=PINS, results={},
+-        model_loaded=False, execution_authorized=False)
+-    def save(): (output / 'run_manifest.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
++        print(json.dumps(oracle_proof(args.output),sort_keys=True));return
++    assert args.environment is not None and args.shard is not None and args.stage is not None
++    assert os.environ.get('A3_HOST_BOUND')=='1', 'native execution requires reviewed actual host binding'
++    assert sys.executable==ENVS[args.environment], 'wrong exact interpreter'
++    pytest_module=importlib.import_module('pytest')
++    interpreter_provenance=dict(python_version=sys.version,pytest_version=pytest_module.__version__,pytest_origin=pytest_module.__file__)
++    python=ENVS[args.environment]; output=args.output.resolve(); manifest_path=output/'run_manifest.json'
++    nodes=partition['shards'][str(args.shard)]['execution_order']
++    if args.stage=='baseline':
++        output.mkdir(parents=True,exist_ok=False)
++        manifest=dict(status='STARTED',commit='538109e809285b6ddc45d42df8786270a65f7b12',source_commit_role='accepted worktree baseline; isolated revisions bound by exact source pins',environment=args.environment,shard=args.shard,python=python,executable=sys.executable,
++            job_id=os.environ['SLURM_JOB_ID'],cluster=os.environ['SLURM_CLUSTER_NAME'],output=str(output),
++            source_before=source_identity(),source_after=None,source_pins=pins,interpreter_provenance=interpreter_provenance,collected=[],executed=[],
++            normal_completion=False,full_suite_accepted=False,model_loaded=False,execution_authorized=False,exit_code=None,
++            artifacts={})
++    else:
++        manifest=json.loads(manifest_path.read_text())
++        assert manifest['interpreter_provenance']==interpreter_provenance
++        assert manifest['source_before']==source_identity() and manifest['environment']==args.environment and manifest['shard']==args.shard
++        assert manifest['job_id']==os.environ['SLURM_JOB_ID'] and manifest['output']==str(output)
++    def save():
++        temp=output/'manifest.new'
++        with temp.open('w') as stream:
++            json.dump(manifest,stream,indent=2,sort_keys=True);stream.write('\n');stream.flush();os.fsync(stream.fileno())
++        os.replace(temp,manifest_path)
++    def ref(path):return dict(path=str(path),sha256=sha(path))
+     save()
++    env=dict(os.environ,**PINS);env['PYTHONPATH']=str(PACKET)+os.pathsep+str(CANDIDATE)
++    env.update(A3_T1_CANDIDATE=str(CANDIDATE),A3_T1_OUTPUT=str(output),
++        A3_SHARD_PARTITION=str(PACKET/'partition.json'),A3_SHARD=str(args.shard),A3_SHARD_EVENTS=str(output/'events.jsonl'))
++    # Host is the sole process-group supervisor. Every stage descendant remains in
++    # its inherited host-owned group, including baseline's inner pytest.
+     try:
+-        for name, python in ENVS.items():
+-            if args.environment not in ('both',name):continue
+-            env = dict(os.environ, **PINS); env['PYTHONPATH'] = str(CANDIDATE)
+-            env['A3_T1_CANDIDATE'] = str(CANDIDATE); env['A3_T1_OUTPUT'] = str(output / name)
+-            sub = output / name; sub.mkdir()
+-            baseline_cmd=[sys.executable,str(PACKET/'baseline_red.py'),'--python',python,'--output',str(sub/'baseline-red')]
+-            baseline=subprocess.run(baseline_cmd,env=env,cwd=str(PACKET),capture_output=True,text=True,timeout=610)
+-            (sub/'baseline-red.stdout').write_text(baseline.stdout);(sub/'baseline-red.stderr').write_text(baseline.stderr)
+-            baseline_status=dict(argv=baseline_cmd,exit_code=baseline.returncode)
+-            manifest['results'][name]=dict(status='CORRECTION_RED_EXITED',baseline_red=baseline_status);save()
+-            assert baseline.returncode==0,baseline_status
+-            baseline_status['manifest']=json.loads((sub/'baseline-red/run_manifest.json').read_text())
+-            oracle_cmd = [python, str(PACKET / 'run_packet.py'), '--oracle-proof', '--output', str(sub)]
+-            row = dict(baseline_red=baseline_status,python=python, status='ORACLE_STARTED', normal_completion=False,
+-                oracle_preflight=dict(argv=oracle_cmd, status='STARTED', exit_code=None))
+-            manifest['results'][name] = row; save()
+-            try:
+-                oracle = subprocess.run(oracle_cmd, env=env, cwd=str(PACKET), capture_output=True, text=True, timeout=90)
+-            except subprocess.TimeoutExpired as error:
+-                def oracle_decoded(value): return value.decode(errors='replace') if isinstance(value, bytes) else value or ''
+-                (sub / 'oracle.stdout').write_text(oracle_decoded(error.stdout))
+-                (sub / 'oracle.stderr').write_text(oracle_decoded(error.stderr))
+-                row.update(status='ORACLE_TIMEOUT')
+-                row['oracle_preflight'].update(status='TIMEOUT', timed_out=True, timeout_seconds=90,
+-                    stdout_path=str(sub / 'oracle.stdout'), stderr_path=str(sub / 'oracle.stderr'))
+-                save(); raise RuntimeError('oracle preflight timed out; no RED evidence') from error
+-            (sub / 'oracle.stdout').write_text(oracle.stdout); (sub / 'oracle.stderr').write_text(oracle.stderr)
+-            row['oracle_preflight'].update(status='EXITED' if oracle.returncode == 0 else 'FAILED',
+-                exit_code=oracle.returncode, termination_signal=-oracle.returncode if oracle.returncode < 0 else None,
+-                stdout_path=str(sub / 'oracle.stdout'), stderr_path=str(sub / 'oracle.stderr'))
+-            row.update(status='ORACLE_EXITED' if oracle.returncode == 0 else 'ORACLE_FAILED'); save()
+-            assert oracle.returncode == 0, name + ' oracle preflight failed'
+-            argv = command(python, sub); check_pins()
+-            row.update(python=python, argv=argv, status='PYTEST_STARTED',
+-                pytest_exit_code=None, normal_completion=False)
+-            save()
+-            try:
+-                result = subprocess.run(argv, env=env, cwd=str(PACKET), capture_output=True, text=True, timeout=2700)
+-            except subprocess.TimeoutExpired as error:
+-                def decoded(value): return value.decode(errors='replace') if isinstance(value, bytes) else value or ''
+-                (sub / 'pytest.stdout').write_text(decoded(error.stdout))
+-                (sub / 'pytest.stderr').write_text(decoded(error.stderr))
+-                row.update(status='PYTEST_TIMEOUT', timed_out=True, timeout_seconds=2700,
+-                    stdout_path=str(sub / 'pytest.stdout'), stderr_path=str(sub / 'pytest.stderr'))
+-                save(); raise RuntimeError('pytest timed out; no RED evidence') from error
+-            (sub / 'pytest.stdout').write_text(result.stdout); (sub / 'pytest.stderr').write_text(result.stderr)
+-            row.update(status='PYTEST_EXITED', pytest_exit_code=result.returncode,
+-                termination_signal=-result.returncode if result.returncode < 0 else None,
+-                stdout_path=str(sub / 'pytest.stdout'), stderr_path=str(sub / 'pytest.stderr'))
+-            save()  # Preserve raw child status BEFORE source checks or XML parsing.
+-            check_pins()
+-            junit = sub / 'junit.xml'
+-            if not junit.is_file():
+-                row.update(status='MISSING_JUNIT', junit_present=False,
+-                    fixture_preflight_manifest=str(sub / 'fixture-preflight/run_manifest.json'))
+-                save(); raise RuntimeError('pytest exited %s without JUnit; no RED evidence' % result.returncode)
+-            cases = ET.parse(sub / 'junit.xml').getroot().findall('.//testcase')
+-            failures = [case for case in cases if case.find('failure') is not None]
+-            errors = [case for case in cases if case.find('error') is not None]
+-            skipped = [case for case in cases if case.find('skipped') is not None]
+-            row.update(python=python, argv=argv, pytest_exit_code=result.returncode,
+-                observed_cases=len(cases), expected_cases=expected_count(), failures=len(failures),
+-                errors=len(errors), skipped=len(skipped), oracle=json.loads(oracle.stdout),
+-                source_pins_before_after_equal=True)
+-            manifest['results'][name] = row; save()
+-            assert len(cases) == expected_count() and not errors and not skipped, row
+-            groups = json.loads((PACKET / 'test-groups.json').read_text())
+-            row['tasks'] = {}
+-            for task in ('T1', 'T2', 'T3','existing','correction','review225','cgroup-comparability'):
+-                chosen = [case for case in cases if groups['functions'][case.attrib['name'].split('[', 1)[0]] == task]
+-                row['tasks'][task] = dict(cases=len(chosen), expected=groups['expected_cases'][task],
+-                    failures=sum(case.find('failure') is not None for case in chosen))
+-                assert len(chosen) == groups['expected_cases'][task], row
+-            observed={}
+-            for case in cases:
+-                function=case.attrib['name'].split('[',1)[0]
+-                observed[function]=observed.get(function,0)+1
+-            assert observed==expected_functions(),dict(observed=observed,expected=expected_functions())
+-            row['per_function_case_counts']=observed
+-            row['collected_nodes_reference']=str(sub/'collected-nodeids.json')
+-            save()
+-            if args.mode == 'RED':
+-                assert result.returncode == 1, row
+-                assert row['tasks']['T1']['failures'] == 0, row
+-                for task in ('T2', 'T3'):
+-                    assert row['tasks'][task]['failures'] == row['tasks'][task]['cases'], row
+-                for case in failures:
+-                    failure = case.find('failure'); text = failure.get('message', '')
+-                    assert 'AttributeError' in text and any(name in text for name in (
+-                        'prepare_pilot_target', 'load_prepared_pilot_target',
+-                        '_validate_prepared_receiver_resources', '_PreparedPilotTarget')), text
+-            else:
+-                assert result.returncode == 0 and not failures, row
+-            row.update(status=args.mode + '_EXPECTED', normal_completion=True); save()
+-        manifest.update(status=args.mode + '_EXPECTED', normal_completion=True, exit_code=0)
++        if args.stage=='baseline':
++            argv=[python,str(PACKET/'baseline_red.py'),'--python',python,'--output',str(output/'baseline-red')]
++        elif args.stage=='oracle':
++            assert 'baseline' in manifest['artifacts']
++            argv=[python,str(PACKET/'run_packet.py'),'--oracle-proof','--output',str(output)]
++        else:
++            assert {'baseline','oracle'}<=set(manifest['artifacts'])
++            argv=command(python,output)
++        manifest.update(status=args.stage.upper()+'_STARTED');save()
++        started=time.time()
++        with (output/(args.stage+'.stdout')).open('xb') as stdout,(output/(args.stage+'.stderr')).open('xb') as stderr:
++            result=subprocess.run(argv,env=env,cwd=str(PACKET),stdout=stdout,stderr=stderr)
++        finished=time.time()
++        manifest.update(status=args.stage.upper()+'_EXITED',raw_stage_exit_code=result.returncode);save()
++        # Raw child status is durable before any source, XML or control parsing.
++        assert result.returncode==0
++        check_pins();assert manifest['source_before']==source_identity()
++        if args.stage=='baseline':
++            manifest['artifacts']['baseline']=ref(output/'baseline-red/run_manifest.json')
++        elif args.stage=='oracle':
++            oracle=json.loads((output/'oracle.stdout').read_text())
++            (output/'oracle.json').write_text(json.dumps(oracle)+'\n')
++            manifest['artifacts']['oracle']=ref(output/'oracle.json')
++        else:
++            collected=json.loads((output/'collected-nodeids.json').read_text())['nodes']
++            events=[json.loads(line) for line in (output/'events.jsonl').read_text().splitlines()]
++            assert all(events[0][key]==value for key,value in interpreter_provenance.items())
++            verify_events(events,nodes,partition['full_collection'],python)
++            verify_junit((output/'junit.xml').read_text(),nodes)
++            for name,path in [('events',output/'events.jsonl'),('junit',output/'junit.xml'),('preflight',output/'fixture-preflight/run_manifest.json'),('candidate_origins',output/'candidate-origins.json')]:
++                manifest['artifacts'][name]=ref(path)
++            verify_controls(manifest['artifacts'],output)
++            assert collected==partition['full_collection']
++            manifest.update(status='SHARD_GREEN',normal_completion=True,exit_code=0,source_after=source_identity(),
++                child_exit_code=result.returncode,child_normal_completion=True,child_started=started,child_finished=finished,
++                child_deadline=float(os.environ['A3_STAGE_DEADLINE']),collected=collected,executed=nodes)
++            assert finished<manifest['child_deadline']
++        save()
+     except BaseException as error:
+-        manifest.update(status='FAILED', normal_completion=False, error=repr(error), exit_code=1)
+-        raise
+-    finally:
+-        manifest.update(ended_unix=time.time(), wall_seconds=time.time() - start); save()
+-
+-
+-if __name__ == '__main__': main()
++        manifest.update(status='FAILED',normal_completion=False,exit_code=1,error=repr(error),source_after=source_identity());save();raise
++
++
++if __name__=='__main__':main()
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/cpu.sbatch
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/cpu.sbatch
+@@ -1,9 +1,10 @@
+ #!/bin/bash
+-#SBATCH --job-name=a3-t23-green
++#SBATCH --job-name=a3-shard-validation
+ #SBATCH --nodes=1
+ #SBATCH --ntasks=1
+ #SBATCH --cpus-per-task=2
+ #SBATCH --mem=32G
++#SBATCH --no-requeue
+ set -euo pipefail
+-PACKET=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5
+-exec /sw/external/python/anaconda3/bin/python3.9 -B "$PACKET/run_packet.py" "$@"
++SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
++exec bash "$SCRIPT_DIR/bridges/launch.sh" "$@"
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/suite/test_a3_prepared_pilot_target.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/suite/test_a3_prepared_pilot_target.py
+@@ -512,7 +512,8 @@
+     r = runtime(); validate = r._validate_prepared_receiver_resources
+     from tests.a3_prepared_integration_cases import environment_identity
+     c = integration_case(tmp_path, monkeypatch).anchor()
+-    record = copy.deepcopy(c.resource_record)
++    # Attack plain data: deepcopy intentionally preserves production frozen references.
++    record = json.loads(json.dumps(c.resource_record, allow_nan=False))
+     record.update(retained_metadata_bytes_bound=20, extra_transient_bytes_bound=30)
+     inputs = dict(references=dict(target=c.preparation_binding['target_reference'],
+         preparation=c.preparation_binding['preparation_reference']), source_identity=c.resource_record['source_identity'],
+@@ -616,7 +617,7 @@
+ def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+     r = runtime(); r._PreparedPilotTarget
+     request.getfixturevalue('fake')
+-    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load(); writer_calls = []; phase = {'final': False, 'mutated': False}
++    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load(); writer_calls = []; phase = {'final': False, 'mutated': False, 'final_live_guard_calls': 0}
+     def mutate():
+         if phase['mutated']: return
+         phase['mutated'] = True
+@@ -628,7 +629,7 @@
+             st = path.stat(); raw = path.read_bytes(); path.write_bytes(raw)
+             os.utime(path, ns=(st.st_atime_ns, st.st_mtime_ns))
+     original_union = r._measure_complete_guard_union; original_before = r._PilotReconciliationPass.before_publication
+-    original_barrier = r._PreparedPilotTarget.final_publication_barrier
++    original_barrier = r._PreparedPilotTarget.final_publication_barrier; original_live_guard = r.live_guard
+     def union(*args, **kwargs):
+         result = original_union(*args, **kwargs)
+         if seam == 'guard-union': mutate()
+@@ -641,17 +642,21 @@
+         phase['final'] = True
+         try: return original_barrier(instance, *args, **kwargs)
+         finally: phase['final'] = False
+-    def guard():
+-        result = c.guard()
+-        if seam == 'final-live-guard' and phase['final']: mutate()
++    def live_guard(*args, **kwargs):
++        result = original_live_guard(*args, **kwargs)
++        if seam == 'final-live-guard' and phase['final']:
++            phase['final_live_guard_calls'] += 1
++            mutate()
+         return result
++    monkeypatch.setattr(r, 'live_guard', live_guard)
+     monkeypatch.setattr(r, '_measure_complete_guard_union', union)
+     monkeypatch.setattr(r._PilotReconciliationPass, 'before_publication', before)
+     monkeypatch.setattr(r._PreparedPilotTarget, 'final_publication_barrier', barrier)
+     monkeypatch.setattr(r, '_publish_measured_pilot_receipt', lambda *args: writer_calls.append(args))
+     with pytest.raises(ValueError):
+         r.run_pilot(object(), c.design, c.protocol, c.pilot_inventory, root=c.root, args=c.args,
+-            guard=guard, startup_seconds=0, prepared_target=handle)
++            guard=c.guard, startup_seconds=0, prepared_target=handle)
++    if seam == 'final-live-guard': assert phase['final_live_guard_calls'] == 1
+     assert phase['mutated'] and writer_calls == []
+ 
+ 
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/green-timeout-diagnosis253/diagnostic253.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/selector.py
+@@ -1,44 +1,51 @@
+-"""Root CPU DIAGNOSTIC_PARTIAL only; never acceptance, no test/assertion edits."""
++"""Diagnostic253 successor: full collection, frozen ordered execution, durable phases."""
+ import json
+ import os
+ from pathlib import Path
++import sys
+ import time
+ 
+ _LOG = None
+ 
+ def _event(value):
+     value['unix_seconds'] = time.time()
+-    with _LOG.open('a') as stream:
+-        stream.write(json.dumps(value, sort_keys=True) + '\n')
+-        stream.flush()
+-        os.fsync(stream.fileno())
++    _LOG.write(json.dumps(value, sort_keys=True) + '\n')
++    _LOG.flush()
++    os.fsync(_LOG.fileno())
+ 
+ def pytest_runtestloop(session):
+     global _LOG
+-    # The original collection hook has already authenticated all223 nodes.
+-    expected = json.loads(Path(os.environ['DIAG253_COLLECTED']).read_text())
+-    selected = json.loads(Path(os.environ['DIAG253_SELECTION']).read_text())
++    if session.config.option.collectonly:
++        return None
++    partition = json.loads(Path(os.environ['A3_SHARD_PARTITION']).read_text())
++    expected = partition['full_collection']
++    selected = partition['shards'][os.environ['A3_SHARD']]['execution_order']
++    assert not session.testsfailed and not session.shouldstop
+     assert [item.nodeid for item in session.items] == expected
+-    assert selected and len(selected) == len(set(selected))
+-    wanted = set(selected)
+-    items = [item for item in session.items if item.nodeid in wanted]
+-    assert [item.nodeid for item in items] == selected
+-    output = Path(os.environ['DIAG253_OUTPUT'])
+-    output.mkdir(parents=True, exist_ok=False)
+-    _LOG = output / 'events.jsonl'
+-    _event(dict(kind='DIAGNOSTIC_PARTIAL', event='start', collected=len(expected),
+-                requested=selected, acceptance=False, execution_authorized=False))
+-    for index, item in enumerate(items):
+-        _event(dict(event='item-start', nodeid=item.nodeid))
+-        following = items[index + 1] if index + 1 < len(items) else None
+-        session.config.hook.pytest_runtest_protocol(item=item, nextitem=following)
+-        _event(dict(event='item-finish', nodeid=item.nodeid))
+-    _event(dict(event='finished', requested_count=len(items), acceptance=False))
++    assert selected and len(set(expected)) == len(expected) and len(set(selected)) == len(selected)
++    lookup = {item.nodeid: item for item in session.items}
++    items = [lookup[node] for node in selected]
++    _LOG = Path(os.environ['A3_SHARD_EVENTS']).open('x')
++    import pytest
++    _event(dict(python_version=sys.version, pytest_version=pytest.__version__, pytest_origin=pytest.__file__, event='start', kind='SHARD_ONLY', collected=expected, requested=selected,
++        python=sys.executable, executable=os.path.abspath(sys.executable), full_suite_accepted=False,
++        execution_authorized=False))
++    try:
++        for index, item in enumerate(items):
++            _event(dict(event='item-start', nodeid=item.nodeid))
++            following = items[index + 1] if index + 1 < len(items) else None
++            session.config.hook.pytest_runtest_protocol(item=item, nextitem=following)
++            _event(dict(event='item-finish', nodeid=item.nodeid))
++            if session.shouldstop or session.shouldfail:
++                raise RuntimeError('pytest stop before normal shard completion')
++        _event(dict(event='finished', requested_count=len(items), full_suite_accepted=False))
++    finally:
++        _LOG.close()
++        _LOG = None
+     return True
+ 
+ def pytest_runtest_logreport(report):
+-    if _LOG is None:
+-        return
+-    _event(dict(event='phase-report', nodeid=report.nodeid, when=report.when,
+-                outcome=report.outcome, duration_seconds=report.duration,
+-                longrepr=str(report.longrepr) if report.failed else None))
++    if _LOG is not None:
++        _event(dict(event='phase-report', nodeid=report.nodeid, when=report.when,
++            outcome=report.outcome, duration_seconds=report.duration,
++            longrepr=str(report.longrepr) if report.failed else None))
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3/host.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/bridges/host.py
+@@ -1,144 +1,160 @@
+ #!/usr/bin/env python3
+-"""Unaccepted diagnostic transport; no admission or test result promotion."""
+-import argparse, ctypes, datetime, errno, hashlib, json, os, re, signal, socket, subprocess, time
++"""Bounded sharded validation transport, adapted from reviewed diagnostic254-r3.
++
++Host is Python3.6 compatible. Actual config/binding and accounting belong to root.
++"""
++import argparse
++import datetime
++import hashlib
++import json
++import os
+ from pathlib import Path
++import re
++import socket
++import subprocess
++import sys
++import time
++
++HERE = Path(__file__).resolve().parent
++sys.path.insert(0, str(HERE.parent))
++import supervisor
+ import transport229 as old
+ 
+-REL=Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3')
+-DIAG=old.VIRT/'Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/green-timeout-diagnosis253'
+-RECIPE=DIAG/'root-diagnostic-recipe-r2.json'
+-PINS={'manifest.json':'d28cfe84647c1961a7c68520acf6dbedc10c8ace49eaa5f7ab029f932b485446','root-diagnostic-recipe-r2.json':'96c57370c5bbc3883eab47774d85d5c38d7c27c2ee5fa1586f246e2082f2c7fb','diagnostic253.py':'63568713bd1c40f143c43932a909f6faf7e831d3f217b6f311256b419c1f4bac','full-collected-nodeids.json':'c7db91d43948f91618dcb891486de6cf1135ee1f6d7d3d7aeecc0e1e4ad5f5eb','suspect-nodeids.json':'8b8e1d6e986219d614fc38ff5d6f57cc4977ffe6c7f3e28ff66b165abd5593cc','next-nodeid.json':'d241c971d92ce5ca2649175cb003003d95b7ed6ab86558a9011be3f0e893246d'}
++PACKET_REL = Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded')
+ 
+-def durable(path,value):
+- with path.open('x') as f:
+-  json.dump(value,f,sort_keys=True,indent=2); f.write('\n'); f.flush(); os.fsync(f.fileno())
++def durable(path, value):
++    with path.open('x') as stream:
++        json.dump(value, stream, indent=2, sort_keys=True); stream.write('\n'); stream.flush(); os.fsync(stream.fileno())
+ 
+-def allocation(timeout=15):
+- e=os.environ; job=e['SLURM_JOB_ID']; assert re.fullmatch('[0-9]+',job)
+- raw=subprocess.check_output(['scontrol','show','job',job,'-o'],universal_newlines=True,timeout=timeout,env=dict(e,TZ='UTC'))
+- f=dict(x.split('=',1) for x in raw.split() if '=' in x); t=dict(x.split('=',1) for x in f.get('AllocTRES',f.get('TRES','')).split(',') if '=' in x)
+- assert f['JobId']==job and f['JobState']=='RUNNING' and re.search(r'\('+str(os.getuid())+r'\)',f['UserId'])
+- assert f['Account']=='cis260361p' and f['Partition']=='RM-shared' and f['QOS']=='rm' and f['NumNodes']=='1' and f['NumTasks']=='1' and f['NumCPUs']=='18' and f['CPUs/Task']=='18' and t['cpu']=='18' and t['mem'] in ('32G','32768M')
+- assert f['TimeLimit'] in ('00:25:00','25:00') and f['Requeue']=='0' and f['Restarts']=='0' and f['BatchHost'].split('.')[0]==socket.gethostname().split('.')[0]
+- assert e.get('SLURM_CLUSTER_NAME')=='bridges2' and e.get('SLURM_CPUS_PER_TASK')=='18' and e.get('SLURM_NTASKS')=='1'
+- assert not any(k.startswith('gres/gpu') and float(v)>0 for k,v in t.items()) and all(not e.get(k) for k in ('SLURM_JOB_GPUS','SLURM_STEP_GPUS','CUDA_VISIBLE_DEVICES')) and all(e.get(k,'') in ('','0') for k in ('SLURM_GPUS','SLURM_GPUS_ON_NODE','SLURM_GPUS_PER_NODE','SLURM_GPUS_PER_TASK'))
+- return f,datetime.datetime.strptime(f['EndTime'],'%Y-%m-%dT%H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp()
++def allocation(c, timeout=15):
++    e = os.environ; job = e['SLURM_JOB_ID']; assert re.fullmatch('[0-9]+', job)
++    raw = subprocess.check_output(['scontrol', 'show', 'job', job, '-o'], universal_newlines=True,
++        timeout=timeout, env=dict(e, TZ='UTC'))
++    f = dict(x.split('=', 1) for x in raw.split() if '=' in x)
++    t = dict(x.split('=', 1) for x in f.get('AllocTRES', f.get('TRES', '')).split(',') if '=' in x)
++    cpus = str(c['cpus'])
++    assert f['JobId'] == c['job_id'] == job and f['JobState'] == 'RUNNING'
++    assert re.search(r'\(' + str(os.getuid()) + r'\)', f['UserId'])
++    assert f['Account'] == c['account'] and f['Partition'] == c['partition'] and f['QOS'] == c['qos']
++    assert f['NumNodes'] == f['NumTasks'] == '1' and f['NumCPUs'] == f['CPUs/Task'] == t['cpu'] == cpus
++    assert t['mem'] in ('32G', '32768M') and f['TimeLimit'] in ('01:20:00', '1:20:00', '80:00')
++    assert f['Requeue'] == f['Restarts'] == '0' and f['BatchHost'].split('.')[0] == socket.gethostname().split('.')[0]
++    assert e.get('SLURM_CLUSTER_NAME') == c['cluster'] and e.get('SLURM_CPUS_PER_TASK') == cpus and e.get('SLURM_NTASKS') == '1'
++    assert not any(k.startswith('gres/gpu') and float(v) > 0 for k, v in t.items())
++    assert all(not e.get(k) for k in ('SLURM_JOB_GPUS', 'SLURM_STEP_GPUS', 'CUDA_VISIBLE_DEVICES'))
++    assert all(e.get(k, '') in ('', '0') for k in ('SLURM_GPUS', 'SLURM_GPUS_ON_NODE', 'SLURM_GPUS_PER_NODE', 'SLURM_GPUS_PER_TASK'))
++    return f, datetime.datetime.strptime(f['EndTime'], '%Y-%m-%dT%H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp()
+ 
+-def source_check(c):
+- assert c['status']=='ROOT_BOUND_A3_DIAGNOSTIC_PARTIAL'
+- assert hashlib.sha256(json.dumps([c['files'],c['aliases']],sort_keys=True,separators=(',',':')).encode()).hexdigest()=='b5946b6cb6aff9c2fad0047f61affaacd0b5ec13e5b832c92e19a6fdd4f63af5'
+- base=dict(c); base['status']='ROOT_BOUND_A3_GREEN_MGNP_TRANSPORT'; old.check_config(base)
+- records={x['virtual']:x['sha256'] for x in c['files']}
+- for name,h in PINS.items(): assert records[str(DIAG/name)]==h
++def check_source(c):
++    assert c['status'] == 'ROOT_BOUND_A3_SHARDED_VALIDATION'
++    assert c['environment'] in ('base', 'mgnp') and c['shard'] in (0, 1)
++    assert c['cluster'] == ('delta' if c['environment'] == 'base' else 'bridges2')
++    assert c['cpus'] == (2 if c['environment'] == 'base' else 18) and c['memory_gib'] == 32 and c['allocation_seconds'] == 4800
++    assert c['account'] and c['partition'] and c['qos'] and c['job_id'] and c['output']
++    if c['environment'] == 'mgnp':
++        assert c['account'] == 'cis260361p' and c['partition'] == 'RM-shared' and c['qos'] == 'rm'
++        physical = Path(c['physical_root'])
++        assert physical.is_absolute() and str(physical).startswith('/ocean/projects/cis260361p/swong2/')
++        assert physical.resolve() == physical and all(not x.is_symlink() for x in [physical] + list(physical.parents))
++        old.PHYS = physical
++    inventory = json.loads((HERE.parent/'transport-inventory.json').read_text())
++    assert [{k: x[k] for k in ('virtual', 'sha256', 'bytes')} for x in c['files']] == inventory['files']
++    assert [{k: x[k] for k in ('virtual', 'literal_target')} for x in c['aliases']] == inventory['aliases']
++    assert len(c['aliases']) == 8
++    assert c['observer_virtual'] == str(old.VIRT/PACKET_REL/'run_packet.py')
++    if c['environment'] == 'mgnp':
++        base = dict(c, status='ROOT_BOUND_A3_GREEN_MGNP_TRANSPORT', expected_cases=223, expected_file_count=len(c['files']))
++        old.check_config(base)
++    else:
++        assert all(x['physical'] == x['virtual'] for x in c['files'] + c['aliases'])
++        old.check_records(c['files'], c['aliases'])
+ 
+-def command(c,phase,kind,env,root):
+- out=old.VIRT/REL/'jobs'/('job-'+env['SLURM_JOB_ID'])/phase['label']
+- physical=Path(old.virtual_to_physical(str(out)))
+- assert kind in ('v1','v2'); cg='/sys/fs/cgroup:/sys/fs/cgroup:ro'
+- if kind=='v1':cg+=',/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro'
+- cmd=['apptainer','exec','--cleanenv','--contain','--no-home','--writable-tmpfs','--pwd',phase['cwd'],'--bind',str(old.PHYS)+':'+str(old.VIRT)+':ro','--bind','/ocean:/ocean:ro','--bind','/ocean/projects/cis260361p/swong2/hf/hub:/work/nvme/beto/swong2:ro','--bind',old.ENV_PATH+':/u/swong2/.conda/envs/mgnp:ro','--bind',str(physical)+':'+str(out)+':rw','--bind',cg]
+- oldout=phase['prepare_fresh_output_directory']
+- def replace(v):return v.replace(oldout,str(out))
+- profile={k:v for k,v in env.items() if k.startswith('SLURM_')}; profile.update({k:replace(v) for k,v in phase['environment'].items()}); profile['HF_HUB_CACHE']='/work/nvme/beto/swong2'
+- for k,v in sorted(profile.items()):cmd.extend(['--env',k+'='+v])
+- return cmd+[old.IMAGE,old.PY,'-B',str(old.VIRT/REL/'inner.py'),kind,str(out)]+[replace(x) for x in phase['argv']]
+-
+-def enable_subreaper():
+- # Adopt orphaned descendants so the supervisor can reap its own process group.
+- assert ctypes.CDLL(None, use_errno=True).prctl(36,1,0,0,0)==0
+-
+-def cleanup_group(child):
+- pgid=child.pid
+- old.group_signal(pgid,signal.SIGTERM)
+- started=time.monotonic(); deadline=started+15; final=started+20
+- killed=False
+- while True:
+-  leader_exit=child.poll()
+-  if leader_exit is not None:
+-   while True:
+-    try: pid,_=os.waitpid(-pgid,os.WNOHANG)
+-    except ChildProcessError: break
+-    if not pid: break
+-  if not old.group_exists(pgid):
+-   child.wait(timeout=max(0,final-time.monotonic())); return
+-  if time.monotonic()>=deadline:
+-   if killed: raise RuntimeError('process group not reaped after KILL')
+-   old.group_signal(pgid,signal.SIGKILL); killed=True; deadline=final
+-  time.sleep(.05)
+-
+-def enough(now,end,remaining):
+- # Per phase: 600 child seconds, 15 TERM, 5 KILL/reap; final reserve 120.
+- return now+remaining*620+120<end
+-
+-def execute_phase(c,p,index,kind,root,end):
+- # All expensive preparation, including source validation and a fresh controller
+- # read, precedes the last allocation check and Popen.
+- source_check(c); assert old.sha(old.IMAGE)==old.IMAGE_SHA
+- phase=root/p['label']; phase.mkdir(mode=0o700)
+- cmd=command(c,p,kind,os.environ,root)
+- durable(root/('command-%d.json'%index),{'status':'DIAGNOSTIC_PARTIAL','argv':cmd})
+- f,current=allocation(); end=min(end,current); now=time.time()
+- assert enough(now,end,2-index),'insufficient remaining allocation before launch'
+- deadline=min(now+600,end-120-(1-index)*620-20); mono=time.monotonic()+min(600,deadline-now)
+- child=None; timed_out=False; error=None; cleanup_error=None; cleanup_started=False
+- try:
+-  with (phase/'pytest.stdout').open('xb') as stdout,(phase/'pytest.stderr').open('xb') as stderr:
+-   _,current=allocation(); end=min(end,current); now=time.time()
+-   deadline=min(deadline,end-120-(1-index)*620-20)
+-   if not enough(now,end,2-index) or now>=deadline or time.monotonic()>=mono:
+-    timed_out=True
+-   else:
+-    child=subprocess.Popen(cmd,stdout=stdout,stderr=stderr,start_new_session=True)
+-   while child is not None and child.poll() is None:
+-    left=min(deadline-time.time(),mono-time.monotonic())
+-    if left<=0:timed_out=True;break
+-    try: _,current=allocation(timeout=min(15,left))
+-    except subprocess.TimeoutExpired:timed_out=True;break
+-    end=min(end,current); deadline=min(deadline,end-120-(1-index)*620-20)
+-    left=min(deadline-time.time(),mono-time.monotonic())
+-    if left<=0:timed_out=True;break
+-    time.sleep(min(1,left))
+-   # Immediately remove descendants, including after the leader has exited.
+-   if child is not None:
+-    cleanup_started=True; cleanup_group(child)
+-   finished=time.time(); _,current=allocation(); end=min(end,current); deadline=min(deadline,end-120-(1-index)*620-20)
+-   if finished>=deadline or time.time()>=deadline or time.monotonic()>=mono:timed_out=True
+-   stdout.flush(); os.fsync(stdout.fileno()); stderr.flush(); os.fsync(stderr.fileno())
+- except BaseException as ex:
+-  error=repr(ex)
+-  if child is not None and not cleanup_started:
+-   try: cleanup_group(child)
+-   except BaseException as cleanup_ex: cleanup_error=repr(cleanup_ex)
+- finally:
+-  durable(root/('phase-%d.json'%index),{'status':'DIAGNOSTIC_PARTIAL','label':p['label'],'acceptance':False,'timed_out':timed_out,'raw_returncode':None if child is None else child.returncode,'error':error,'cleanup_error':cleanup_error,'allocation_end_bound':end})
+- if error or cleanup_error: raise RuntimeError(str(error)+'; cleanup '+str(cleanup_error))
+- return end
++def command(c, stage, kind, deadline):
++    out = Path(c['output']); packet = old.VIRT/PACKET_REL
++    env = {k: v for k, v in os.environ.items() if k.startswith('SLURM_')}
++    env.update(CUDA_VISIBLE_DEVICES='', PYTHONDONTWRITEBYTECODE='1', PYTEST_DISABLE_PLUGIN_AUTOLOAD='1',
++        HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1',
++        MKL_NUM_THREADS='1', NUMEXPR_NUM_THREADS='1', VECLIB_MAXIMUM_THREADS='1', DC_RUN_MANIFEST_GIT='0',
++        A3_HOST_BOUND='1', A3_STAGE_DEADLINE=str(deadline), A3_STAGE_NAME=stage)
++    py = '/sw/external/python/anaconda3/bin/python3.9' if c['environment'] == 'base' else old.PY
++    argv = [py, '-B', str(packet/'run_packet.py'), '--environment', c['environment'], '--shard', str(c['shard']),
++        '--stage', stage, '--output', str(out)]
++    if c['environment'] == 'base':
++        return argv, dict(os.environ, **env)
++    assert kind in ('v1', 'v2')
++    cg = '/sys/fs/cgroup:/sys/fs/cgroup:ro'
++    if kind == 'v1':
++        cg += ',/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro'
++    physical = old.virtual_to_physical(str(out.parent))
++    # Only this actual job's private output parent is writable in the container.
++    cmd = ['apptainer', 'exec', '--cleanenv', '--contain', '--no-home', '--writable-tmpfs', '--pwd', str(packet),
++        '--bind', str(old.PHYS)+':'+str(old.VIRT)+':ro', '--bind', '/ocean:/ocean:ro',
++        '--bind', '/ocean/projects/cis260361p/swong2/hf/hub:/work/nvme/beto/swong2:ro',
++        '--bind', old.ENV_PATH+':/u/swong2/.conda/envs/mgnp:ro', '--bind', physical+':'+str(out.parent)+':rw', '--bind', cg]
++    env['HF_HUB_CACHE'] = '/work/nvme/beto/swong2'
++    for k, v in sorted(env.items()):
++        cmd.extend(['--env', k+'='+v])
++    return cmd + [old.IMAGE, old.PY, '-B', str(packet/'bridges/inner.py'), kind, str(out.parent)] + argv, None
+ 
+ def main():
+- a=argparse.ArgumentParser();a.add_argument('--config',required=True);a.add_argument('--config-sha256',required=True);a.add_argument('--manifest-sha256',required=True); a=a.parse_args(); here=Path(__file__).resolve().parent
+- assert Path(a.config).is_absolute() and Path(a.config).resolve()==Path(a.config) and not Path(a.config).is_symlink() and all(not x.is_symlink() for x in Path(a.config).parents) and re.fullmatch('[0-9a-f]{64}',a.config_sha256) and old.sha(a.config)==a.config_sha256
+- assert re.fullmatch('[0-9a-f]{64}',a.manifest_sha256) and old.sha(here/'manifest.json')==a.manifest_sha256
+- m=json.loads((here/'manifest.json').read_text()); assert set(m)=={'host.py','transport229.py','inner.py','launch.sh'}
+- for n,h in m.items():assert old.sha(here/n)==h
+- c=json.loads(Path(a.config).read_text());source_check(c)
+- recipe=json.loads(Path(old.virtual_to_physical(str(RECIPE))).read_text()); phases=recipe['commands']; assert [x['label'] for x in phases]==['six-failure-traces','next-122'] and all(x['child_wall_limit_seconds']==600 and x['term_grace_seconds']==15 for x in phases)
+- f,end=allocation(); job=os.environ['SLURM_JOB_ID'];root=old.PHYS/REL/'jobs'/('job-'+job)
+- assert root.is_dir() and root.stat().st_uid==os.getuid() and not root.is_symlink() and root.resolve()==root and all(not p.is_symlink() for p in root.parents)
+- assert not list(root.iterdir()); kind=old.actual_controller(job); enable_subreaper()
+- durable(root/'host-before.json',{'status':'DIAGNOSTIC_PARTIAL','allocation':f,'end_bound':end,'config_sha256':a.config_sha256,'manifest_sha256':a.manifest_sha256,'cgroup_kind':kind,'hostname':socket.gethostname()})
+- def interrupt(signum,frame):raise RuntimeError('host signal %d'%signum)
+- for sig in (signal.SIGTERM,signal.SIGINT):signal.signal(sig,interrupt)
+- error=None
+- try:
+-  for i,p in enumerate(phases):end=execute_phase(c,p,i,kind,root,end)
+- except BaseException as ex:error=repr(ex)
+- finally:
+-  posterror=None
+-  try:
+-   source_check(c); assert old.sha(a.config)==a.config_sha256 and old.sha(here/'manifest.json')==a.manifest_sha256
+-   for n,h in m.items():assert old.sha(here/n)==h
+-   f,current=allocation();end=min(end,current)
+-  except BaseException as ex:posterror=repr(ex);f=None
+-  durable(root/'host-after.json',{'status':'DIAGNOSTIC_PARTIAL','acceptance':False,'error':error,'postcheck_error':posterror,'allocation':f,'end_bound':end})
+- if error or posterror:raise RuntimeError('diagnostic partial: '+str(error)+'; postcheck '+str(posterror))
+-if __name__=='__main__':main()
++    ap = argparse.ArgumentParser()
++    ap.add_argument('--config'); ap.add_argument('--config-sha256'); ap.add_argument('--manifest-sha256')
++    ap.add_argument('--dry-run', action='store_true'); a = ap.parse_args()
++    if a.dry_run:
++        print(json.dumps(dict(status='UNBOUND_NOT_RUNNABLE', stages=supervisor.CAPS, allocation_seconds=4800,
++            final_reserve=120, shared_failure_cleanup_seconds=20, overhead_seconds=360,
++            actual_job=None, actual_config=None, scheduler_calls=0, execution_authorized=False), sort_keys=True)); return
++    assert a.config and a.config_sha256 and a.manifest_sha256
++    path = Path(a.config)
++    assert path.is_absolute() and path.resolve() == path and all(not x.is_symlink() for x in [path]+list(path.parents))
++    assert re.fullmatch('[0-9a-f]{64}', a.config_sha256) and old.sha(path) == a.config_sha256
++    assert re.fullmatch('[0-9a-f]{64}', a.manifest_sha256) and old.sha(HERE/'manifest.json') == a.manifest_sha256
++    manifest = json.loads((HERE/'manifest.json').read_text())
++    for n, h in manifest.items():
++        assert old.sha(HERE/n) == h
++    c = json.loads(path.read_text()); check_source(c)
++    f, end = allocation(c); initial_end = end
++    virtual_out = Path(c['output']); physical_out = Path(old.virtual_to_physical(str(virtual_out))) if c['environment'] == 'mgnp' else virtual_out
++    root = physical_out.parent
++    assert root.name == 'job-'+c['job_id'] and virtual_out.name == 'execution'
++    assert root.is_dir() and root.stat().st_uid == os.getuid() and root.resolve() == root and all(not p.is_symlink() for p in [root]+list(root.parents))
++    assert not list(root.iterdir())
++    kind = old.actual_controller(c['job_id']); supervisor.enable_subreaper()
++    durable(root/'host-before.json', dict(allocation=f, end_bound=end, config_sha256=a.config_sha256, cgroup_kind=kind))
++    error = None; stage_refs = {}
++    try:
++        for stage in ('baseline', 'oracle', 'suite'):
++            check_source(c)
++            if c['environment'] == 'mgnp':
++                assert old.sha(old.IMAGE) == old.IMAGE_SHA
++            _, current = allocation(c); end = min(end, current)
++            deadline = supervisor.stage_bound(time.time(), initial_end, end, supervisor.CAPS[stage])
++            argv, env = command(c, stage, kind, deadline)
++            durable(root/(stage+'-command.json'), dict(argv=argv, deadline=deadline))
++            with (root/(stage+'.stdout')).open('xb') as stdout, (root/(stage+'.stderr')).open('xb') as stderr:
++                result = supervisor.execute(argv, stdout, stderr, supervisor.CAPS[stage], initial_end,
++                    lambda timeout=15: allocation(c, timeout), env=env)
++            durable(root/(stage+'-terminal.json'), result)
++            stage_refs[stage] = dict(path=str(virtual_out.parent/(stage+'-terminal.json')), sha256=old.sha(root/(stage+'-terminal.json')))
++            assert result['normal_completion'] is True, result
++    except BaseException as ex:
++        error = repr(ex)
++    finally:
++        posterror = None
++        try:
++            check_source(c); assert old.sha(path) == a.config_sha256 and old.sha(HERE/'manifest.json') == a.manifest_sha256
++            for n, h in manifest.items():
++                assert old.sha(HERE/n) == h
++            f, current = allocation(c); end = min(end, current)
++            assert time.time() < end
++        except BaseException as ex:
++            posterror = repr(ex)
++        durable(root/'host-after.json', dict(status='HOST_COMPLETE' if not error and not posterror else 'FAILED',
++            normal_completion=not error and not posterror, exit_code=0 if not error and not posterror else 1,
++            job_id=c['job_id'], cluster=c['cluster'], output=c['output'], source_checks_complete=not posterror,
++            allocation_checks_complete=not posterror, config_sha256=a.config_sha256,
++            stages=stage_refs, error=error, postcheck_error=posterror, allocation=f, end_bound=end, execution_authorized=False))
++    if error or posterror:
++        raise RuntimeError(str(error)+'; final '+str(posterror))
++
++if __name__ == '__main__': main()
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3/inner.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/bridges/inner.py
+@@ -20,7 +20,7 @@
+  targets=set(paths)
+  flags={p:os.statvfs(p).f_flag for p in sorted(targets)}
+  assert all(flag & os.ST_RDONLY for flag in flags.values()),flags
+- with (Path(out)/'inner-mounts.json').open('x') as f:
++ with (Path(out)/('inner-mounts-'+os.environ['A3_STAGE_NAME']+'.json')).open('x') as f:
+   json.dump({'status':'DIAGNOSTIC_PARTIAL','mountinfo':relevant,'statvfs_flags':flags,'pid':os.getpid(),'argv':sys.argv[3:]},f,indent=2);f.write('\n');f.flush();os.fsync(f.fileno())
+  os.execvpe(sys.argv[3],sys.argv[3:],os.environ)
+ if __name__=='__main__':main()
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3/launch.sh
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/bridges/launch.sh
+@@ -1,5 +1,8 @@
+ #!/bin/bash
+ set -euo pipefail
+-: "${SLURM_JOB_ID:?actual Bridges CPU allocation required}"
+-P=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3
+-exec python3 -B "$P/host.py" --config "$1" --config-sha256 "$2" --manifest-sha256 "$3"
++SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
++if [[ "${1:-}" == --dry-run ]]; then
++    exec "${A3_HOST_PYTHON:-python3}" -B "$SCRIPT_DIR/host.py" --dry-run
++fi
++: "${SLURM_JOB_ID:?actual CPU allocation required}"
++exec "${A3_HOST_PYTHON:-python3}" -B "$SCRIPT_DIR/host.py" --config "$1" --config-sha256 "$2" --manifest-sha256 "$3"

@@ -1,0 +1,319 @@
+{
+  "kind": "option_A_test_first_RED_evidence",
+  "job_id": "23489341",
+  "allocation": "JobId=23489341 JobName=lad-A3-optionA-red UserId=swong2(78031) GroupId=grp_202(202) MCS_label=N/A Priority=1662 Nice=0 Account=bimc-delta-cpu QOS=bimc-delta-cpu JobState=RUNNING Reason=None Dependency=(null) Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0 RunTime=00:00:31 TimeLimit=00:10:00 TimeMin=N/A SubmitTime=2026-11-03T17:02:56 EligibleTime=2026-11-03T17:02:56 AccrueTime=2026-11-03T17:02:56 StartTime=2026-11-03T17:02:57 EndTime=2026-11-03T17:12:57 Deadline=N/A SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-03T17:02:57 Scheduler=Main Partition=cpu-interactive AllocNode:Sid=dt-login04:1026952 ReqNodeList=(null) ExcNodeList=(null) NodeList=cn024 BatchHost=cn024 NumNodes=1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:* ReqTRES=cpu=4,mem=16G,node=1,billing=16384 AllocTRES=cpu=4,mem=16G,node=1,billing=16384 Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=* MinCPUsNode=4 MinMemoryNode=16G MinTmpDiskNode=0 Features=projects DelayBoot=00:00:00 OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null) Command=(null) SubmitLine=sbatch --parsable --account=bimc-delta-cpu --partition=cpu-interactive --constraint=projects --nodes=1 --ntasks=1 --cpus-per-task=4 --mem=16G --time=00:10:00 --no-requeue --job-name=lad-A3-optionA-red --export=ALL,CUDA_VISIBLE_DEVICES= --output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/red-cpu/slurm-%j.log --wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/red-cpu/red_cpu.sh WorkDir=/projects/beto/swong2/Alignment StdErr= StdIn=/dev/null StdOut=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/red-cpu/slurm-23489341.log TresPerTask=cpu=4\n",
+  "python": "/sw/external/python/anaconda3/bin/python3.9",
+  "baseline_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "pytest_exit": 1,
+  "failed_call_names": [
+    "test_option_a_never_copies_target_only_rows_for_lengths",
+    "test_option_a_sender_constant_encoded_and_bounded_once",
+    "test_option_a_source_rows_scanned_at_most_three_times_per_group"
+  ],
+  "expected_failed_call_names": [
+    "test_option_a_never_copies_target_only_rows_for_lengths",
+    "test_option_a_sender_constant_encoded_and_bounded_once",
+    "test_option_a_source_rows_scanned_at_most_three_times_per_group"
+  ],
+  "setup_errors": [],
+  "outcomes": [
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_never_copies_target_only_rows_for_lengths",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_never_copies_target_only_rows_for_lengths",
+      "when": "call",
+      "outcome": "failed",
+      "text": "monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efe75ff0df0>\n\n    def test_option_a_never_copies_target_only_rows_for_lengths(monkeypatch):\n        d, p, _ = fixture()\n        target_only = {id(row) for rows in d['access_rows'].values() for row in rows if row['split'] == 'train'}\n        deepcopy = copy.deepcopy\n        seen = []\n        depth = [0]\n        def observe(value, *args, **kwargs):\n            if depth[0] == 0 and id(value) in target_only:\n                seen.append(value['instance_id'])\n            depth[0] += 1\n            try:\n                return deepcopy(value, *args, **kwargs)\n            finally:\n                depth[0] -= 1\n        monkeypatch.setattr(w.copy, 'deepcopy', observe)\n        result = w.build_inventory(d, p, stage='fit-select')\n        assert result['capture_shards']\n>       assert seen == [], 'target-only source rows were deep-copied solely for discarded lengths'\nE       AssertionError: target-only source rows were deep-copied solely for discarded lengths\nE       assert ['far_v2t0', ...ar_v2t1', ...] == []\nE         \nE         Left contains 96 more items, first extra item: 'far_v2t0'\nE         Use -v to get more diff\n\ntests/test_a3_direction_workload.py:856: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_never_copies_target_only_rows_for_lengths",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_source_rows_scanned_at_most_three_times_per_group",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_source_rows_scanned_at_most_three_times_per_group",
+      "when": "call",
+      "outcome": "failed",
+      "text": "monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efe760634c0>\n\n    def test_option_a_source_rows_scanned_at_most_three_times_per_group(monkeypatch):\n        from collections import Counter\n        d, p, _ = fixture()\n        scans = Counter()\n        original = w._source_rows\n        def observe(design, task, split):\n            scans[(task, split)] += 1\n            return original(design, task, split)\n        monkeypatch.setattr(w, '_source_rows', observe)\n        result = w.build_inventory(d, p, stage='fit-select')\n        assert result['expected_keys']\n>       assert max(scans.values()) <= 3, dict(scans)\nE       AssertionError: {('far_v2', 'train'): 11, ('far_v2', 'validation'): 16, ('ioi', 'validation'): 16, ('mmlu', 'validation'): 13, ...}\nE       assert 16 <= 3\nE        +  where 16 = max(dict_values([16, 16, 16, 16, 13, 11, 11, 11]))\nE        +    where dict_values([16, 16, 16, 16, 13, 11, 11, 11]) = <built-in method values of Counter object at 0x7efe75e49b30>()\nE        +      where <built-in method values of Counter object at 0x7efe75e49b30> = Counter({('far_v2', 'validation'): 16, ('sdr_v2', 'validation'): 16, ('ser_v2', 'validation'): 16, ('ioi', 'validation'): 16, ('mmlu', 'validation'): 13, ('far_v2', 'train'): 11, ('sdr_v2', 'train'): 11, ('ser_v2', 'train'): 11}).values\n\ntests/test_a3_direction_workload.py:870: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_source_rows_scanned_at_most_three_times_per_group",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_sender_constant_encoded_and_bounded_once",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_sender_constant_encoded_and_bounded_once",
+      "when": "call",
+      "outcome": "failed",
+      "text": "monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efe75a068e0>\n\n    def test_option_a_sender_constant_encoded_and_bounded_once(monkeypatch):\n        d, p, _ = fixture()\n        dumps = w.json.dumps\n        host_bound = w._host_bound\n        counts = dict(wire=0, host=0)\n        def senders(value):\n            return isinstance(value, list) and len(value) > 10 and all(isinstance(x, list) and len(x) == 3 and x[0] in ('head', 'mlp') for x in value)\n        def observe_dump(value, *args, **kwargs):\n            if senders(value):\n                counts['wire'] += 1\n            return dumps(value, *args, **kwargs)\n        def observe_host(value, *args, **kwargs):\n            if senders(value):\n                counts['host'] += 1\n            return host_bound(value, *args, **kwargs)\n        monkeypatch.setattr(w.json, 'dumps', observe_dump)\n        monkeypatch.setattr(w, '_host_bound', observe_host)\n        result = w.build_inventory(d, p, stage='fit-select')\n        assert result['storage_requirements']['components']['positive_evidence'] > 0\n>       assert counts == dict(wire=1, host=1), counts\nE       AssertionError: {'host': 72, 'wire': 72}\nE       assert {'host': 72, 'wire': 72} == {'host': 1, 'wire': 1}\nE         \nE         Differing items:\nE         {'host': 72} != {'host': 1}\nE         {'wire': 72} != {'wire': 1}\nE         Use -v to get more diff\n\ntests/test_a3_direction_workload.py:892: AssertionError"
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_sender_constant_encoded_and_bounded_once",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_retained_timing_records_are_independent",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_retained_timing_records_are_independent",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_retained_timing_records_are_independent",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_target_lengths_preserve_padding_and_deduplication",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_target_lengths_preserve_padding_and_deduplication",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_target_lengths_preserve_padding_and_deduplication",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[missing_source]",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[missing_source]",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[missing_source]",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[duplicate_source]",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[duplicate_source]",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[duplicate_source]",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[readout]",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[readout]",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[readout]",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[width]",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[width]",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[width]",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[utility_width]",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[utility_width]",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_invalid_sources_match_original_errors[utility_width]",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_changed_input_between_calls_not_cached",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_changed_input_between_calls_not_cached",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_changed_input_between_calls_not_cached",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_defaults_match_untouched_writer[payload0]",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_defaults_match_untouched_writer[payload0]",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_defaults_match_untouched_writer[payload0]",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_defaults_match_untouched_writer[payload1]",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_defaults_match_untouched_writer[payload1]",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_defaults_match_untouched_writer[payload1]",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_defaults_match_untouched_writer[payload2]",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_defaults_match_untouched_writer[payload2]",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_defaults_match_untouched_writer[payload2]",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_rejects_nonfinite_without_complete",
+      "when": "setup",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_rejects_nonfinite_without_complete",
+      "when": "call",
+      "outcome": "passed",
+      "text": null
+    },
+    {
+      "nodeid": "tests/test_a3_direction_workload.py::test_option_a_publisher_stream_rejects_nonfinite_without_complete",
+      "when": "teardown",
+      "outcome": "passed",
+      "text": null
+    }
+  ],
+  "module_origins": {
+    "component_analysis": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/__init__.py",
+    "component_analysis.a3_direction_workload": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/a3_direction_workload.py",
+    "tests": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/tests/__init__.py",
+    "tests.conftest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/tests/conftest.py",
+    "tests.test_a3_direction_workload": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/tests/test_a3_direction_workload.py",
+    "component_analysis.hooks": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/hooks.py",
+    "component_analysis.specificity_ladder": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/specificity_ladder.py",
+    "component_analysis.a3_directions": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/a3_directions.py",
+    "component_analysis.a3_direction_runner": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/a3_direction_runner.py",
+    "tests.test_a3_direction_runner": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/tests/test_a3_direction_runner.py",
+    "component_analysis.sampling": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/sampling.py",
+    "component_analysis.ladder_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/ladder_design.py",
+    "dataset": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/dataset/__init__.py",
+    "dataset.deception_common": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/dataset/deception_common.py",
+    "dataset.matched_honest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/dataset/matched_honest.py",
+    "dataset.build_user_inversion_v2": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/dataset/build_user_inversion_v2.py",
+    "dataset.user_inversion_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/dataset/user_inversion_pipeline.py",
+    "component_analysis.a3_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/a3_design.py",
+    "component_analysis.ladder_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/ladder_pipeline.py",
+    "component_analysis.a3_direction_artifacts": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/a3_direction_artifacts.py",
+    "component_analysis.a3_direction_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/a3_direction_pipeline.py",
+    "component_analysis.a3_direction_runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/a3_direction_runtime.py"
+  },
+  "source_unchanged": true,
+  "production_unchanged": true,
+  "elapsed_seconds": 15.374779053999873,
+  "no_scientific_model_stage_requested": true
+}

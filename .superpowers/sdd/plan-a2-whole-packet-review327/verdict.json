@@ -1,0 +1,36 @@
+{
+  "verdict": "SOURCE_READY_FOR_BOUNDED_ROOT_CPU_VALIDATION_ONLY",
+  "spec_verdict": "PASS",
+  "quality_verdict": "PASS_WITH_HISTORICAL_METADATA_QUALIFICATION",
+  "packet_pins_sha256": "9a5129f6c3fae0455c706a6077ac04047c5062f7abbea0f98018113da1f7e571",
+  "test_sha256": "b480636a8712de573916a4e9b438a82983156cebf180d36d0ed7429a4648ab03",
+  "predecessor_packet_pins_sha256": "88407b1745c6169afbf75de0d3789e5d10cb55cda88c4134580af58f6d1e679c",
+  "checks_sha256": "cc70056917302e732e7e0d2ace27638c5d50f925763408b75fb8b6fe25a06d09",
+  "production_components_unchanged": 17,
+  "cases_per_environment": 33,
+  "native_tests_run_by_reviewer": 0,
+  "actual_previous_job": "23638286",
+  "actual_previous_outcome": "FAILED1:0; each interpreter31pass/2fail/0error/0skip",
+  "resource_proposal": {
+    "CPUs": 2,
+    "RAM_bytes": 17179869184,
+    "wall_seconds": 3600,
+    "per_environment_cap_seconds": 1650,
+    "accepted_as": "bounded diagnostic CPU validation proposal, no successful-path runtime/RSS guarantee"
+  },
+  "nonblocking_metadata_qualification": "Inherited claim that failed run never retained full score graphs is inaccurate: normal full score construction/publication/audit passed. Mutation copies plus reloaded score coexistence and three mutation audits remain unmeasured. MGNP pending-at-diagnosis is historical; final failure/runtime is preserved in independent checks.",
+  "prerequisites": [
+    "Root binds a distinct actual CPU job/output and confirms exact frozen source/config/spool/resources, supported interpreters and live usage/session before any release",
+    "Require all33 unchanged cases to pass in each actual normal interpreter, with complete raw logs/XML/source-after/terminal evidence",
+    "Preserve job23638286 and all failed/partial evidence; no automatic retry or extension"
+  ],
+  "authority": {
+    "native_validation": false,
+    "actual_job_release": false,
+    "actual_resource_binding": false,
+    "scientific_result": false,
+    "GPU": false,
+    "model": false
+  },
+  "status": "handed-back"
+}

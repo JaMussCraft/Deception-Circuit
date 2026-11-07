@@ -1,0 +1,82 @@
+{
+  "CPU_test_proposal": {
+    "CPUs": 2,
+    "GPUs": 0,
+    "RAM_bytes": 17179869184,
+    "actual_job_id": null,
+    "actual_resources": null,
+    "construction_accounting": {
+      "actual_peak_RSS_bytes": null,
+      "actual_wall_seconds": null,
+      "automatic_retry": false,
+      "bounds_are_planning_estimates": true,
+      "cases_per_environment": 32,
+      "enumeration_basis": "Source call-path counts: initial build expected_keys plus validate_scope, then two each for normal/support-drift/control-drift audits; manifest drift rejects at read_stage before key construction. Positive keys: three in build, two each normal/support audit, one in failing control audit.",
+      "full_row_key_enumerations_per_environment": 8,
+      "full_support_reconstructions_dual_total": 2,
+      "full_support_reconstructions_per_environment": 1,
+      "native_audit_invocations_per_environment": 4,
+      "native_context_loads_per_environment": 5,
+      "positive_key_enumerations_per_environment": 8,
+      "retention_basis": "Initial support build retains one prepared context, one receipt/bank, support mask and full key list, constructed score rows and domain-reference rows; these are multiple representations, not independent repeated context builds. The full return retains only synthetic score. Postguards retain baseline score plus at most one mutation copy plus one audit-loaded score; prior mutation and rejection traceback graphs are released/collected before the next mutation. Serialized JSON/envelope buffers and native validation temporaries add memory; no measured allocator/RSS bound is claimed.",
+      "source_level_simultaneous_prepared_context_roots": 1,
+      "source_level_simultaneous_score_graph_roots_maximum": 3
+    },
+    "interpreters": [
+      {
+        "label": "base39",
+        "pytest": "8.3.3",
+        "python": "/sw/external/python/anaconda3/bin/python3.9",
+        "python_minor": [
+          3,
+          9
+        ]
+      },
+      {
+        "label": "mgnp",
+        "pytest": "9.1.1",
+        "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+        "python_minor": [
+          3,
+          12
+        ]
+      }
+    ],
+    "new_cases": 32,
+    "per_environment_timeout_seconds": 360,
+    "rationale": "Prior complete Task3 ran approximately 205 seconds (209 seconds observer context) at 2 CPUs/8 GiB. This distinct 32-case scope adds one full support reconstruction and four serial native audits per interpreter, restored real pin/admission/closed 422-input validation at each root gate, and seven extra semantic/namespace negatives. 2 CPUs/16 GiB/900 seconds with 360 seconds per interpreter remain unmeasured planning estimates; source graph accounting does not prove time or RSS. Root must review or revise before dispatch. Timeout preserves evidence and never retries.",
+    "root_review_accepted": false,
+    "walltime_seconds": 900
+  },
+  "actual_cache_runtime_binding": null,
+  "actual_ledger_transition": null,
+  "actual_operational_admission": null,
+  "actual_remote_release": null,
+  "actual_resource_bindings": null,
+  "actual_scoring_job": null,
+  "actual_source_publication": null,
+  "execution_authorized": false,
+  "full_scoring_resource_proposal": {
+    "CPUs": 4,
+    "RAM_bytes": 103079215104,
+    "actual_binding": null,
+    "duration_seconds": 19800,
+    "status": "historical conditional proposal only; actual capacity and independent resource binding still required"
+  },
+  "kind": "UNBOUND_TASK4_PREPARATION_PROPOSAL",
+  "operational_feasible": null,
+  "phase": "full_score",
+  "predecessor_packet": "plan-a2-whole-packet289",
+  "review296_corrections": [
+    "Restore original root pin and GPU admission validators with delegating spies and closed synthetic evidence.",
+    "Route all fresh GPU MAIN constants to temporary namespace while preserving original runtime/source."
+  ],
+  "timing_scope": {
+    "local_parent_child_seconds": 193.165566,
+    "local_publication_seconds": 0.394136,
+    "operational_feasible": null,
+    "remote_publication_seconds": null,
+    "remote_rechecks_seconds": null,
+    "remote_transfer_seconds": null
+  }
+}

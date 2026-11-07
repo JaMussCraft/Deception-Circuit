@@ -1,0 +1,43 @@
+{
+  "status": "handed-back",
+  "verdict": "REQUEST_CHANGES_TWO_NARROW_STARTUP_RECONCILIATION_GAPS",
+  "original_P1": "External same-invocation sealed prefix is within the requested correction scope and covers actual cache/resource reads, but these implementation gaps prevent closure acceptance.",
+  "findings": [
+    {
+      "id": "R257-r2-A",
+      "severity": "blocking actual handshake correctness",
+      "site": "runtime-probe.py main load_bound -> startup_handshake -> check_startup_trace",
+      "problem": "The full exec-through-barrier trace necessarily includes load_bound opening args.closure before the hook. check_startup_trace requires this ordinary file in entries, while the existing control_read_paths contract intentionally keeps the same manifest outside entries because it cannot embed its own hash. No authenticated control-read mapping is passed to reconciliation, so legitimate master/RED/GREEN startup rejects.",
+      "evidence": "Pure actual check_startup_trace rejects unlisted /control/closure.json; source main always performs the read before the barrier. This is not an observed full handshake.",
+      "minimal_correction": "Carry exact already same-buffer-authenticated closure path/digest as a separate explicit control-read binding into reconciliation and audit as needed. Revalidate that specific identity; do not require self-hashing or silently skip arbitrary control paths.",
+      "required_regressions": [
+        "Positive source-bound startup prefix includes the real authenticated closure read without a self-entry.",
+        "Changed closure bytes/hash or an extra undeclared ordinary read rejects; preserve complete unabridged prefix and per-process context bindings."
+      ]
+    },
+    {
+      "id": "R257-r2-B",
+      "severity": "blocking trace-path closure",
+      "site": "runtime-probe.py check_startup_trace readlink/readlinkat branch",
+      "problem": "Relative readlinkat ignores its annotated directory FD and resolves against process cwd. A valid trace readlinkat(3</actual/dir>,\"alias\",...) is accepted with only /cwd/alias declared; consumed /actual/dir/alias remains unlisted.",
+      "evidence": "Pure parser counterexample recorded in reconcile-results.json; file-digest I/O seam only, no complete runtime acceptance claimed.",
+      "minimal_correction": "Resolve readlinkat relative paths using AT_FDCWD or the actual annotated dirfd, consistently with openat, or fail closed for an unsupported form. Do not substitute cwd for a non-AT_FDCWD descriptor.",
+      "required_regressions": [
+        "Non-AT_FDCWD relative readlinkat rejects when actual link path is undeclared even if same basename exists in cwd.",
+        "Correctly declared actual link with literal target passes; missing/unresolved dirfd fails closed."
+      ]
+    }
+  ],
+  "frozen_run_manifest_sha256": "20ff4ffb9b306404db7167b1c70b1a161de105ddf7f2abf55914944ff8f0c028",
+  "runtime_probe_sha256": "2e52bde1c8a818ef9d68e53b4226b21d503ad356fe730649de4d4438fe2c87db",
+  "original43_test_bytes_unchanged": true,
+  "recorded61_each_pass": true,
+  "actual_external_handshake_or_SIF_runtime_accepted": false,
+  "Task250_host_or_repeat_Task2_authorized": false,
+  "root_prerequisites_unchanged": [
+    "Actual tracer/PID namespace association and root-protected live prefix/sealing protocol",
+    "Readonly input/evidence mounts and exact tool/loader/provider closure",
+    "Full actual original interpreter/image startup/import/collection within original bounded gate"
+  ],
+  "no_full_suite_rerun_or_native_remote_staging_jobs_git_RS_source_edits_or_agents": true
+}

@@ -1,0 +1,37 @@
+{
+  "status": "DIAGNOSTIC_PARTIAL",
+  "mountinfo": [
+    "1952 1923 0:25 / /sys/fs/cgroup ro,nosuid,nodev,noexec master:558 - tmpfs tmpfs ro,mode=755",
+    "1954 1952 0:26 / /sys/fs/cgroup/systemd rw,nosuid,nodev,noexec,relatime master:559 - cgroup cgroup rw,xattr,release_agent=/usr/lib/systemd/systemd-cgroups-agent,name=systemd",
+    "1955 1952 0:30 / /sys/fs/cgroup/cpu,cpuacct rw,nosuid,nodev,noexec,relatime master:560 - cgroup cgroup rw,cpu,cpuacct",
+    "1956 1952 0:31 / /sys/fs/cgroup/memory rw,nosuid,nodev,noexec,relatime master:561 - cgroup cgroup rw,memory",
+    "1957 1952 0:32 / /sys/fs/cgroup/net_cls,net_prio rw,nosuid,nodev,noexec,relatime master:562 - cgroup cgroup rw,net_cls,net_prio",
+    "1958 1952 0:33 / /sys/fs/cgroup/devices rw,nosuid,nodev,noexec,relatime master:563 - cgroup cgroup rw,devices",
+    "1959 1952 0:34 / /sys/fs/cgroup/freezer rw,nosuid,nodev,noexec,relatime master:564 - cgroup cgroup rw,freezer",
+    "1960 1952 0:35 / /sys/fs/cgroup/hugetlb rw,nosuid,nodev,noexec,relatime master:565 - cgroup cgroup rw,hugetlb",
+    "1961 1952 0:36 / /sys/fs/cgroup/pids rw,nosuid,nodev,noexec,relatime master:566 - cgroup cgroup rw,pids",
+    "1962 1952 0:37 / /sys/fs/cgroup/rdma rw,nosuid,nodev,noexec,relatime master:567 - cgroup cgroup rw,rdma",
+    "1963 1952 0:38 / /sys/fs/cgroup/cpuset rw,nosuid,nodev,noexec,relatime master:568 - cgroup cgroup rw,cpuset",
+    "1964 1952 0:39 / /sys/fs/cgroup/perf_event rw,nosuid,nodev,noexec,relatime master:569 - cgroup cgroup rw,perf_event",
+    "1965 1952 0:40 / /sys/fs/cgroup/blkio rw,nosuid,nodev,noexec,relatime master:570 - cgroup cgroup rw,blkio",
+    "1966 1956 0:31 / /sys/fs/cgroup/memory ro,nosuid,nodev,noexec,relatime master:561 - cgroup cgroup rw,memory"
+  ],
+  "statvfs_flags": {
+    "/sys/fs/cgroup": 15,
+    "/sys/fs/cgroup/memory": 4111
+  },
+  "pid": 23150,
+  "argv": [
+    "/u/swong2/.conda/envs/mgnp/bin/python",
+    "-B",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/run_packet.py",
+    "--environment",
+    "mgnp",
+    "--shard",
+    "0",
+    "--stage",
+    "suite",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/jobs/job-50319105/child/execution"
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "status": "TINY_STDLIB_DESCRIPTION_CHECKS_ONLY",
+  "results": [
+    {
+      "environment": "base",
+      "argv": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/test_check_ready.py"
+      ],
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.002s\n\nOK\n"
+    },
+    {
+      "environment": "base",
+      "argv": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/check_ready.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/producer.template.json"
+      ],
+      "expected_exit_code": 2,
+      "exit_code": 2,
+      "stdout": "{\n  \"status\": \"UNBOUND\",\n  \"errors\": [\n    \"source_commit is unpublished/unbound\",\n    \"actual_job requires root-bound absolute path and exact content hash\",\n    \"source_publication requires root-bound absolute path and exact content hash\",\n    \"admission requires root-bound absolute path and exact content hash\",\n    \"resources requires root-bound absolute path and exact content hash\",\n    \"design requires root-bound absolute path and exact content hash\",\n    \"protocol requires root-bound absolute path and exact content hash\",\n    \"pilot_inventory requires root-bound absolute path and exact content hash\"\n  ],\n  \"execution_authorized\": false,\n  \"native_imports\": false\n}\n",
+      "stderr": ""
+    },
+    {
+      "environment": "base",
+      "argv": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/check_ready.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/receiver.template.json"
+      ],
+      "expected_exit_code": 2,
+      "exit_code": 2,
+      "stdout": "{\n  \"status\": \"UNBOUND\",\n  \"errors\": [\n    \"source_commit is unpublished/unbound\",\n    \"actual_job requires root-bound absolute path and exact content hash\",\n    \"source_publication requires root-bound absolute path and exact content hash\",\n    \"admission requires root-bound absolute path and exact content hash\",\n    \"resources requires root-bound absolute path and exact content hash\",\n    \"design requires root-bound absolute path and exact content hash\",\n    \"protocol requires root-bound absolute path and exact content hash\",\n    \"pilot_inventory requires root-bound absolute path and exact content hash\",\n    \"target_reference is unbound\",\n    \"preparation_reference is unbound\",\n    \"namespace_policy is unbound\"\n  ],\n  \"execution_authorized\": false,\n  \"native_imports\": false\n}\n",
+      "stderr": ""
+    },
+    {
+      "environment": "mgnp",
+      "argv": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/test_check_ready.py"
+      ],
+      "expected_exit_code": 0,
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nOK\n"
+    },
+    {
+      "environment": "mgnp",
+      "argv": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/check_ready.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/producer.template.json"
+      ],
+      "expected_exit_code": 2,
+      "exit_code": 2,
+      "stdout": "{\n  \"status\": \"UNBOUND\",\n  \"errors\": [\n    \"source_commit is unpublished/unbound\",\n    \"actual_job requires root-bound absolute path and exact content hash\",\n    \"source_publication requires root-bound absolute path and exact content hash\",\n    \"admission requires root-bound absolute path and exact content hash\",\n    \"resources requires root-bound absolute path and exact content hash\",\n    \"design requires root-bound absolute path and exact content hash\",\n    \"protocol requires root-bound absolute path and exact content hash\",\n    \"pilot_inventory requires root-bound absolute path and exact content hash\"\n  ],\n  \"execution_authorized\": false,\n  \"native_imports\": false\n}\n",
+      "stderr": ""
+    },
+    {
+      "environment": "mgnp",
+      "argv": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/check_ready.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/receiver.template.json"
+      ],
+      "expected_exit_code": 2,
+      "exit_code": 2,
+      "stdout": "{\n  \"status\": \"UNBOUND\",\n  \"errors\": [\n    \"source_commit is unpublished/unbound\",\n    \"actual_job requires root-bound absolute path and exact content hash\",\n    \"source_publication requires root-bound absolute path and exact content hash\",\n    \"admission requires root-bound absolute path and exact content hash\",\n    \"resources requires root-bound absolute path and exact content hash\",\n    \"design requires root-bound absolute path and exact content hash\",\n    \"protocol requires root-bound absolute path and exact content hash\",\n    \"pilot_inventory requires root-bound absolute path and exact content hash\",\n    \"target_reference is unbound\",\n    \"preparation_reference is unbound\",\n    \"namespace_policy is unbound\"\n  ],\n  \"execution_authorized\": false,\n  \"native_imports\": false\n}\n",
+      "stderr": ""
+    }
+  ],
+  "native_imports": false,
+  "scheduler_calls": 0,
+  "large_payload_builds": 0,
+  "candidate_runtime_sha256": "aea07dbf153824f373be70629dd24edc28dd6566cafa5955f43c69fd1119ec90"
+}

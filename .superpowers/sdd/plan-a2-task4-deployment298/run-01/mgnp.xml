@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="14" skipped="0" tests="32" time="297.362" timestamp="2026-11-07T05:19:53.675960-06:00" hostname="cn096.delta.ncsa.illinois.edu"><testcase classname="test_full_score_integration" name="test_whole_chain_normal_native_full_publication" time="10.908"><failure message="FileNotFoundError: [Errno 2] No such file or directory: 'data/datasets/far_v2/dataset_config.json'">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:437: in test_whole_chain_normal_native_full_publication
+    j=joined(chain,tmp_path,monkeypatch,full=True)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:293: in joined
+    scored=full_native_score(m,p,producer.g,tmp_path,monkeypatch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:334: in full_native_score
+    prepared,_,_=p._load_context(args);p._validate_live(args,receipt,prepared)
+                 ^^^^^^^^^^^^^^^^^^^^^
+../../../../outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/a2_pipeline.py:1092: in _load_context
+    a1.validate_prepared(ancestor, prepared)
+../../../../outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/ladder_pipeline.py:312: in validate_prepared
+    require(common.file_hash(path)==digest,'stale source/selection hash: '+path)
+            ^^^^^^^^^^^^^^^^^^^^^^
+../../../../outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/dataset/user_inversion_pipeline.py:44: in file_hash
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+/u/swong2/.conda/envs/mgnp/lib/python3.12/pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'data/datasets/far_v2/dataset_config.json'</failure></testcase><testcase classname="test_full_score_integration" name="test_transfer_failure_cannot_cross_score_boundary[catalogue]" time="11.451" /><testcase classname="test_full_score_integration" name="test_transfer_failure_cannot_cross_score_boundary[CPU]" time="10.826" /><testcase classname="test_full_score_integration" name="test_transfer_failure_cannot_cross_score_boundary[SIF]" time="11.316" /><testcase classname="test_full_score_integration" name="test_transfer_failure_cannot_cross_score_boundary[ledger]" time="10.987" /><testcase classname="test_full_score_integration" name="test_transfer_failure_cannot_cross_score_boundary[WAITING]" time="11.413" /><testcase classname="test_full_score_integration" name="test_transfer_failure_cannot_cross_score_boundary[cache]" time="11.311" /><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[postactivation]" time="9.519"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[catalogue]" time="8.692"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[bank]" time="8.855"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[release]" time="9.141"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[existing-score]" time="8.977"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[null-resource]" time="10.243"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[config]" time="9.218"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[WAITING]" time="9.381"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[expired]" time="9.005"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[old-authority]" time="9.012"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_entry_failure_has_zero_score_calls[short-allocation]" time="8.833"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+                                                ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_consumed_partial_is_preserved_and_never_retried" time="8.993"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:500: in test_consumed_partial_is_preserved_and_never_retried
+    j=joined(chain,tmp_path,monkeypatch);j.producer.publish()
+                                         ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase><testcase classname="test_full_score_integration" name="test_native_sibling_publication_and_mount_policy" time="1.103" /><testcase classname="test_full_score_integration" name="test_current_authority_failure_stops_before_remote_publication[ordinary-cap]" time="9.101" /><testcase classname="test_full_score_integration" name="test_current_authority_failure_stops_before_remote_publication[freeze]" time="8.798" /><testcase classname="test_full_score_integration" name="test_current_authority_failure_stops_before_remote_publication[checkpoint]" time="9.401" /><testcase classname="test_full_score_integration" name="test_current_authority_failure_stops_before_remote_publication[old-charge]" time="8.983" /><testcase classname="test_full_score_integration" name="test_current_authority_failure_stops_before_remote_publication[missing-successor]" time="8.802" /><testcase classname="test_full_score_integration" name="test_actual_root_pin_and_admission_gates_reject_synthetic_semantic_damage[resource-review-genuine independently reviewed resource]" time="8.634" /><testcase classname="test_full_score_integration" name="test_actual_root_pin_and_admission_gates_reject_synthetic_semantic_damage[capacity-job-actual reviewed placement/capacity]" time="8.779" /><testcase classname="test_full_score_integration" name="test_actual_root_pin_and_admission_gates_reject_synthetic_semantic_damage[admission-scope-new root operational admission]" time="9.328" /><testcase classname="test_full_score_integration" name="test_actual_root_pin_and_admission_gates_reject_synthetic_semantic_damage[reader-cutover-completed reader-safe native mapping transition]" time="9.023" /><testcase classname="test_full_score_integration" name="test_actual_root_pin_and_admission_gates_reject_synthetic_semantic_damage[CPU-resource-fresh accepted owning CPU resource decision]" time="7.401" /><testcase classname="test_full_score_integration" name="test_actual_root_pin_and_admission_gates_reject_synthetic_semantic_damage[root-scope-closed full-only ordinary80 bindings]" time="8.771" /><testcase classname="test_full_score_integration" name="test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI" time="9.049"><failure message="task3_helper.Rejected: CPU immutable WAITING copy">../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:582: in test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI
+    j=joined(chain,tmp_path,monkeypatch);j.producer.publish()
+                                         ^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+              ^^^^^^^^^^^^^^^^^^^
+E   task3_helper.Rejected: CPU immutable WAITING copy</failure></testcase></testsuite></testsuites>

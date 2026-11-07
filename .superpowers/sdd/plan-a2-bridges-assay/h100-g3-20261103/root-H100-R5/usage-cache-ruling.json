@@ -1,0 +1,29 @@
+{
+  "kind": "root_helper_usage_cache_ruling",
+  "created_unix": 1793746417.6352775,
+  "session": "codex-01a1a2f4",
+  "authoritative_usage": "fresh codex-usage live account response",
+  "session_authority": "targeted read-only research-session status for identity, freeze, cadence, accumulated points and reset-bound exception",
+  "allowed_live_cache_relation": "live_used >= cached_used within same known reset window",
+  "projected_points": "recorded_session_points + live_used_percent - cached_used_percent",
+  "requirements": [
+    "known fresh account and session status",
+    "no session freeze",
+    "projected_points strictly below next checkpoint points",
+    "live used percent strictly below conservative 99 percent checkpoint",
+    "active matching captured-reset exception above original 80 percent cap"
+  ],
+  "fail_closed": [
+    "unknown or stale status",
+    "live used less than cached used",
+    "reset mismatch",
+    "unknown cadence or checkpoint fields",
+    "inactive exception above original cap",
+    "projected or conservative checkpoint reached"
+  ],
+  "private_state_writes": false,
+  "synthetic_hook_invocation": false,
+  "infrastructure_changes": false,
+  "cap_or_cadence_change": false,
+  "independent_review_required": true
+}

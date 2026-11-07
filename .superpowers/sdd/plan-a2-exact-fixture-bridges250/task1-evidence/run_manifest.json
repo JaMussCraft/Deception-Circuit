@@ -1,0 +1,212 @@
+{
+  "actual_runtime_compatibility": false,
+  "baseline_assertion": "Before implementation both interpreters had 31 expected missing-implementation assertion failures; final probe-only tests have 43 passing in each interpreter. This is not a fixture runtime or scientific baseline reproduction.",
+  "cluster": "local login checks only; no Slurm job",
+  "commands": [
+    {
+      "argv": [
+        "timeout",
+        "30",
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py"
+      ],
+      "environment": {
+        "MKL_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "exit_code": 0,
+      "exit_file": "final-base.exit",
+      "expected": 43,
+      "label": "base",
+      "observed": 43,
+      "stdout": "final-base.stdout"
+    },
+    {
+      "argv": [
+        "timeout",
+        "30",
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py"
+      ],
+      "environment": {
+        "MKL_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "exit_code": 0,
+      "exit_file": "final-mgnp.exit",
+      "expected": 43,
+      "label": "mgnp",
+      "observed": 43,
+      "stdout": "final-mgnp.stdout"
+    }
+  ],
+  "deployment_prerequisite": "Root receipt root-tool-discovery/sif-tool-presence.json reports readelf absent in pinned SIF. Root must bind a pinned read-only inspection tool and its provider closure; actual tool/runtime bindings remain null.",
+  "duration_seconds": {
+    "final_base": 0.69,
+    "final_mgnp": 0.88
+  },
+  "files": {
+    "candidate/PROBE_SCHEMA.txt": {
+      "bytes": 8509,
+      "sha256": "1a964cd30cc828e563f995fd0caa3abb6e4f68d7bd01ea5ec50f2d8d5da9da84"
+    },
+    "candidate/closure.template.json": {
+      "bytes": 1355,
+      "sha256": "368695a42ae5af639485f136f395d5710fb3032305def83a24c27257dff8e89f"
+    },
+    "candidate/runtime-probe.py": {
+      "bytes": 27587,
+      "sha256": "d8e7cd94c385c49f321f97e9fcde4e07ce298e35ef2dee045fc012d6fb0e7f5a"
+    },
+    "candidate/test_runtime_probe.py": {
+      "bytes": 12665,
+      "sha256": "e3b0bf2f557bad38e1e520d11915e4a8b829233b918f6d4341aa6a6aae445633"
+    },
+    "task1-evidence/final-base.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "task1-evidence/final-base.stdout": {
+      "bytes": 99,
+      "sha256": "6615571ae97bcbf3ab2cb4e88a3d6171ee8cfcec35316e68898654b944f5b6f0"
+    },
+    "task1-evidence/final-mgnp.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "task1-evidence/final-mgnp.stdout": {
+      "bytes": 99,
+      "sha256": "1666e6d7dcbee597f995f8e5ab9a2bb1fd854aeb996d21f7dd198b55e6687e36"
+    },
+    "task1-evidence/green-base.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "task1-evidence/green-base.stdout": {
+      "bytes": 2034,
+      "sha256": "f3cdab8fca244ac2fbc22fb32a5ae35c014fe31556d306469c21b123a2081ba8"
+    },
+    "task1-evidence/green-base2.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "task1-evidence/green-base2.stdout": {
+      "bytes": 99,
+      "sha256": "12f9f8689618f10190cfeeb23d4e3804f49b5ac3e92ac0e1b9044628c9bf6ff8"
+    },
+    "task1-evidence/green-base3.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "task1-evidence/green-base3.stdout": {
+      "bytes": 99,
+      "sha256": "63bbbfbd3be194bd720514fed0ae1925d0ffc13824e4f43f69ac83f78a93d12f"
+    },
+    "task1-evidence/green-mgnp.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "task1-evidence/green-mgnp.stdout": {
+      "bytes": 99,
+      "sha256": "05058e41f1454b4e5feca445b7de84d4731afa3d0c194a1fc50d85f8a28e700f"
+    },
+    "task1-evidence/red-base.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "task1-evidence/red-base.stdout": {
+      "bytes": 27938,
+      "sha256": "6f03cca7c59681e7662f3b186fe4be2e57850d048514891a299c09f80788fc3a"
+    },
+    "task1-evidence/red-base2.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "task1-evidence/red-base2.stdout": {
+      "bytes": 45159,
+      "sha256": "34804d0c9d3a4693566e4a435c6440ff19ee45de98db60b374da0ff8daf6f1c8"
+    },
+    "task1-evidence/red-helper-base.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "task1-evidence/red-helper-base.stdout": {
+      "bytes": 2510,
+      "sha256": "203e80069f24a15b239e661418cc08b2a0301414a92093f961bccb6b24320858"
+    },
+    "task1-evidence/red-helper-base2.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "task1-evidence/red-helper-base2.stdout": {
+      "bytes": 4039,
+      "sha256": "c6e5c325aaa22ca2fb355a308c93e7242d169dfcb3f5ce9eb3038f5cccaf1908"
+    },
+    "task1-evidence/red-inventory-base.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "task1-evidence/red-inventory-base.stdout": {
+      "bytes": 2451,
+      "sha256": "ef9e28126dc419bb5d5d2497a97a9ce7bd6bae1965b5760969ef813fdfa66cf3"
+    },
+    "task1-evidence/red-mgnp.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "task1-evidence/red-mgnp.stdout": {
+      "bytes": 46525,
+      "sha256": "b773fcfd2dae881d8339622f15b1d7a9574d501f2e250a9f8baa666452ee5a82"
+    },
+    "task1-evidence/red-resolution-base.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "task1-evidence/red-resolution-base.stdout": {
+      "bytes": 2514,
+      "sha256": "cf8fc13b364138ed186d6d1a0bee4f152e4139309faa3358d4e544dd777dfc40"
+    }
+  },
+  "host": "dt-login04.delta.ncsa.illinois.edu",
+  "job_id": null,
+  "kind": "TASK1_PURE_PROBE_TEST_EVIDENCE_ONLY",
+  "local_test_counts": {
+    "final_expected_each": 43,
+    "final_observed_each": 43,
+    "initial_corrected_red_each": 31,
+    "initial_setup_errors": 31,
+    "intermediate_green_fail": 1,
+    "intermediate_green_pass": 30
+  },
+  "red_notes": "red-base.stdout is the preserved first attempt: 31 setup errors due to the missing probe fixture. red-base2.stdout and red-mgnp.stdout are corrected explicit missing-feature assertions: 31 failures each. green-base.stdout retained one synthetic pth fixture mismatch (30 pass/1 fail); the fixture literal path was corrected before subsequent GREEN runs. Later RED rounds exercise added symbol/provider, helper, metadata and retained-inventory gates.",
+  "scientific_execution_authorized": false,
+  "source_commit": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "source_commit_basis": "root-supplied frozen worktree HEAD; worker ran no git",
+  "usage_checkpoint": {
+    "remaining_percent": 67,
+    "reset_utc": "2026-11-13T16:18:29Z",
+    "should_pause": false,
+    "source": "live codex-usage reading during task; raw stdout was returned by tool",
+    "used_percent": 33
+  }
+}

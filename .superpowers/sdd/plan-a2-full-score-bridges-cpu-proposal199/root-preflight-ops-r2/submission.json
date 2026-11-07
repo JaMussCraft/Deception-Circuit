@@ -1,0 +1,41 @@
+{
+  "at_utc": "2026-11-06T21:17:38.174459+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'from pathlib import Path; p=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r2/execution'\"'\"'); assert not p.exists() and not p.is_symlink()' && sbatch --parsable --account=cis260361p --partition=RM-shared --qos=rm --nodes=1 --ntasks=1 --cpus-per-task=26 --mem=48G --time=00:05:00 --no-requeue --export=ALL,CUDA_VISIBLE_DEVICES= --chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime --output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r2/job-%j.log --job-name=a2-cgroup199-r2 /ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/launch.sh /ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r2/execution 9b538a5cedd5b26cd689edfc5ca156b82d3d172405306daf8f8e83b790efce6f"
+  ],
+  "scheduler_command": [
+    "sbatch",
+    "--parsable",
+    "--account=cis260361p",
+    "--partition=RM-shared",
+    "--qos=rm",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=26",
+    "--mem=48G",
+    "--time=00:05:00",
+    "--no-requeue",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime",
+    "--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r2/job-%j.log",
+    "--job-name=a2-cgroup199-r2",
+    "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/launch.sh",
+    "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r2/execution",
+    "9b538a5cedd5b26cd689edfc5ca156b82d3d172405306daf8f8e83b790efce6f"
+  ],
+  "returncode": 0,
+  "output": "50309188\n",
+  "scope": "Single reviewed cgroup visibility diagnostic only; no model, graph, resource or GPU admission."
+}

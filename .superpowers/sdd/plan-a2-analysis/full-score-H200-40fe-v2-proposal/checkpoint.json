@@ -1,0 +1,43 @@
+{
+  "status": "PAUSED_AT_CODEX78_PERCENT_PARTIAL_NOT_EXECUTION_ADMISSION",
+  "paused_UTC": "2026-11-03T15:34:00Z",
+  "reset_UTC": "2026-11-06T16:07:41Z",
+  "source_commit": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime",
+  "accepted_resource_proposal": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/154-a2-timing-audit-evidence/full-scoring-resource-proposal.json",
+  "resource_proposal_sha256": "3d14df0b00d9fdd19e03c405212e60f567e97211116f1b3a8e28db4dc6d05df2",
+  "accepted_audit": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/specificity-ladder/reports/154-a2-timing-audit-evidence/audit-verdict.json",
+  "main_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2",
+  "groups_sha256": "efe92038365ad010dbd5a889c6696d7a1b86a1ccb889564a65eca55005849f73",
+  "bank": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2/bank/banks.json",
+  "bank_sha256": "9c874e387a45d26fa966d69eda64ee9398a836f1c1681aa1c049ff5532702660",
+  "bank_manifest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v2/bank/run_manifest.json",
+  "preserved_timing_packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/bank-scoring-timing/launch-g2",
+  "scope": {
+    "stage": "score_only",
+    "groups": 9,
+    "rows": 59652,
+    "bank_rebuild": false,
+    "limit": 0,
+    "minutes": 450,
+    "gpu_hours": 7.5,
+    "gpus": 1,
+    "gpu_type": "H200",
+    "cpus": 4,
+    "memory_GiB": 64,
+    "batch_size": 8,
+    "dtype": "bfloat16",
+    "backend": "sdpa"
+  },
+  "source_reuse_finding": {
+    "numeric_environment": "Exact versions/Python/CUDA/backend/precision/thread flags, excludes physicalUUID",
+    "bank_contract": "Exact original H IDs/order/source/tokens/model+tokenizer/geometry/keys/shapes/code/numeric environment",
+    "owning_score_checks": "dtype equal; CUDA device prefix equal; exact torch.cuda GPU name equals bank execution gpu_name. No physicalUUID equality gate in owning used path.",
+    "timing_outer_UUID_check": "Was a same-allocation bank-to-prefix timing precaution. Do not blindly carry it into new score-only allocation or invent exemption to any owning predicate.",
+    "source_locations": "a2_pipeline.numeric_environment,bank_contract,validate_banks,score,read_stage"
+  },
+  "next_action": "On explicit resume belowusage78: clone reviewed launch-g2 common/environment/gpu probe into distinct156 packet; adapt25min/.4167h\u2192450min/7.5h, score-only command from154 without --limit, main/score fresh, existing bank+manifest byte binding; fresh source/protection/grader/tokenization checks via unchanged owning CLI before model; exactsameGPUname/numeric env gate; no bank/UUID-resign, no source changes, no summary/finalization; fresh root ledger/cap/reservation/release + actual H200 lease; bounded cleanup/no automaticretry; send final hashes to independent157(a3_edge_tokenizer_fix) before rootsubmission.",
+  "implementation_files_written": false,
+  "tests_or_jobs_started": false,
+  "source_or_RS_or_scheduler_changes": false
+}

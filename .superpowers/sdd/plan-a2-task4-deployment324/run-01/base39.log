@@ -1,0 +1,43 @@
+FF...............................                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_whole_chain_normal_native_full_publication ________________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction321/packet-r4/candidate/tests/test_full_score_integration.py:511: in test_whole_chain_normal_native_full_publication
+    with pytest.raises(FileExistsError):j.producer.publish()
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:589: in publish
+    need(self.work.is_dir(),'trigger required first');verify_runtime_pins(self.b,self.g,self.c)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction321/packet-r4/candidate/tests/test_full_score_integration.py:305: in verify_runtime_pins
+    result=real_verify(b,g,c)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:522: in verify_runtime_pins
+    gpu.packet();gpu.source();gpu.input_closure();gpu.verify_existing_bank(g);gpu.reviewed_admission();gpu.protection()
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:155: in _bank_binding
+    require(not score.exists() and not score.is_symlink(), 'score already exists or is symlink')
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:40: in require
+    raise ValueError(message)
+E   ValueError: score already exists or is symlink
+_________ test_transfer_failure_cannot_cross_score_boundary[catalogue] _________
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction321/packet-r4/candidate/tests/test_full_score_integration.py:546: in test_transfer_failure_cannot_cross_score_boundary
+    with pytest.raises(FileExistsError):j.producer.publish()
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:589: in publish
+    need(self.work.is_dir(),'trigger required first');verify_runtime_pins(self.b,self.g,self.c)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction321/packet-r4/candidate/tests/test_full_score_integration.py:305: in verify_runtime_pins
+    result=real_verify(b,g,c)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:522: in verify_runtime_pins
+    gpu.packet();gpu.source();gpu.input_closure();gpu.verify_existing_bank(g);gpu.reviewed_admission();gpu.protection()
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:291: in input_closure
+    require(path.is_absolute() and not path.is_symlink() and sha(path) == digest, 'ordinary input changed: ' + name)
+/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:40: in require
+    raise ValueError(message)
+E   ValueError: ordinary input changed: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment324/run-01/base39-tmp/test_transfer_failure_cannot_c0/catalogue0/held_out.json
+=============================== warnings summary ===============================
+test_full_score_integration.py::test_whole_chain_normal_native_full_publication
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment324/run-01/base39.xml -
+=========================== short test summary info ============================
+FAILED ../../plan-a2-whole-packet-correction321/packet-r4/candidate/tests/test_full_score_integration.py::test_whole_chain_normal_native_full_publication
+FAILED ../../plan-a2-whole-packet-correction321/packet-r4/candidate/tests/test_full_score_integration.py::test_transfer_failure_cannot_cross_score_boundary[catalogue]
+2 failed, 31 passed, 1 warning in 750.79s (0:12:30)

@@ -1,0 +1,14 @@
+{
+  "cause": "Native builder retains Python tuples; untouched original JSON publisher serializes these as arrays. The old chain incorrectly required Python-type equality across that serialization.",
+  "changed_test_functions": [
+    "test_prepared_native_prefit_inventory_seam_without_model"
+  ],
+  "corrected_test_sha256": "4082bc6d81fc86479bf9cb0e44f3a49afc75533f7cd7c26c0f6d21c5fcba2097",
+  "failed_green_job": "23612764",
+  "failed_green_manifest_sha256": "0d9d1ea125810251047e4cf748d49fadbf99b8993d2ab31394132598bd7ff98d",
+  "independent_review": "193",
+  "prior_test_sha256": "9a9ae6e2eff235e4ddf95447681204e9a03eb74adc149a1dcc30788aa9e53790",
+  "replacement": "Compare frozen graph to both untouched original published representations; compare canonical digest to native builder value and exact emitted payload bytes to native publisher. Preserve inventory_sha256, positive exact expected-key count, final witness and every other assertion.",
+  "runtime_changed": false,
+  "status": "ROOT_AUTHORIZED_TEST_ONLY_CORRECTION"
+}

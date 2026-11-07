@@ -1,0 +1,29 @@
+{
+  "job_id": "23472894",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T14:06:02.684046+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--dependency=",
+    "--account=beto-delta-cpu",
+    "--partition=cpu",
+    "--time=02:05:00",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/launch.sbatch"
+  ],
+  "driver_manifest_sha256": "babaf17dbf75e3cd8e9cbb8aa59b7ea714ab95ce3db69ed67825126ee1dbce3b",
+  "cpus": 4,
+  "memory_GiB": 32,
+  "gpus": 0,
+  "time_minutes": 125,
+  "account": "beto-delta-cpu",
+  "partition": "cpu",
+  "parent_accounting": "23470886|COMPLETED|0:0\n23470886.batch|COMPLETED|0:0\n23470886.extern|COMPLETED|0:0\n23470886.0|COMPLETED|0:0\n",
+  "dependency_override_reason": "Parent already completed successfully in actual accounting; scheduler rejected historical afterok ID. Coordinator retains mandatory actual parent/source/case checks before model.",
+  "scope": [
+    "original_selected_pilot_aggregate",
+    "first_32_calibration_shards"
+  ],
+  "no_automatic_retry": true
+}

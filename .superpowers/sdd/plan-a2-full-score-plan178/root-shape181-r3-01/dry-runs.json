@@ -1,0 +1,45 @@
+[
+  {
+    "command": [
+      "bash",
+      "-n",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r3/run.sh"
+    ],
+    "returncode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "/u/swong2/.conda/envs/mgnp/bin/python",
+      "-B",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r3/shape.py",
+      "--help"
+    ],
+    "returncode": 0,
+    "output": "usage: shape.py [-h] --output OUTPUT --manifest-sha256 MANIFEST_SHA256\n\noptions:\n  -h, --help            show this help message and exit\n  --output OUTPUT\n  --manifest-sha256 MANIFEST_SHA256\n"
+  },
+  {
+    "command": [
+      "sbatch",
+      "--test-only",
+      "--parsable",
+      "--account=beto-delta-cpu",
+      "--partition=cpu-interactive",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=4",
+      "--mem=16G",
+      "--time=00:15:00",
+      "--no-requeue",
+      "--export=ALL",
+      "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime",
+      "--job-name=a2-shape181-r3",
+      "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/root-shape181-r3-01/job-%j.log",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r3/run.sh",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/root-shape181-r3-01/execution",
+      "bd12ebd27853dd63156dc2d1b2662688d4e8c2513269e4ef872db557538a821b"
+    ],
+    "returncode": 0,
+    "output": "sbatch: Job 23612212 to start at 2026-11-06T13:45:30 a using 4 processors on nodes cn096 in partition cpu-interactive\n"
+  }
+]

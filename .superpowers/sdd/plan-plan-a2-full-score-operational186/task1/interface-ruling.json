@@ -1,0 +1,27 @@
+{
+  "scope": "Task1 tests and prospective internal interfaces only; no execution authority",
+  "root_accepted": true,
+  "common": {
+    "validate_config(c)": "closed full_score config and explicitly reviewed bound resources; rejects every null and old authority flag",
+    "verify_existing_bank(c)": "return original pinned file/manifest/internal-payload identities; no adoption, write, native bank regeneration or score symlink",
+    "full_score_command(c)": "return sole original shell CLI argv with stage score and no limit argument",
+    "validate_score_command(c, command)": "exact external argv policy, including rejection of explicit --limit 0",
+    "validate_gpu_identity(c, probe)": "exact name/device-type/dtype/numeric_environment; return bank_gpu_uuid and actual_gpu_uuid separately",
+    "effective_deadlines(c, initial_end, current_end, fixed_end, now)": "fresh min initial/current/fixed run deadline; work deadline subtracts reviewed margin; remaining computed from current clock, never memoized submission time",
+    "environment()": "postactivation offline/project/cache/thread environment using bound config",
+    "gpu_release(phase)": "only full_score; finite fresh root release without renewal",
+    "entry_release(r, phase)": "final fresh hash/catalogue/allocation/deadline/lease validation and once-only consumption"
+  },
+  "host-launch": {
+    "validate_allocation(c, captured)": "actual fresh raw/fields identity, host, RUNNING account/QoS, exactly one typed H100 GPU, reviewed CPU/RAM/time and no restart/requeue",
+    "build_container_command(c, profile)": "original /projects and /work namespaces; base Alignment read-only; MAIN parent read-write; every existing non-output leaf read-only; cache/source/input/bank/G3/SIF protected"
+  },
+  "controller": {
+    "run_full_score(c, r)": "always invoke genuine internal preflight; recompute remaining work/lease immediately before final entry and sole Popen; native completion audit after normal exit; no retry",
+    "preflight_full_score(c, r)": "internal owning guard/activation/probe boundary, returning environment/work_deadline and before evidence",
+    "audit_score_result(c)": "internal normal native completion/domain/control/support audit, not scientific result acceptance or effects permission",
+    "terminate_process_group(child, timeout_seconds)": "TERM group, bounded wait, KILL group if needed and reap"
+  },
+  "test_boundary": "Tests may monkeypatch module-level external I/O/native audit seams. Production function parameters must not permit caller-supplied guard success, model-provider callbacks or loader injection. Substantive config/bank/release/allocation/deadline checks have separate real behavioral tests.",
+  "fixture_limit": "Complete authentic bank metadata shape and contracts, with vectors deliberately stripped. This fixture cannot pass owning native validate_banks and does not claim that proof. Actual bank version metadata is observed provenance, never a spoof of the CPU test interpreter."
+}

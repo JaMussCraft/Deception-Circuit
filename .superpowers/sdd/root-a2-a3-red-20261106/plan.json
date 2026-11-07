@@ -1,0 +1,39 @@
+{
+  "scope": "Two independent test-only packets sequentially in one actual CPU allocation; separate unchanged observers, source pins and receipts. No model, GPU, scientific/source admission or automatic retry.",
+  "resources": {
+    "CPUs": 2,
+    "RAM_GiB": 32,
+    "wall_seconds": 1200
+  },
+  "child_cap_sum_seconds": 1080,
+  "remaining_allocation_margin_seconds": 120,
+  "phases": [
+    {
+      "name": "a2_task2_red",
+      "pin_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/red/pins.json",
+      "pin_sha256": "f225d7dc1d9a431d0e102b796c8cf938f3372b56569fe0ac0ea5ef576203d75e",
+      "output": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/red/root-red-01",
+      "argv": [
+        "bash",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/red/launch_cpu_red.sh",
+        "--output",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/red/root-red-01"
+      ]
+    },
+    {
+      "name": "a3_task23_red_r2",
+      "pin_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/source-pins.json",
+      "pin_sha256": "4a91a94024038efd14b9f87a3062816abe8249cd1d88025167d5b5438551c5e0",
+      "output": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01",
+      "argv": [
+        "bash",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/cpu.sbatch",
+        "--mode",
+        "RED",
+        "--output",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r2/red-run-01"
+      ]
+    }
+  ],
+  "acceptance": "Each phase requires its own complete attributable RED; parent status is reported separately. Keep all candidate sources frozen until parent job terminal. No concurrent builders. Shared cgroup peak is not an individual receiver resource proof."
+}

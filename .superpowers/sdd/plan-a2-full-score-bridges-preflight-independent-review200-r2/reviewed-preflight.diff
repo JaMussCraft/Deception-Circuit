@@ -1,0 +1,99 @@
+--- preflight/host_probe.py
++++ preflight-r2/host_probe.py
+@@ -2,10 +2,11 @@
+ """Bridges actual 5-minute visibility probe; no model or resource proof."""
+ import argparse,datetime,json,os,socket,subprocess,sys,time
+ from pathlib import Path
+-HERE=Path(__file__).resolve().parent;sys.path.insert(0,str(HERE.parent/'proof-adapter'))
+-import host_supervisor as h
+-assert h.sha(HERE.parent/'proof-adapter/host_supervisor.py')=='c08c99de710a08dde1082d2954c3c535576840b911570b4665c5284520094c6f'
+-ap=argparse.ArgumentParser();ap.add_argument('--output',required=True);ap.add_argument('--manifest-sha256',required=True);a=ap.parse_args();h.check_packet(HERE,a.manifest_sha256);out=Path(a.output);assert out.is_absolute() and not out.exists();out.relative_to(h.PHYS/h.REL);out.mkdir(parents=True,exist_ok=False)
++HERE=Path(__file__).resolve().parent;sys.path.insert(0,str(HERE))
++import allocation_helper as h
++from guards import fresh_output
++ap=argparse.ArgumentParser();ap.add_argument('--output',required=True);ap.add_argument('--manifest-sha256',required=True);a=ap.parse_args();h.check_packet(HERE,a.manifest_sha256)
++allowed=h.PHYS/h.REL/'.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-cgroup199-r2';out=fresh_output(a.output,allowed,os.getuid());out.mkdir(exist_ok=False)
+ raw=subprocess.check_output(['scontrol','show','job',os.environ['SLURM_JOB_ID'],'-o'],universal_newlines=True,timeout=15,env=dict(os.environ,TZ='UTC'));f=dict(x.split('=',1) for x in raw.split() if '=' in x);work=str(h.PHYS/h.REL/'outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime');t=h.validate_allocation(f,os.environ,os.getuid(),socket.gethostname(),work,expected_minutes=5);assert h.sha(h.IMAGE)==h.IMAGE_SHA
+ h.write(out/'allocation.json',dict(fields=f,tres=t,raw=raw,host=socket.gethostname(),captured_unix=time.time()))
+ env=dict(os.environ);host=subprocess.run([sys.executable,str(HERE/'cgroup_probe.py')],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,env=env);(out/'host-cgroup.json').write_text(host.stdout)
+--- preflight/cgroup_probe.py
++++ preflight-r2/cgroup_probe.py
+@@ -2,16 +2,43 @@
+ """Record actual membership and readable job-specific memory counters; no graph."""
+ import json,os,sys
+ from pathlib import Path
+-job=os.environ.get('SLURM_JOB_ID','');out={'job':job,'proc_self_cgroup':Path('/proc/self/cgroup').read_text(),'records':[]}
+-for line in out['proc_self_cgroup'].splitlines():
+- f=line.split(':',2)
+- if f[0]=='0':base=Path('/sys/fs/cgroup')/f[2].lstrip('/');names=('memory.current','memory.peak','memory.events');kind='v2'
+- elif 'memory' in f[1].split(','):base=Path('/sys/fs/cgroup/memory')/f[2].lstrip('/');names=('memory.usage_in_bytes','memory.max_usage_in_bytes','memory.failcnt','memory.oom_control');kind='v1'
+- else:continue
+- rec={'controller':kind,'path':str(base),'job_scoped':bool(job and job in str(base)),'values':{}}
+- for n in names:
+-  p=base/n
+-  if p.is_file():rec['values'][n]=p.read_text()
+- out['records'].append(rec)
+-required=lambda r:r['job_scoped'] and (all(k in r['values'] for k in ('memory.peak','memory.events')) if r['controller']=='v2' else all(k in r['values'] for k in ('memory.max_usage_in_bytes','memory.failcnt','memory.oom_control')))
+-out['required_194_counter_visible']=any(required(r) for r in out['records']);print(json.dumps(out,indent=2,allow_nan=False));sys.exit(0 if out['required_194_counter_visible'] else 2)
++from guards import job_scoped
++
++def controller_path(kind,membership,mountinfo,cgroup_root):
++ path=Path(membership);assert path.is_absolute() and '..' not in path.parts
++ if mountinfo is None:return cgroup_root/('memory' if kind=='v1' else '')/membership.lstrip('/')
++ candidates=[]
++ for line in mountinfo.splitlines():
++  left,right=line.split(' - ',1);l=left.split();r=right.split()
++  if not ((kind=='v2' and r[0]=='cgroup2') or (kind=='v1' and r[0]=='cgroup' and 'memory' in r[2].split(','))):continue
++  root=Path(l[3]);mount=Path(l[4])
++  try:relative=path.relative_to(root)
++  except ValueError:continue
++  candidates.append((len(root.parts),mount/relative))
++ assert candidates,'actual cgroup memory mount unavailable'
++ return max(candidates,key=lambda x:x[0])[1]
++
++def collect(job,proc_text,cgroup_root=Path('/sys/fs/cgroup'),mountinfo=None):
++ out={'job':job,'proc_self_cgroup':proc_text,'records':[]}
++ for line in proc_text.splitlines():
++  f=line.split(':',2)
++  if len(f)!=3:raise ValueError('malformed cgroup membership')
++  if f[0]=='0':kind='v2';base=controller_path(kind,f[2],mountinfo,cgroup_root);names=('memory.current','memory.peak','memory.events');kind='v2'
++  elif 'memory' in f[1].split(','):kind='v1';base=controller_path(kind,f[2],mountinfo,cgroup_root);names=('memory.usage_in_bytes','memory.max_usage_in_bytes','memory.failcnt','memory.oom_control');kind='v1'
++  else:continue
++  worker_base=controller_path(kind,f[2],None,cgroup_root)
++  try:same_path=base.samefile(worker_base)
++  except OSError:same_path=False
++  rec={'controller':kind,'path':str(base),'frozen_worker_path':str(worker_base),'same_as_frozen_worker_path':same_path,'membership':f[2],'job_scoped':job_scoped(job,f[2]),'values':{}}
++  for n in names:
++   p=base/n
++   if p.is_file():rec['values'][n]=p.read_text()
++  out['records'].append(rec)
++ def required(r):
++  keys=('memory.peak','memory.events') if r['controller']=='v2' else ('memory.max_usage_in_bytes','memory.failcnt','memory.oom_control')
++  return r['job_scoped'] and r['same_as_frozen_worker_path'] and all(k in r['values'] for k in keys)
++ out['required_194_counter_visible']=any(required(r) for r in out['records']);return out
++
++def main():
++ out=collect(os.environ.get('SLURM_JOB_ID',''),Path('/proc/self/cgroup').read_text(),mountinfo=Path('/proc/self/mountinfo').read_text());print(json.dumps(out,indent=2,allow_nan=False));return 0 if out['required_194_counter_visible'] else 2
++if __name__=='__main__':sys.exit(main())
+--- preflight/inner.sh
++++ preflight-r2/inner.sh
+@@ -1,7 +1,7 @@
+ #!/bin/bash
+ set -euo pipefail
+ R=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime
+-P=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight
++P=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2
+ cd "$R"
+ source "$R/scripts/cluster/bridges2.env"
+ set +u
+--- preflight/launch.sh
++++ preflight-r2/launch.sh
+@@ -1,5 +1,6 @@
+ #!/bin/bash
+ set -euo pipefail
+ : "${SLURM_JOB_ID:?actual Bridges CPU allocation required}"
+-P=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight
+-exec python3 "$P/host_probe.py" --output "$1" --manifest-sha256 "$2"
++P=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2
++export PYTHONDONTWRITEBYTECODE=1
++exec python3 -B "$P/host_probe.py" --output "$1" --manifest-sha256 "$2"

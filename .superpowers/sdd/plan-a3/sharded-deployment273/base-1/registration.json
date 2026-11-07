@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "stdout": "recorded job 23631880 on delta (PENDING). Waiter, run in the background:\ntimeout 60m sh -c 'until sacct -j 23631880 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'\n",
+  "stderr": ""
+}

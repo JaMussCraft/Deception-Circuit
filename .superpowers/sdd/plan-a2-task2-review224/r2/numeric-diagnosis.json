@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/sw/external/python/anaconda3/bin/python3.9",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--noconftest",
+    "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task2-review224/r2",
+    "--tb=short",
+    "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task2-review224/r2/numeric-temp",
+    "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task2-review224/r2/numeric-diagnosis.xml",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task2-review224/r2/test_numeric_marker_fixture.py"
+  ],
+  "exit_code": 0,
+  "expected": 2,
+  "observed": 2,
+  "only_runtime_fixture_change": "actual_job_id=456",
+  "no_candidate_edits": true,
+  "no_native_model_or_scheduler": true
+}

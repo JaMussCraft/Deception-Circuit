@@ -1,0 +1,26 @@
+test_reaped_normal_exit_at_or_after_limit_fails (test_deadline.SupervisorTests.test_reaped_normal_exit_at_or_after_limit_fails) ... 
+  test_reaped_normal_exit_at_or_after_limit_fails (test_deadline.SupervisorTests.test_reaped_normal_exit_at_or_after_limit_fails) (scenario='at_limit') ... FAIL
+  test_reaped_normal_exit_at_or_after_limit_fails (test_deadline.SupervisorTests.test_reaped_normal_exit_at_or_after_limit_fails) (scenario='after_limit') ... FAIL
+
+======================================================================
+FAIL: test_reaped_normal_exit_at_or_after_limit_fails (test_deadline.SupervisorTests.test_reaped_normal_exit_at_or_after_limit_fails) (scenario='at_limit')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-candidate-base-cpu-r4/test_deadline.py", line 36, in test_reaped_normal_exit_at_or_after_limit_fails
+    calls,complete,failed=self.execute(scenario);self.assertFalse(complete);self.assertTrue(failed)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_reaped_normal_exit_at_or_after_limit_fails (test_deadline.SupervisorTests.test_reaped_normal_exit_at_or_after_limit_fails) (scenario='after_limit')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-candidate-base-cpu-r4/test_deadline.py", line 36, in test_reaped_normal_exit_at_or_after_limit_fails
+    calls,complete,failed=self.execute(scenario);self.assertFalse(complete);self.assertTrue(failed)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 1 test in 0.071s
+
+FAILED (failures=2)

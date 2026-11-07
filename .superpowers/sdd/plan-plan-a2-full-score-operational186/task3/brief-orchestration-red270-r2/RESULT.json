@@ -1,0 +1,211 @@
+{
+  "kind": "BRIEF_PURE_ORCHESTRATION_BASELINE_ONLY",
+  "host": "dt-login04.delta.ncsa.illinois.edu",
+  "actual_job_id": null,
+  "cluster": "local brief-check allowance; not Slurm evidence",
+  "selected_nodes": [
+    "test_full_score_release.py::test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2",
+    "test_full_score_release.py::test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain",
+    "test_full_score_release.py::test_existing_composite_schema_passes_actual_Task1_consumer",
+    "test_full_score_release.py::test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration",
+    "test_full_score_release.py::test_actual_generated_remote_program_publishes_full_only_reviewed_resources",
+    "test_full_score_usage.py::test_ordinary80_cannot_be_bypassed_by_old_exception",
+    "test_full_score_cache.py::test_metadata_hashed_every_weight_sized_and_blob_bound_no_full_rehash"
+  ],
+  "results": [
+    {
+      "environment": "base",
+      "python": "/sw/external/python/anaconda3/bin/python3.9",
+      "actual_identity": {
+        "python": "3.9.18 (main, Sep 11 2023, 13:41:44) \n[GCC 11.2.0]",
+        "pytest": "8.3.3",
+        "pytest_origin": "/u/swong2/.local/lib/python3.9/site-packages/pytest/__init__.py"
+      },
+      "argv": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-B",
+        "-m",
+        "pytest",
+        "-c",
+        "/dev/null",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/brief-orchestration-red270-r2/base-tmp",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/brief-orchestration-red270-r2/base.xml",
+        "-q",
+        "--tb=short",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_existing_composite_schema_passes_actual_Task1_consumer",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_actual_generated_remote_program_publishes_full_only_reviewed_resources",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_usage.py::test_ordinary80_cannot_be_bypassed_by_old_exception",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_cache.py::test_metadata_hashed_every_weight_sized_and_blob_bound_no_full_rehash"
+      ],
+      "exit_code": 1,
+      "seconds": 2.0804748790105805,
+      "cases": [
+        {
+          "name": "test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2",
+          "outcome": "failed",
+          "message": "task3_helper.Rejected: unknown phase"
+        },
+        {
+          "name": "test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain",
+          "outcome": "failed",
+          "message": "task3_helper.Rejected: CPU immutable bindings"
+        },
+        {
+          "name": "test_existing_composite_schema_passes_actual_Task1_consumer",
+          "outcome": "passed",
+          "message": null
+        },
+        {
+          "name": "test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration",
+          "outcome": "failed",
+          "message": "task3_helper.Rejected: owned exact60min1GPUh charge"
+        },
+        {
+          "name": "test_actual_generated_remote_program_publishes_full_only_reviewed_resources",
+          "outcome": "failed",
+          "message": "AssertionError"
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[active-80]",
+          "outcome": "failed",
+          "message": "Failed: DID NOT RAISE (<class 'task3_helper.Rejected'>, <class 'ValueError'>, <class 'AssertionError'>)"
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[active-80.001]",
+          "outcome": "failed",
+          "message": "Failed: DID NOT RAISE (<class 'task3_helper.Rejected'>, <class 'ValueError'>, <class 'AssertionError'>)"
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[active-95]",
+          "outcome": "failed",
+          "message": "Failed: DID NOT RAISE (<class 'task3_helper.Rejected'>, <class 'ValueError'>, <class 'AssertionError'>)"
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[expired-80]",
+          "outcome": "passed",
+          "message": null
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[expired-80.001]",
+          "outcome": "passed",
+          "message": null
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[expired-95]",
+          "outcome": "passed",
+          "message": null
+        },
+        {
+          "name": "test_metadata_hashed_every_weight_sized_and_blob_bound_no_full_rehash",
+          "outcome": "passed",
+          "message": null
+        }
+      ],
+      "junit_sha256": "2db4b09c95c2151bd3fad7374bde5676d358ebbf6acd3ab7ddff3c61ea8e5038"
+    },
+    {
+      "environment": "mgnp",
+      "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "actual_identity": {
+        "python": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]",
+        "pytest": "9.1.1",
+        "pytest_origin": "/u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/pytest/__init__.py"
+      },
+      "argv": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-c",
+        "/dev/null",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/brief-orchestration-red270-r2/mgnp-tmp",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/brief-orchestration-red270-r2/mgnp.xml",
+        "-q",
+        "--tb=short",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_existing_composite_schema_passes_actual_Task1_consumer",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_release.py::test_actual_generated_remote_program_publishes_full_only_reviewed_resources",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_usage.py::test_ordinary80_cannot_be_bypassed_by_old_exception",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/red259/tests/test_full_score_cache.py::test_metadata_hashed_every_weight_sized_and_blob_bound_no_full_rehash"
+      ],
+      "exit_code": 1,
+      "seconds": 2.1363052160013467,
+      "cases": [
+        {
+          "name": "test_request_generated_from_actual_Task1_WAITING_accepted_by_actual_Task2",
+          "outcome": "failed",
+          "message": "task3_helper.Rejected: unknown phase"
+        },
+        {
+          "name": "test_actual_Task2_COMPLETE_is_read_only_and_valid_full_domain",
+          "outcome": "failed",
+          "message": "task3_helper.Rejected: CPU immutable bindings"
+        },
+        {
+          "name": "test_existing_composite_schema_passes_actual_Task1_consumer",
+          "outcome": "passed",
+          "message": null
+        },
+        {
+          "name": "test_budget_retains_cancelled_charge_and_accepts_reviewed_two_hour_duration",
+          "outcome": "failed",
+          "message": "task3_helper.Rejected: owned exact60min1GPUh charge"
+        },
+        {
+          "name": "test_actual_generated_remote_program_publishes_full_only_reviewed_resources",
+          "outcome": "failed",
+          "message": "AssertionError"
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[active-80]",
+          "outcome": "failed",
+          "message": "Failed: DID NOT RAISE any of (Rejected, ValueError, AssertionError)"
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[active-80.001]",
+          "outcome": "failed",
+          "message": "Failed: DID NOT RAISE any of (Rejected, ValueError, AssertionError)"
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[active-95]",
+          "outcome": "failed",
+          "message": "Failed: DID NOT RAISE any of (Rejected, ValueError, AssertionError)"
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[expired-80]",
+          "outcome": "passed",
+          "message": null
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[expired-80.001]",
+          "outcome": "passed",
+          "message": null
+        },
+        {
+          "name": "test_ordinary80_cannot_be_bypassed_by_old_exception[expired-95]",
+          "outcome": "passed",
+          "message": null
+        },
+        {
+          "name": "test_metadata_hashed_every_weight_sized_and_blob_bound_no_full_rehash",
+          "outcome": "passed",
+          "message": null
+        }
+      ],
+      "junit_sha256": "569dff141854249c28a11da05b298ebbdf4b53795878f6bb303fcc59eb77f532"
+    }
+  ],
+  "full_RED_job_still_required": "23625160",
+  "full_Task3_or_native_or_GPU_acceptance": false
+}

@@ -1,0 +1,93 @@
+import pathlib,json,hashlib,shutil,datetime
+w=pathlib.Path('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder');p=w/'.superpowers/sdd/plan-a3/source-guard-cost-fix-plan';c=w/'.superpowers/sdd/plan-a3/source-guard-cost-fix-source';b=w/'outputs/_analyses/specificity-ladder/a3-edge-runtime-87fceb28b3b4/runtime';p.mkdir(parents=True,exist_ok=True);(p/'evidence').mkdir(exist_ok=True)
+snapshot_path=b.parent/'snapshot.json';snapshot=json.loads(snapshot_path.read_text());different=[name for name,sha in snapshot['source_sha256'].items() if hashlib.sha256((c/name).read_bytes()).hexdigest()!=sha];assert not different,different
+check=dict(kind='diagnosis_only_source_check',baseline_commit=snapshot['source_commit'],candidate_root=str(c),expected_files=len(snapshot['source_sha256']),observed_files=len(snapshot['source_sha256']),different_files=different,checked_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),source_edits=False)
+(p/'evidence/source-unchanged.json').write_text(json.dumps(check,indent=2)+'\n')
+old=w/'outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/root-mask-m1';edge=w/'outputs/_analyses/specificity-ladder/a3-edge-pilots-87fceb28b3b4/evidence'
+for source in [old/'source-guard-cpu-timing.json',old/'source-guard-cpu-profile.json',old/'source-guard-profile.txt',edge/'first-validate-prepared-timing.json',edge/'receiver-groups.json']:
+ shutil.copy2(source,p/'evidence'/source.name)
+(p/'scope.md').write_text('''# Accepted scope for the proposed source-refresh repair
+
+Diagnosis and concrete plan only until root acceptance. Candidate source is an ordinary isolated copy of the frozen edge successor. Proposed ownership is the mask and edge pipelines and their corresponding tests, plus one named shared source-validation helper and its test if needed.
+
+Preserve complete scientific coverage, all source/ancestry bytes and lexical symlink ancestors, actual current protected sets and graders, source/data/in-memory boundaries, and existing ledger/reservation/budget/lease checks. No original A1 dependency, direction runtime/workload, scientific parameter or public execution authority changes. No source edits, git, research-session state, scheduler, GPU, large weights, paid API, notebooks or subagents during planning. Existing artifacts and the held mask reservation are immutable. Root may freeze a fresh exact candidate after focused tests; genuine fresh preparation and real-input benchmarks precede final review. User involvement is reserved for any eventual explicit source/reservation or cap exception after a concrete tested repair.
+''')
+plan=f'''# Authenticated source refresh repair implementation plan
+
+> **Execution:** Await root acceptance and independent plan review. Then use the executing-plans workflow inline, task by task. No subagents or worker git commands. This instruction overrides the planning skill's default execution choices.
+
+**Goal:** Remove repeated semantic reconstruction of unchanged authenticated mask/edge source while retaining every fresh byte, protected-set, grader and execution-authority obligation.
+
+**Architecture:** Mint one private process-local source state only after the original full semantic validator succeeds with stable before/after dependency witnesses. Retain sealed JSON source views and compact authenticated candidate-ID contexts; ordinary refreshes check fresh dependency bytes/lexical links and invoke the actual current registry and grader validators. Execution authority remains in the existing authority functions, called at the same boundaries.
+
+**Tech stack:** Existing Python/pytest, JSON artifacts and read-only authority byte-witness patterns; support both project interpreters.
+
+**Spec:** `{p}/scope.md` and the root task brief. Candidate root: `{c}`. Baseline commit: `87fceb28b3b46f4a406c0280db785697a0bbd3fc`.
+
+## Global constraints
+
+- No implementation until root accepts this plan; no edits to frozen source, existing artifacts, original A1 dependencies, direction runtime/workload, scientific parameters or public execution authority.
+- Preserve all existing model/lease/ledger/reservation/cap checks and every guard call site. No caller boolean, serialized source cache, stat-only freshness, TTL or timing/phase-charge redesign.
+- Fresh source bytes still require fresh reads/hashes. A hit performs no whole-source JSON parsing/serialization, semantic row scans, source deepcopy, parent reconstruction, H-bank reconstruction or graph rebuilding.
+- Current unrelated protected/grader-registry updates may pass fresh validation. Added source overlaps, stale graders, malformed sets or untrusted path redirects fail.
+- Original held mask reservation/source mapping remains unchanged; a tested repair supplies no automatic permission to resume that job or replace its source.
+
+## Diagnosis and review focus
+
+The mask profile attributes 20.287 seconds to deepcopy and 8.072 seconds to JSON encoding, with repeated parent/artifact loads. `a3_design.validate_access` deep-copies rich source rows, but `common.check_registry` consumes only expanded instance IDs. The edge path additionally reconstructs ancestral banks, copies an extended design and rebuilds graphs. The actual edge validator took 36.626855 seconds. These are measured source-only costs, not GPU forecasts. Raw evidence: `{p}/evidence/source-guard-profile.txt`, `{p}/evidence/source-guard-cpu-profile.json`, `{p}/evidence/first-validate-prepared-timing.json`.
+
+Review must concentrate on these cases, each pinned below: complete nested donor/H-bank ID coverage; mutable registry contents with immutable path provenance; source/dependency changes under identical sizes or symlink targets; mutation and empty-container/reinitialization routes; and intentional consumer copies that must remain independently mutable.
+
+## Files and private interfaces
+
+- Modify only `component_analysis/a3_mask_pipeline.py`, `component_analysis/a3_edge_pipeline.py` and their corresponding test files under the candidate root.
+- Create only `component_analysis/a3_source_validation.py` and `tests/test_a3_source_validation.py` as the shared helper/test. Both owner code-hash closures must explicitly include the helper. Do not touch the original shared validators or authority modules.
+- Shared helper exposes private source-view freezing/thawing, exact access-ID-context compilation, and a sealed PID-bound `_SourceState`. Its `refresh(*, bound_inputs, registry_paths) -> dict` checks source bindings/witnesses and returns a NEW small evidence dict with current registry/grader results. `stats()` reports initialization/retained-memory/refresh counters; none of these fields grants authority.
+- Owner factories `_make_mask_source_state(prepared, args)` and `_make_edge_source_state(prepared, design, args)` perform the complete original source validation before minting state. Owners retain authority-specific reservation logic. State is one command/process, not a module-global cache.
+- Mask `_live_mask` retains its return contract `(execution_design, evidence)`. Edge `validate_prepared` remains the complete slow public validator; the execution guard uses owner-minted state. Source-only calls lacking real artifact paths retain strict slow behavior, not an unbound fast proof.
+
+## Task A: source views, file witnesses and current-protection contexts
+
+- [ ] Write failing tests that ordinary nested mutation, slice assignment/deletion, update/clear/append/extend/in-place operators, attribute changes and reinitialization all fail, including initially empty dictionaries/lists. `deepcopy(view)` must produce a completely independent ordinary mutable tree; mutating any descendant of that copy cannot reach the proof. Shallow copies may share only sealed descendants.
+- [ ] Implement JSON-compatible sealed dict/list source views. Do not directly reuse the inventory classes: their deepcopy returns self, which would break edge `source_pair` map updates, `_utility_batch` enrichment and mask timing task copies. Bind original top-level argument values by identity as well, so replacement/deletion through an original outer dict fails on refresh.
+- [ ] Compile exact per-task ID sets from authenticated source once: all access rows, declared donor IDs, every original IOI/MMLU utility list and nested donor/source reference, validation utilities, and the exact owner H-bank extension. Compare candidate sets against BOTH the original `validate_access` expansion and mask `_protect_bank_sources`/edge extended-access expansion in tests. Use the existing `_utility_identity` extraction once; do not reinterpret its recognized identifier fields.
+- [ ] On EVERY hit call actual `common.check_registry` on those immutable compact contexts, preserving its primary, branch/default and explicit registry discovery, schema/count/hash/escape checks and file-backed protected IDs. Call actual `ladder.grader_registry` each time, covering current grader files/glob membership and both direction-registry variants. A nonoverlapping update passes with its fresh returned hashes; a new overlap or changed grader fails. One union access check covers base plus H-bank obligations, preserving their evidence keys.
+- [ ] Reuse `_FileWitness`/`_DependencyForest` read-only for fresh static byte checks, deduplicating identical lexical dependency roots. Preserve every original lexical alias and symlink ancestor; do not normalize away the evidence path. For mutable registry files retain structural lexical/link provenance separately from content, so ordinary valid content/atomic-file updates can revalidate while ancestor/leaf-link redirects fail. Track missing optional New30 JSON paths as absence dependencies; appearance invalidates the old state.
+
+### Complete dependency closure
+
+Before and after full initialization, bind the exact canonical and prepared artifact envelopes (including completion markers and directory membership), original A1 prepared/selected files and mandatory completion sidecar, and root execution bundle. Include all original A1 source/selection hashes with lexical paths resolved from the declared A1 repository root, original A1 code/grader dependencies, canonical direction and owner runtime source closures, helper source, rulings, historical CSV, matched build manifest, and both MMLU manifests' permitted snapshot/blob parquet dependencies. Mask additionally binds original New30 receipt/linked JSONs or their missing sentinels, the interpreter and explicit wrapper-launcher lexical paths. Preserve dynamic source-glob membership, not only already listed files.
+
+The closure follows every file actually consumed by the original full live validators and their manifest references. Matched materialized output datasets are not scanned by the current per-access guards: running source comes from authenticated canonical bytes; their source inputs and build manifest are covered. Audit the closure against a recorded initialization file-read/hash trace so no consumed dependency is omitted. Do not witness unrelated study directories, checkpoints or weight trees. Mutable protected-set/direction registry contents and their current set-file references are deliberately reread by the existing validators rather than fixed to an initialization hash.
+
+A proof is minted only if before/after static witnesses agree across full validation; otherwise fail and discard it. Changed static bytes/markers/membership/aliases fail, rather than silently refreshing the proof. A restart/fork, different objects/owner/scope/registry arguments, replaced source-state attribute or fabricated dictionary cannot inherit the proof.
+
+## Task B: mask used-path integration
+
+- [ ] Red regression: initialize a real-path fixture, then call `_live_mask` repeatedly. Spy only heavy semantic operations and prove they currently repeat. After the fix, their counters stop after initialization while byte witnesses, real registry/grader checks and `mask_reservation` still run each time.
+- [ ] Keep the original early protocol/kind/injection checks and full source validator as the initializer. Seal prepared source before downstream identity/inventory consumers retain aliases; return the sealed execution-design view and a fresh evidence dictionary. Inventory equivalence validation retains its original first-authority-boundary semantics; reservation and actual lease/budget checks remain untouched.
+- [ ] Preserve `execution_design` and timing subset semantics: authenticated views stay sealed, explicit timing/task deepcopies thaw independently, and tensor/chunk/measurement objects remain normally mutable. Scientific H-bank rows loaded once in the assessment path are sealed after their existing domain/hash checks before model use; do not retain the entire A1 parent solely for the cache.
+- [ ] Compare first/repeated return values to the original path: exact candidate/width/protocol/bank domains, source chunks, utility tokens, physical masks/readouts and current protection evidence. Existing injected test-only bank-proof mutation remains test-only; it cannot create a production source state.
+
+## Task C: edge used-path integration
+
+- [ ] Red regression: construct `execution_guard`, call it repeatedly and assert that full `validate_prepared`/graph/ancestral-bank semantic work currently repeats; after repair it runs only for initialization, with fresh witness/protection/authority calls still occurring at each original boundary.
+- [ ] Mint/seal source state before `_stage_identity` and workload construction in `main`, so those consumers cannot retain unsealed source aliases. Direct `execution_guard` construction performs equivalent initialization if no bound owner state exists; a caller-provided state cannot skip validation.
+- [ ] Keep `validate_prepared` unchanged as the independent full validator. Its results justify static semantic reuse only while all source witnesses/bindings remain current. Keep `normalize_ledger`, `make_authority_context`, `validate_reservation`, storage/lease deadlines and current subphase caps exactly in the execution guard.
+- [ ] Positive tests exercise actual `source_pair`/neutral map updates, `_utility_batch`, graph equality and H-bank rows with sealed inputs; mutable copies must work without aliases back into canonical source. Fixture runtime outputs match the legacy path.
+
+## Task D: counterexamples, focused checks and genuine performance evidence
+
+- [ ] Reject changed canonical/parent/selection/sidecar bytes; changed root-bundle or prepared completion markers; changed source/helper/ruling/CSV/parquet/New30 JSON; missing/extra artifact children; changed source-glob membership; same-size byte edits with restored mtime; and retargeted leaf/ancestor links even when target contents match. All tests mutate temporary fixtures only.
+- [ ] Reject altered original outer bindings, frozen nested data, candidates/widths/protocol/maps/graphs, reinitialized/empty containers, foreign PID/process or owner, serialized/forged source cache and changed argument scope. Separately prove valid unrelated registry updates pass, file-backed protected-set overlap and stale graders fail, and ledger/cap/reservation/lease failures still propagate through repeated cached-source refreshes.
+- [ ] Run helper + affected mask/edge pipeline tests with both project interpreters, threads pinned, no bytecode/pytest cache, dedicated basetemps. Use meaningful red/green evidence and call-count assertions, not flaky unit timing thresholds. No broad unrelated suite and no subagents.
+- [ ] Stop for root source freeze after focused tests. Root creates a new exact candidate commit/bundle; then use its actual wrappers/owning APIs to prepare NEW canonical/mask/edge settings, prepared artifacts and complete inventories in fresh output namespaces. Preserve science/assessment/utility/source digests and original parents. Never patch old hashes or re-sign earlier lineage; mask interpreter-bound source preparation must match the measured interpreter.
+- [ ] Benchmark the genuine new-path source states on real prepared inputs, serially: one measured initialization, repeated unchanged refreshes, compact current-registry checks, byte volumes/roots, wall and user/system CPU, retained unique object bytes, peak RSS and initialization transient peak. Record strict positive equivalence and real-input byte/registry invalidation using separate temporary input copies; keep the actual original/frozen inputs unchanged. mgnp is the primary used-path measurement; run base against separately genuine interpreter-matched preparation rather than reusing mgnp mask closure hashes.
+- [ ] Preserve the existing startup/guard/host-peak measurement accounting: initialization and source-state retention are not free and must be visible in the current measurement mechanism. No phase reclassification, denominator changes or new authority from benchmark results. Root independently reviews closure, negatives and measured total used-path viability; if remaining mandatory byte IO/native work cannot fit the cap, report that fact and keep model work held.
+
+## Acceptance and handoff
+
+Root acceptance authorizes implementation choices inside this ownership only. No implementation, new preparation, budget exception or model admission is performed by this planning pass. Initial source equality is recorded in `{p}/evidence/source-unchanged.json`. After a tested fix and genuine new-source measurement, root handles any explicit source/reservation or cap exception; the held old reservation cannot silently change or refund.
+'''
+(p/'repair-plan.md').write_text(plan)
+print(p/'repair-plan.md')

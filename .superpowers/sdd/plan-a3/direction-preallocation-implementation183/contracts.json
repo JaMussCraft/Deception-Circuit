@@ -1,0 +1,104 @@
+{
+  "status": "IMPLEMENTATION_PLAN_ONLY_AWAIT_ROOT_REVIEW",
+  "design_manifest": "397b788d18816b19f700ce1373c12c9cc8c34be9e09d9d8d0a3018ecab5c437e",
+  "review_manifest": "98c182c772a8f82c027681348472ecc921f2046268c9d9f9935f0d00abb85b5e",
+  "candidate": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183",
+  "copy_from": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate",
+  "execution_method": "Root-orchestrated subagent execution, sequential task ownership, test-first and independent review; no worker git/RS/scheduler/remote/source publication.",
+  "models": {
+    "Sol": "All semantic/authority/codec/alias/guard/resource validation implementation and independent review",
+    "Terra": "Only explicitly bounded mechanical manifest/hash/diff/AST/syntax packaging after semantic source is frozen; no design or acceptance rulings"
+  },
+  "production_file": "component_analysis/a3_direction_runtime.py",
+  "new_test_file": "tests/test_a3_prepared_pilot_target.py",
+  "native_adapter": "tests/a3_direction_native_scenario.py",
+  "unchanged_optionA_files": {
+    "component_analysis/a3_direction_workload.py": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+    "tests/test_a3_direction_workload.py": "846427fc2f4aa048f652d18c48715eda7eedcac3f4422adbded6be6c781a46dc"
+  },
+  "unchanged_critical_interfaces": [
+    "workload.build_inventory and derive_storage_requirements algorithms as accepted765",
+    "workload.digest/_source_rows/_validate_inventory",
+    "publish_object/read_object/object_reference generic contracts",
+    "_AuthorityContext minting and all original source/protection/ledger/budget/allocation/lease checks",
+    "_FileWitness/_DependencyForest numeric refresh behavior"
+  ],
+  "interfaces": {
+    "_publish_prepared_target_object(path, payload) -> dict": "CPU-only exact-format atomic writer using common.publish and artifacts._finish; returns reference/emitted_payload_sha256/emitted_payload_bytes. Hash bytes as emitted from validated value; verify final reference against that hash/count. No new encoding.",
+    "_prepared_namespace_identity(work_dir, target_root, preparation_root, allowed_aliases) -> tuple": "Check exact normalized lexical roots, expected resolved paths and ordered literal aliases; capture scoped ordinary-directory device/inode/type without mutable ancestor mtime. Roots/leaves ordinary. Entry-local only.",
+    "_read_prepared_target_object(target_reference, preparation_reference, namespace_policy) -> tuple": "Returns (frozen_value, entry_references, namespace_identity, phase_witness, observed_io). Exact marker/child/type/hash/nonfinite contract, same-buffer target hash/parse, one freeze and separate entry witness; no execution authority.",
+    "prepare_pilot_target(args, design, protocol, *, selected=None) -> dict": "Existing prepare action pilot-target; read completed original pilot inventory via args.inventory, validate it unchanged, build exact full target, independently validate on CPU, publish target+descriptor after fresh guards. Returns preparation object reference; no model argument.",
+    "_validate_prepared_receiver_resources(record, *, references, source_identity, environment, actual_host_capacity, existing_host_obligations) -> dict": "Root-anchored exact artifact/reader/freeze/environment/recipe validation; return separate retained/extra-transient resource charges and reject insufficient actual capacity before reading/loading. No unmeasured sharing subtraction or tier reduction.",
+    "load_prepared_pilot_target(args, design, protocol, pilot_inventory, *, selected=None) -> _PreparedPilotTarget": "Production derives all expected refs and resource record from freshly validated root pilot admission/context, not caller booleans. Reads the data, seals one PID-local graph and binds exact source/part/workdir/pilot/admission/reservation references. CPU measurement uses only the lower data reader and never mints model authority.",
+    "_PreparedPilotTarget.assert_scope(args, design, protocol, pilot_inventory) -> None": "Reject wrong PID/seal/context/part/namespace/ref or graph replacement; data handle cannot grant execution or be serialized/reinitialized.",
+    "_PreparedPilotTarget.final_publication_barrier(reconciliation, receipt) -> None": "After union+before_publication: exact entry-bound namespace/full witness; original fresh live guard/effective deadline; cheap unchanged identity/alias seal; final deadline. No adopt-current path.",
+    "run_pilot(..., prepared_target=None)": "Production requires loader-minted handle and performs no target rebuild/publication/readback. Explicit injected reference path remains for differential fixtures only; fresh native aggregate must use prepared path."
+  },
+  "root_admission_extension": {
+    "existing_kind": "a3_root_pilot_admission_v1",
+    "field": "pilot_target_preparation",
+    "keys": [
+      "part",
+      "pilot_inventory_sha256",
+      "target_reference",
+      "preparation_reference",
+      "receiver_resources_reference",
+      "namespace_policy"
+    ],
+    "rule": "Whole admission body/hash remains anchored by existing original mapping. Descriptor/resource references alone never authorize a model. No new admission kind."
+  },
+  "canonical_paths": {
+    "target": "work_dir/pilot-target-inventory/part",
+    "descriptor": "work_dir/pilot-target-preparation/part"
+  },
+  "descriptor_required_fields": [
+    "kind=a3_pilot_target_preparation_v1",
+    "part,target_stage,injected",
+    "source_identity and exact design/protocol references",
+    "pilot inventory identity/reference",
+    "target_reference and emitted payload SHA/byte count",
+    "canonical inventory SHA and complete unchanged summary/bounds",
+    "planned geometry/numeric/width/tile/finish fields",
+    "selected full backing reference only for selected",
+    "actual normal CPU provenance/source before-after references",
+    "model_loaded=false,execution_authorized=false"
+  ],
+  "receiver_resources_required_fields": [
+    "kind=a3_prepared_target_receiver_resources_v1",
+    "exact target/preparation references and source/reader/freeze code hashes",
+    "actual software environment and declared deployment/storage family",
+    "read/hash/parse/freeze recipe and observed counts",
+    "retained_metadata_bytes_bound,extra_transient_bytes_bound",
+    "cold/warm wall/CPU/cgroup peak scope and normal-completion provenance",
+    "model_loaded=false,execution_authorized=false"
+  ],
+  "resource_rule": "Keep original pilot/authority/model/numeric obligations and full original tiers. Add separate retained and extra-transient metadata charges; do not subtract presumed overlap. A fixture existing50+retained20+extra30 needs capacity100 and rejects99. Actual allocation contract must back root capacity. A CPU producer peak is not a receiver bound.",
+  "planned_receiver": {
+    "full_payload_reads": 3,
+    "SHA_passes": 3,
+    "parse_passes": 1,
+    "freeze_passes": 1,
+    "GPU_target_writes": 0,
+    "rule": "Prove actual counts; if higher, report and revise cost/feasibility before acceptance, not hide calls or weaken witnesses."
+  },
+  "final_order": [
+    "_measure_complete_guard_union",
+    "reconciliation.before_publication",
+    "prepared_target.final_publication_barrier: namespace+full witness -> original fresh live/deadline -> cheap identity seal -> deadline",
+    "_publish_measured_pilot_receipt"
+  ],
+  "separate_gates": [
+    "Code completion and independent source review",
+    "Complete BASE same-environment original/candidate equality in existing workflow",
+    "Actual genuine producer and cold/warm reader/RAM/read-count evidence under exact receiver code/bytes/environment",
+    "Root final source publication and fresh source-dependent artifacts",
+    "Fresh source-bound original nine prefit cases plus complete prefit aggregate/reconciliation",
+    "Conservative paired direction M1 total0.5GPUh feasibility and actual host/storage support",
+    "Root-only actual admission/reservation/mapping/GPU allocation and every fresh guard"
+  ],
+  "direction_M1_GPU_hours": 0.5,
+  "direction_M1_seconds": 1800,
+  "automatic_retries": false,
+  "worker_jobs": false,
+  "source_publication": false
+}

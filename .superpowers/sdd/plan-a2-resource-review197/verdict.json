@@ -1,0 +1,66 @@
+{
+  "verdict": "BLOCKED_SUPERVISOR_EFFECTIVE_DEADLINE_CONTRACT",
+  "packet_manifest_sha256": "6c6bed2a3738846f008daa42454eac104ba4bfc43f3765aa41da9c47ac584f70",
+  "manifest_members_verified": 26,
+  "approved_plan_sha256": "08c335d65acdd61b59317d410c9c6ea9d7509115af86e23aecc80edec997456a",
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "genuine_proof_executed": false,
+  "blockers": [
+    {
+      "id": "B1",
+      "site": "supervisor.normal_child / child-execution timely",
+      "defect": "finished<=deadline accepts exact-deadline normalzero child, violating existing strict at/after-bound rejection.",
+      "actual_pure_probe": {
+        "finished_99_deadline_100": "accept",
+        "finished_100_deadline_100": "accept (must reject)",
+        "finished_101_deadline_100": "reject"
+      },
+      "required": "Strict observed finished<effective deadline; update diagnostic timely and attributable before/at/after boundary tests."
+    },
+    {
+      "id": "B2",
+      "site": "supervisor.main post-reap allocation-after",
+      "defect": "After reaping child, fresh allocation-after is read but deadline is not reclamped from its current EndTime before normal_child. The >=90 post-check and >=30 final check do not enforce the original child currentEnd-120 reserve.",
+      "counterexample_seconds": {
+        "initial_deadline": 2400,
+        "child_observed_finished": 2390,
+        "shortened_current_End": 2500,
+        "effective_current_child_deadline": 2380,
+        "remaining_after_child": 110,
+        "postcheck_minimum": 90
+      },
+      "required": "Reclamp to min(existing deadline,fresh allocation currentEnd mapped to monotonic time minus original120 reserve) after reaping, then reject untimely zeroexit before proof promotion; add test on actual supervisor path with shortening between final poll/reap and allocation-after."
+    }
+  ],
+  "no_other_static_blocker_identified": true,
+  "reviewed_semantics": [
+    "Exact fixed native supported/nonchoice/choice/unsupported/nullable/degenerate/h_mean/alias metadata shapes with literal unknown metric slots; original field/function/code pins.",
+    "Sender inventory includes embedding, every head and MLP in native order; full expected row/control keys and support-reason digests match accepted187 targets.",
+    "Bounded finite scalar representations use actual metadata for unrelated IDs/counts, not vocabulary ceilings; future operational job/cluster/peak labels have explicit limited domains. Native unknown slots remain nonnumeric/no valid/control result claims.",
+    "Incremental host recipe separately charges context, no-sharing graph, validation structures, raw-return overlap, old/new parent buffers and bank storage, native encoder chunks/string/UTF8, actual prior RSS plus declared allocator allowance. Both analytic24GiB and job-scoped actual peak/OOM checks must pass; no prefix RAM subtraction.",
+    "Native hash/write probes retain complete synthetic graph/validation; source event table distinguishes diagnostic3 stress hashes from2 production fullpayload hashes+1 final writer. Full10188/prefix432 raw provenance pairs execute two original uncached hashes per pair, no extrapolated completion.",
+    "Actual Delta allocation, job/UID/node/WorkDir/TRES/noGPU/current min-end checks, source511+4/input422/alias/G3/bank/catalogue snapshots and original owning guards before/after. No model/score/calibrate/capture/effect calls in worker.",
+    "Private synthetic artifact kind/file outside MAIN, no _publish_stage or native score completion manifest; child incompleteFalse plus labels remain data until bounded supervisor promotes proof-only record."
+  ],
+  "tests": {
+    "base_observed": 14,
+    "base_expected": 14,
+    "mgnp_observed": 14,
+    "mgnp_expected": 14,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "schema_RED_mutations": 2,
+    "supervisor_RED_rejections": 3,
+    "errors_in_recorded_RED": 0,
+    "limitations": "Current tests miss exact deadline and post-reap EndTime change; no genuine proof or serialization/hash loop ran during review."
+  },
+  "remaining_after_fix": [
+    "Publish distinct immutable successor and attributable strict-boundary/currentEnd-shortening tests; preserve194.",
+    "Independent scoped re-review before one deliberate Delta genuine CPU proof using unchanged4CPU48GiB45min/2400-child envelope; no resource increase or relaxed timeout to fit code.",
+    "Genuine normal result, actual host/JSON/serialization/full-uncached timing observations, source/protection and cgroup checks remain required; platform effects and future operational labels need root binding.",
+    "Separate Bridges adapter review must report actual Bridges allocation/container/cgroup provenance, never fake Delta facts or relax194.",
+    "No GPU/resource/model/full-score authority from implementation or CPU schema artifacts."
+  ]
+}

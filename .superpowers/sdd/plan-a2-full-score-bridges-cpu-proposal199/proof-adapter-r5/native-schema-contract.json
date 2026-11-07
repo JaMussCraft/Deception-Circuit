@@ -1,0 +1,134 @@
+{
+  "alias_fields": [
+    "group_source",
+    "a2_group_sha256",
+    "a2_receipt_sha256",
+    "training_seed",
+    "compute_alias"
+  ],
+  "control_fields": [
+    "task",
+    "instance_id",
+    "stream",
+    "max_abs_logit_error",
+    "valid",
+    "donor_choice_differs",
+    "donor_provenance",
+    "sender_keys",
+    "mechanism_task",
+    "condition"
+  ],
+  "control_schema": "all actual sender keys and true calibration map bytes; valid/error/donor-choice fields remain explicit unknown-type slot labels, never passed controls",
+  "execution_label_constraints": {
+    "GPU_name": "NVIDIA H100 80GB HBM3",
+    "cluster_max_chars": 64,
+    "device": "cuda:0",
+    "dtype": "torch.bfloat16",
+    "future_GPU_job_id_max_chars": 32,
+    "unknown_GPU_byte_peaks": "25-character quoted integer slot exceeds uint64 decimal width"
+  },
+  "function_AST_sha256": {
+    "a2_pipeline.py": {
+      "_groups_for_compute": "b5a8c84f731da503a907b7bca4210c73b7825b29395ec9284eb8ce362bb212a3",
+      "_manifest": "39ac7c1392ea1d40e1b7f90ebe34d42dc027301e47ac4ad8b33a94d5557e52d1",
+      "_publish_stage": "9fa961e6226697a9f89268fae912449c4660766e04239fe91e4e155792f16dd4",
+      "bank_reference": "488019f11acf466769f15d39c039f391c10afd3d865b6d8fc6e7a05a8061ac78",
+      "score": "a4bcf7256ee0e693a0cbded90ca3e2d409289938747c8c7cfd06fccb32725dc9",
+      "validate_a2_scope": "88b23ea361d32632d24711800684efbd453a854bf75876f6d38ae81a4f762e26"
+    },
+    "hooks.py": {
+      "all_component_keys": "9cf51327e857bf2946de9095b170cb4d7b5e4a8da8f29786f5acc377c3478c93"
+    },
+    "ladder_design.py": {
+      "_hash": "b44760d707f042d7776618294b305e6f9bd6d0411dbabe588edf28f7306e4690"
+    },
+    "ladder_pipeline.py": {
+      "calibrate": "58c6e2590146f61ddf5746bafc1bad295c9097cb12a328868dc12c0d5bc0fc06",
+      "finish_execution": "71cbf1b80d3e3be3e7506c53f29a1062446e29c6b96defdbc3ed0e7050632f96",
+      "positive_keys": "67f11f083bb42cb9b33804b2bf760b3309593f1db5e0f03a56ff8c8ed87718fd",
+      "selection_runtime_identity": "fdcdb55f1c0e1ebc59bddd03b19f510de1a47c84888af185e438c63db774705e",
+      "timed_model_stage": "2fad114143aefb532123a4af52c0c2100a2053c42b2daddfdb7d092937bf5a32",
+      "validate_rows": "1248f3be06db830d59c24fe08f16115747beb3e7822333483828542f84189af8",
+      "write_artifact": "c90bc69a5b732c2c880c7a18d9e944b3567f7dc78f255935bff1d0e1fbbcbe69"
+    },
+    "specificity_ladder.py": {
+      "_pad_calibration_batch": "f28ac996e5d06a08fc7af38605165a851d70e7ec43d0786e7614d559fbf32755",
+      "_rows": "acb93b2de93509b2887ca6113fdf4c9cfc086e7c4c6f8abcd594e586d8c8b469",
+      "_stats": "0e37ddcbedd08596bd6ad963915df3211ec8974fd787ca4ed8f36305e32413e9",
+      "positive_control": "15e1cd03efc12bd5e0840ff077d0ec4a6fa65ab4dda91b82e95b111a383f21a9",
+      "score_cell": "310a03b1f9d8a9afdf65f25e2b679414867cd2c96e074ae0f3ccbe1036486fb3"
+    }
+  },
+  "metric_field_domain": {
+    "argmax_int": "0..vocab_size-1 only; unrelated token IDs/seeds/counts are actual known metadata, never a generic vocabulary assumption",
+    "bool": "quoted UNKNOWN_BOOLEAN_SLOT exceeds true/false bytes",
+    "float": "maximum24-character finite Python JSON representation; quoted UNKNOWN_FINITE_FLOAT_SLOT is longer"
+  },
+  "representation_warning": "Synthetic native-hash/writer stress artifact has an explicitly synthetic kind and nonnumeric metric slots, no native completion manifest, no validity/outcome claims. Analytic ceilings separately bound finite real metric representation; future operational labels must fit declared limits.",
+  "row_base_fields": [
+    "task",
+    "instance_id",
+    "condition",
+    "stream",
+    "group",
+    "group_members",
+    "operation",
+    "expected_token",
+    "opposite_token",
+    "honest_token",
+    "pressure_id",
+    "source_provenance",
+    "donor_provenance",
+    "donor_seed",
+    "self_replay_margin_error",
+    "assay_valid",
+    "supported",
+    "degenerate",
+    "gate_valid"
+  ],
+  "row_branches": [
+    "supported nonchoice",
+    "supported choice",
+    "unsupported with exact frozen reason and no statistics",
+    "nullable donor map/seed",
+    "mapped degenerate or no-op metadata",
+    "h_mean raw provenance hashes then compact reference",
+    "deep-copied aliased group members"
+  ],
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "status": "EXACT_FROZEN_BRANCH_SCHEMA_NOT_SCIENTIFIC_OUTPUT",
+  "supported_metric_fields": [
+    "margin",
+    "raw_margin",
+    "native_margin",
+    "native_raw_margin",
+    "argmax",
+    "native_argmax",
+    "correct",
+    "binary_win",
+    "choice_margin",
+    "choice_correct"
+  ],
+  "top_payload_fields": [
+    "kind",
+    "receipt_sha256",
+    "bank_artifact_sha256",
+    "rows",
+    "positive_controls",
+    "expected",
+    "pilot",
+    "limit",
+    "injected",
+    "execution_provenance",
+    "counts"
+  ],
+  "transient_classes": [
+    "raw score_cell return list overlaps alias-expanded rows; raw bank provenance references existing context, never deep-copied",
+    "old/new current recipient/donor parent tensors and Python wrappers/records",
+    "old/new task-local fp32 bank tensor storage",
+    "full validation keys/lists/sets",
+    "actual full canonical encoder chunks/list/string/UTF8 overlap",
+    "complete owning context charged incrementally",
+    "existing interpreter/native/Rust/allocator actualRSS plus declared512MiB allowance"
+  ]
+}

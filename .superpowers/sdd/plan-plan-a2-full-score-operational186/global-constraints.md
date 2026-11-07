@@ -1,0 +1,11 @@
+# Binding implementation constraints
+
+
+- Source50e, G3c309 and authentic bank remain immutable. Full expected59652 rows/3396 controls; retain all native unsupported diagnostic rows/reasons/support mask. Actual GPU calls are singleton, retaining parent staging padding8; no eight-way activation inference.
+- Ordinary usage stop80%, native cadence16/current next17%, no expired exception. Ledger max_concurrent_gpu_jobs99 is separate. A1/A2/A3 caps25/60/40,total125 remain exact, all failed/cancelled charges retained. No refund/cap transfer.
+- Genuine proof181 and conservative host/GPU memory/storage/work-ratio/cost review plus actual Bridges placement are prerequisites to resource binding. 4.75h remains a prior provisional proposal, not a default or acceptance. Unbound requested duration, CPU/RAM, capacity, child cap, entry floor and finish reserve cannot execute; chosen values must be mutually feasible and reviewed. Existing proposed finish reserve300s remains provisional pending actual capacity/resource proof; finite release300s is a separate fixed entry-permission limit.
+- Root inventories current ledger readers. A confirmed unstarted reader may be held; a running reader ends naturally. No ledger row/successor transition may race any active reader, including A3. If quiescence is unavailable, defer. Complete native successor and full native normalization precede any reader release or full-score admission; no two-file atomicity assumption.
+- No source/model-loader/geometry injection; no bank, pilot-copy/link creation, summarize/effects, automatic retries, time extension, requeue, release renewal or fallback. Preserve every historical packet/result/partial failure. Any new attempt needs separate root decision; this packet never creates it automatically.
+
+
+Root rulings: source and all historical packets remain immutable. Worker owns only its assigned new candidate files. Root alone runs git, RS, scheduler, transfers and releases. Begin with RED tests/packet; no semantic implementation until root observes attributable RED. No subagents. Current checkpoint17 is dated telemetry; real entry uses fresh native session checkpoint arithmetic, never a hard-coded enduring threshold. Scope is full_score only; resource fields stay null until separately reviewed actual binding.

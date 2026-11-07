@@ -1,0 +1,58 @@
+{
+  "status": "PASS_SCOPED_CORRECTED_ALGORITHM_AND_MGNP_COMPARISON_PACKET",
+  "candidate_hashes": {
+    "component_analysis/a3_direction_workload.py": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+    "tests/test_a3_direction_workload.py": "846427fc2f4aa048f652d18c48715eda7eedcac3f4422adbded6be6c781a46dc"
+  },
+  "baseline_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "source_file_count": 511,
+  "changed_file_count": 2,
+  "modified_functions": [
+    "derive_storage_requirements",
+    "build_inventory"
+  ],
+  "digest_source_rows_validate_inventory_unchanged": true,
+  "runtime_whole_file_unchanged": true,
+  "GREEN_job": "23490357",
+  "GREEN": {
+    "mgnp": {
+      "passed": 158,
+      "pytest_exit": 0,
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu-r3/result-23490357-mgnp.json",
+      "sha256": "a857f07f4506c7dd792f08e37dc331ee0fe6101de6f82009bd1dfc76c36eb114"
+    },
+    "base": {
+      "passed": 158,
+      "pytest_exit": 0,
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu-r3/result-23490357-base.json",
+      "sha256": "6794dfa7e087203bb37d0a3f3eb765d4d3857bea419625364de819435981e424"
+    }
+  },
+  "genuine_packet_manifest_sha256": "21122c2077c367c7ccf9b08f8b865f263b7dcba66bf0480af25e14757973ed4d",
+  "original_mgnp_oracle": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-mgnp-r2-02/COMPLETE_ORACLE.json",
+    "sha256": "1685fca54172ab3de7a8003b8503fdf2a9ac184e684ae1c17a52493fcc7ca991",
+    "complete": true,
+    "full_stream_bytes": 11421127399,
+    "full_stream_sha256": "c738a185b9a79ef8873113e63aefa197a820f0a5c117159db055de6f70e0a6c9"
+  },
+  "candidate_comparison_bindings": {
+    "mode": "candidate",
+    "environment": "mgnp",
+    "candidate_workload": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/component_analysis/a3_direction_workload.py",
+    "candidate_workload_sha256": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+    "complete_original_oracle": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-mgnp-r2-02/COMPLETE_ORACLE.json",
+    "complete_original_oracle_sha256": "1685fca54172ab3de7a8003b8503fdf2a9ac184e684ae1c17a52493fcc7ca991",
+    "output": "fresh absent root-bound directory"
+  },
+  "finding": "No blocking correctness issue after capture-only correction. False temporary record views do not escape capture identity extraction; timing records retain independent deep copies; source/dummy/readout/dedup/digest checks preserved. All metadata bounds and profiles preserve original expressions/content.",
+  "not_established": [
+    "genuine candidate full-stream equality/performance",
+    "base comparison without complete same-environment oracle",
+    "source publication or fresh-source prefit9+aggregate readiness",
+    "model/numerical/GPU admission"
+  ],
+  "author_report_not_read": true,
+  "completed_suites_rerun": false,
+  "no_jobs_git_RS_remote_or_source_edits": true
+}

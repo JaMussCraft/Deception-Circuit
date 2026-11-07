@@ -1,0 +1,51 @@
+{
+  "scope": "NON_NATIVE_STATIC_AND_EXTRACTED_IDENTITY_ARGUMENTS_GUARDS_ONLY",
+  "original": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/suite/test_a3_direction_runtime.py",
+  "draft": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/startup-identity-correction287/tests/test_a3_direction_runtime.py",
+  "original_sha256": "8a314262a2c4fb09c9f6ca883264e072d475affde7a4b927a4379b9c276ec112",
+  "draft_sha256": "760cfe9c9aef14b0ab3a0b41eaba526b2aa64376334be1bea5a710978f9c6f23",
+  "changed_function": "test_completed_index_startup_is_measured_conditionally_and_charged_per_job",
+  "all_other_top_level_asts_equal": true,
+  "original_statement_order_preserved": true,
+  "original_assertions": 17,
+  "draft_assertions": 18,
+  "identity_specimens": [
+    {
+      "environment": {},
+      "independent_expected_job": "injected-cpu",
+      "validator_call_outcomes": [
+        "pass",
+        "reject",
+        "reject",
+        "pass",
+        "pass"
+      ]
+    },
+    {
+      "environment": {
+        "SLURM_JOB_ID": "50319108"
+      },
+      "independent_expected_job": "50319108",
+      "validator_call_outcomes": [
+        "pass",
+        "reject",
+        "reject",
+        "pass",
+        "pass"
+      ]
+    },
+    {
+      "environment": {
+        "SLURM_JOB_ID": ""
+      },
+      "independent_expected_job": "",
+      "validator_call_outcomes": [
+        "pass",
+        "reject",
+        "reject",
+        "pass",
+        "pass"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "command": [
+    "bash",
+    "/tmp/a2-t2-r4-preview-xsvustxs/slurm_script",
+    "--pins-sha256",
+    "ddee7e6df8220e06212c56b4bf79e6e5fa659fb2cfd9e4ead1131c164d5456b4",
+    "--dry-run",
+    "--output",
+    "/tmp/a2-t2-r4-preview-xsvustxs/not-created"
+  ],
+  "exit_code": 0,
+  "dry_run": {
+    "commands": {
+      "red": [
+        [
+          "/sw/external/python/anaconda3/bin/python3.9",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--noconftest",
+          "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests",
+          "--tb=short",
+          "--junitxml=/tmp/a2-t2-r4-preview-xsvustxs/not-created/red-env1.xml",
+          "--basetemp=/tmp/a2-t2-r4-preview-xsvustxs/not-created/tmp-red-env1",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_cpu.py",
+          "-k",
+          "review224"
+        ],
+        [
+          "/u/swong2/.conda/envs/mgnp/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--noconftest",
+          "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests",
+          "--tb=short",
+          "--junitxml=/tmp/a2-t2-r4-preview-xsvustxs/not-created/red-env2.xml",
+          "--basetemp=/tmp/a2-t2-r4-preview-xsvustxs/not-created/tmp-red-env2",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_cpu.py",
+          "-k",
+          "review224"
+        ]
+      ],
+      "green": [
+        [
+          "/sw/external/python/anaconda3/bin/python3.9",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--noconftest",
+          "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests",
+          "--tb=short",
+          "--junitxml=/tmp/a2-t2-r4-preview-xsvustxs/not-created/green-env1.xml",
+          "--basetemp=/tmp/a2-t2-r4-preview-xsvustxs/not-created/tmp-green-env1",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_cpu.py",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_controller.py",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py"
+        ],
+        [
+          "/u/swong2/.conda/envs/mgnp/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "-p",
+          "no:cacheprovider",
+          "--noconftest",
+          "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests",
+          "--tb=short",
+          "--junitxml=/tmp/a2-t2-r4-preview-xsvustxs/not-created/green-env2.xml",
+          "--basetemp=/tmp/a2-t2-r4-preview-xsvustxs/not-created/tmp-green-env2",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_cpu.py",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_controller.py",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py"
+        ]
+      ]
+    },
+    "baseline_CPU": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task2/green/root-dispatch/candidate-before-interface-review/cpu",
+    "corrected_CPU": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/cpu",
+    "red_cases": 22,
+    "red_required_failures": 19,
+    "red_expected_passes": 3,
+    "green_cases": 226,
+    "original_Task2": 107,
+    "review224_added": 22,
+    "accepted_controller": 82,
+    "accepted_entry198": 15,
+    "red_timeout_seconds_per_environment": 30,
+    "green_timeout_seconds_per_environment": 90,
+    "no_native_import": true,
+    "no_model": true,
+    "no_GPU": true
+  },
+  "output_created": false
+}

@@ -1,0 +1,26 @@
+{
+  "observed_unix": 1794006081.5025115,
+  "argv": [
+    "sbatch",
+    "--parsable",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu,cpu-interactive",
+    "--cpus-per-task=1",
+    "--mem=8G",
+    "--time=00:20:00",
+    "--no-requeue",
+    "--export=ALL",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r1/red-slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r1/cpu.sbatch",
+    "--mode",
+    "RED",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-red-r1/red-run-01"
+  ],
+  "exit_code": 0,
+  "stdout": "23616760\n",
+  "stderr": "",
+  "source_pins_sha256": "88763c77ef8eca4cbddae44159502af4b9380cd25f9b6d6827a284b1b9769278",
+  "scope": "CPU test-first fixture validation only; no implementation/model/GPU/source admission; expected T1 55 pass, T2 52 missing-helper fail, T3 30 missing-class fail each environment"
+}

@@ -1,0 +1,185 @@
+"""DRAFT ONLY: promote after Task1 acceptance and authentic case adapter completion.
+
+This file is deliberately outside pytest discovery. `case` below is a TEST-ONLY
+fixture adapter described in fixture-contract.json, not a production provider or
+validation flag. No test here is executed or claimed as RED/GREEN evidence.
+New runtime helpers must be resolved inside test bodies before case construction
+when promoted, keeping missing functionality attributable rather than a setup error.
+"""
+import copy
+import pickle
+import pytest
+
+
+def runtime():
+    from component_analysis import a3_direction_runtime
+    return a3_direction_runtime
+
+
+@pytest.mark.parametrize('part,stage', [('prefit', 'fit-select'), ('selected', 'remaining')])
+def test_prepared_cpu_producer_uses_exact_builder_contract(case, part, stage):
+    r = runtime(); producer = r.prepare_pilot_target
+    c = case(part=part, authentic_selected=(part == 'selected'))
+    preparation_reference = producer(c.args, c.design, c.protocol, selected=c.selected)
+    descriptor = r.read_object(preparation_reference['path'])
+    assert c.builder_calls == [dict(stage=stage, fits=None, selected=c.selected)]
+    assert c.independent_target_validator_calls == 1
+    assert descriptor['target_reference'] == r.object_reference(c.target_path)
+    assert descriptor['model_loaded'] is False and descriptor['execution_authorized'] is False
+    assert descriptor['part'] == part and descriptor['target_stage'] == stage
+    assert c.loader_calls == []
+    assert c.trace.index('producer-pre-guard') < c.trace.index('builder')
+    assert c.trace.index('independent-validator') < c.trace.index('producer-post-guard')
+    assert c.trace.index('producer-post-guard') < c.trace.index('descriptor-complete')
+
+
+@pytest.mark.parametrize('failure', ['partial-target', 'source-change', 'post-guard', 'wrong-summary', 'missing-selected-backing'])
+def test_prepared_cpu_failure_never_certifies(case, failure):
+    r = runtime(); producer = r.prepare_pilot_target
+    c = case(part='selected' if failure == 'missing-selected-backing' else 'prefit')
+    c.inject_failure(failure)
+    with pytest.raises(ValueError): producer(c.args, c.design, c.protocol, selected=c.selected)
+    assert not (c.preparation_path / 'COMPLETE.json').exists()
+    assert c.loader_calls == []
+
+
+@pytest.mark.parametrize('damage', ['caller-flag', 'descriptor-as-reservation', 'resource-as-reservation',
+    'unanchored', 'source', 'part', 'pilot', 'selection', 'work-dir', 'fake-seal'])
+def test_prepared_admission_anchor_is_required(case, damage):
+    r = runtime(); load = r.load_prepared_pilot_target
+    c = case(prepared=True, original_admission=True)
+    c.damage_anchor(damage)  # Mutate files and re-sign data where appropriate; never bypass the root validator.
+    with pytest.raises(ValueError): load(c.args, c.design, c.protocol, c.pilot_inventory, selected=c.selected)
+    assert c.loader_calls == []
+
+
+@pytest.mark.parametrize('damage', ['equal-graph-copy', 'equal-requirement-copy', 'mutation',
+    'wrong-pid', 'wrong-context', 'wrong-part', 'reinitialize'])
+def test_prepared_handle_is_one_graph(case, damage):
+    r = runtime(); load = r.load_prepared_pilot_target
+    c = case(prepared=True, original_admission=True)
+    handle = load(c.args, c.design, c.protocol, c.pilot_inventory, selected=c.selected)
+    requirement = c.requirement(handle)  # Test adapter reads actual retained private graph; no new production accessor.
+    assert c.requirement(handle) is requirement
+    assert c.timing_record is not requirement and c.dummy_record is not requirement
+    c.damage_handle(handle, damage)
+    with pytest.raises((ValueError, TypeError)):
+        handle.assert_scope(c.args, c.design, c.protocol, c.pilot_inventory)
+    with pytest.raises(TypeError): pickle.dumps(handle)
+
+
+@pytest.mark.parametrize('record_damage', [None, 'missing', 'target', 'preparation', 'reader-code',
+    'freeze-code', 'source', 'environment', 'recipe', 'storage-family', 'scope'])
+@pytest.mark.parametrize('capacity,accepts', [(100, True), (99, False)])
+def test_prepared_receiver_resource_identity_and_capacity(case, capacity, accepts, record_damage):
+    r = runtime(); validate = r._validate_prepared_receiver_resources
+    c = case(resource_fixture=(50, 20, 30), original_admission=True)
+    kwargs = dict(c.resource_validation_inputs, actual_host_capacity=capacity, existing_host_obligations=50)
+    if record_damage is not None: c.damage_resource_record(record_damage)
+    if accepts and record_damage is None:
+        charges = validate(c.resource_record, **kwargs)
+        assert charges['retained_metadata_bytes'] == 20
+        assert charges['extra_transient_bytes'] == 30
+        assert 50 + charges['retained_metadata_bytes'] + charges['extra_transient_bytes'] == 100
+    else:
+        with pytest.raises(ValueError): validate(c.resource_record, **kwargs)
+    assert c.reader_calls == [] and c.loader_calls == []
+
+
+@pytest.mark.parametrize('observation', ['retained', 'transient', 'applicable-peak', 'unavailable', 'wrong-scope'])
+def test_prepared_correct_identity_understated_observed_resources_rejects(case, observation):
+    r = runtime(); load = r.load_prepared_pilot_target
+    c = case(prepared=True, original_admission=True, ample_capacity=True)
+    c.anchor_resource_case(observation)  # Correct root/bytes/source/reader/freeze/environment identities throughout.
+    with pytest.raises(ValueError): load(c.args, c.design, c.protocol, c.pilot_inventory, selected=c.selected)
+    assert len(c.reader_calls) == 1
+    assert c.loader_calls == []
+    assert c.trace.index('reader') < c.trace.index('post-reader-resource-comparison')
+
+
+@pytest.mark.parametrize('damage', [None, 'cancel-during-reader', 'shorten-lease-during-reader', 'post-load-geometry'])
+def test_prepared_dispatch_guard_and_geometry_order(case, damage):
+    r = runtime(); r._PreparedPilotTarget
+    c = case(prepared=True, original_admission=True, controlled_clock=True)
+    c.inject_failure(damage)
+    if damage is None:
+        r.dispatch(c.args)
+        assert c.intake_trace == ['pre-reader-live', 'reader', 'post-reader-resource-comparison',
+            'pre-loader-live', 'loader', 'actual-geometry', 'pre-numeric-live', 'numeric']
+    else:
+        with pytest.raises(ValueError): r.dispatch(c.args)
+        assert c.numeric_calls == []
+        assert len(c.loader_calls) == (1 if damage == 'post-load-geometry' else 0)
+
+
+@pytest.mark.parametrize('damage', ['missing-preparation', 'missing-handle', 'caller-provider'])
+def test_prepared_production_has_no_build_fallback(case, damage):
+    r = runtime(); r._PreparedPilotTarget
+    c = case(prepared=True, original_admission=True)
+    c.damage_anchor(damage)
+    with pytest.raises(ValueError): r.dispatch(c.args)
+    assert c.loader_calls == [] and c.gpu_target_builder_calls == [] and c.gpu_target_writes == []
+
+
+@pytest.mark.parametrize('seam', ['guard-union', 'before-publication', 'final-live-guard'])
+@pytest.mark.parametrize('damage', ['target-payload-restored-mtime', 'descriptor-marker', 'identical-target-tree'])
+def test_prepared_final_barrier_after_all_costly_work(case, seam, damage):
+    r = runtime(); r._PreparedPilotTarget
+    c = case(prepared=True, original_admission=True, bounded_numeric_fixture=True)
+    c.mutate_at(seam, damage)
+    with pytest.raises(ValueError): c.run_pilot(r)
+    assert c.receipt_writer_calls == []
+    assert c.final_trace[:2] == ['guard-union', 'before-publication']
+
+
+@pytest.mark.parametrize('damage', ['adopt-current-reference', 'equal-requirement-copy', 'forged-handle',
+    'expiry-during-final-hash', 'expiry-during-final-live-guard'])
+def test_prepared_final_barrier_cannot_adopt_current(case, damage):
+    r = runtime(); r._PreparedPilotTarget
+    c = case(prepared=True, original_admission=True, bounded_numeric_fixture=True)
+    c.mutate_at('final-barrier', damage)
+    with pytest.raises(ValueError): c.run_pilot(r)
+    assert c.receipt_writer_calls == []
+
+
+@pytest.mark.parametrize('damage', [None, 'oversize-update', 'nonfinite-update'])
+def test_prepared_costs_and_envelope_are_charged(case, damage):
+    r = runtime(); r._PreparedPilotTarget
+    c = case(prepared=True, original_admission=True, bounded_numeric_fixture=True)
+    c.inject_failure(damage)
+    if damage is not None:
+        with pytest.raises(ValueError): c.run_pilot(r)
+        assert c.completed_receipt_paths == []
+    else:
+        receipt = c.run_pilot(r)
+        assert set(c.prepared_metadata_keys) <= c.keys_at_envelope_sizing
+        projected = r.workload.project_cost(c.receipts(receipt), c.target_inventory, c.ledger,
+            packing_proofs=c.packing_proofs(receipt), runtime_cost=c.startup_evidence)
+        assert projected['projected_seconds'] == c.expected_projected_seconds_startup_and_final_once
+        assert c.final_trace[-6:] == ['namespace-and-full-witness', 'fresh-live-and-deadline',
+            'identity-alias-seal', 'final-deadline', 'bounded-writer', 'receipt-complete']
+        assert c.target_read_count == 3 and c.target_parse_count == 1 and c.target_freeze_count == 1
+        assert c.gpu_target_writes == []
+
+
+def test_prepared_native_adapter_and_intake_preserve_scope(case):
+    r = runtime(); r._PreparedPilotTarget
+    c = case(prepared=True, original_admission=True, adapter_only=True)
+    result = c.exercise_adapter_route_without_model()
+    assert result['prepared_target_is_loader_minted'] is True
+    assert result['case_ids'] == c.original_prefit_case_ids and len(result['case_ids']) == 9
+    assert result['requires_all_cases_before_aggregate'] is True
+    assert result['original_case_forwards_reexecuted'] is False
+    assert result['new_reconciliation_work_is_actual'] is True
+
+
+@pytest.mark.parametrize('damage', ['legacy-no-preparation', 'missing-preparation', 'changed-resource',
+    'unanchored-resource', 'wrong-preparation-source', 'wrong-preparation-part'])
+def test_prepared_migrated_intake_and_legacy_rejection(case, damage):
+    r = runtime(); r._PreparedPilotTarget
+    c = case(production_shaped_completed_fixture=True)
+    c.damage_completed_origin(damage)
+    with pytest.raises(ValueError):
+        r._authenticated_pilot_receipts(c.design, c.protocol, c.target_inventory,
+            [c.receipt_path], ledger_path=c.mapping_path)
+    assert c.projector_calls == []

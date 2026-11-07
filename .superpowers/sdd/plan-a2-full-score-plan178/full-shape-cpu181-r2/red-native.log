@@ -1,0 +1,45 @@
+test_calibration_ignores_assay_support_and_validates_readouts (test_native_seams.NativeSeams.test_calibration_ignores_assay_support_and_validates_readouts) ... ERROR
+test_native_operation_filter (test_native_seams.NativeSeams.test_native_operation_filter) ... ERROR
+test_native_utility_donor_default16 (test_native_seams.NativeSeams.test_native_utility_donor_default16) ... ERROR
+test_support_and_capture_counts (test_native_seams.NativeSeams.test_support_and_capture_counts) ... ERROR
+
+======================================================================
+ERROR: test_calibration_ignores_assay_support_and_validates_readouts (test_native_seams.NativeSeams.test_calibration_ignores_assay_support_and_validates_readouts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r2/test_native_seams.py", line 35, in test_calibration_ignores_assay_support_and_validates_readouts
+    self.assertEqual(shape.calibration_width('ioi',m,2,9,1,8),9)
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'shape' has no attribute 'calibration_width'
+
+======================================================================
+ERROR: test_native_operation_filter (test_native_seams.NativeSeams.test_native_operation_filter)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r2/test_native_seams.py", line 26, in test_native_operation_filter
+    self.assertFalse(shape.selected_map([m],'zero',('IOI','0','clean')))
+                     ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'shape' has no attribute 'selected_map'
+
+======================================================================
+ERROR: test_native_utility_donor_default16 (test_native_seams.NativeSeams.test_native_utility_donor_default16)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r2/test_native_seams.py", line 20, in test_native_utility_donor_default16
+    rec=task_batches(rows(),batch_size=8);don=shape.utility_donors(task_batches,rows(),'corrupt')
+                                              ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'shape' has no attribute 'utility_donors'
+
+======================================================================
+ERROR: test_support_and_capture_counts (test_native_seams.NativeSeams.test_support_and_capture_counts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-plan178/full-shape-cpu181-r2/test_native_seams.py", line 30, in test_support_and_capture_counts
+    self.assertEqual(shape.capture_counts(m,False,2),(5,0))
+                     ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'shape' has no attribute 'capture_counts'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.097s
+
+FAILED (errors=4)

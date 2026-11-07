@@ -1,0 +1,15 @@
+{
+  "command": [
+    "rsync",
+    "-rl",
+    "--no-perms",
+    "--no-times",
+    "--files-from=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r2/transfer-files.txt",
+    "-e",
+    "ssh -o BatchMode=yes -o ConnectTimeout=15 -o ControlMaster=no -o ControlPath=none",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/",
+    "b2dtn:/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/"
+  ],
+  "returncode": 0,
+  "output": ""
+}

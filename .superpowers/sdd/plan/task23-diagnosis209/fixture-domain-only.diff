@@ -1,0 +1,35 @@
+--- failed/tests/a3_prepared_integration_cases.py
++++ proposed/tests/a3_prepared_integration_cases.py
+@@ -47,6 +47,18 @@
+         self.monkeypatch.setattr(r.ladder, 'load_model', forbidden_loader)
+         self.design, self.protocol = _real_injected_design()
+         d = self.design; p = self.protocol
++        if selected:
++            # Synthetic selected domain only. Keep all tasks/seeds, all 199/32
++            # axes, microbatch/tile/padding policies and 63 invocation classes.
++            from component_analysis import ladder_tasks
++            for task, spec in d['tasks'].items():
++                spec['selection_ids'] = spec['selection_ids'][:1]
++                d['access_rows'][task] = [row for row in d['access_rows'][task]
++                    if row['split'] != 'validation' or row['instance_id'] in spec['selection_ids']]
++            d['utility']['ioi'] = d['utility']['ioi'][:1]
++            d['utility']['mmlu'] = d['utility']['mmlu'][:2]
++            d['utility']['ioi_maps'] = ladder_tasks.ioi_item_swap_maps(d['utility']['ioi'])
++            d['utility']['mmlu_maps'] = ladder_tasks.mmlu_calibration_maps(d['utility']['mmlu'])
+         # Four actual synthetic training IDs permit the original fit/selection
+         # pipeline to emit complete selected backing, rather than inline axes.
+         for task, spec in d['tasks'].items():
+@@ -84,7 +96,12 @@
+         settings = {key: copy.deepcopy(cfg[key]) for key in required}
+         settings.update(head_width=2, hidden_size=4, dtype='torch.float32', backend='fake',
+             probe_max_bytes=1048576, axis_tile_sizes=dict(prefit=2, **{'fit-select': 2, 'selected-pilot': 32, 'remaining': 32}))
+-        r.freeze_operational_contract(d, p, settings)
++        # Regenerate every protocol/source/utility binding with the ORIGINAL
++        # factory; never relabel the previous larger selected backing.
++        d.pop('direction_protocol', None); d.pop('direction_protocol_sha256', None)
++        p = a3_pipeline.direction_protocol(d, commit=p['commit'],
++            injected_code_hashes=closure, execution_settings=settings)
++        self.protocol = p
+         core = {key: value for key, value in d.items() if key not in ('direction_protocol', 'direction_protocol_sha256')}
+         p['design_sha256'] = r.ladder.design._hash(core)
+         d['direction_protocol'] = p; d['direction_protocol_sha256'] = r.ladder.design._hash(p)

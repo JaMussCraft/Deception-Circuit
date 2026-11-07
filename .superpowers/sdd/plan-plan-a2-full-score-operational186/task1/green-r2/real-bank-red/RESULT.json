@@ -1,0 +1,43 @@
+{
+  "status": "REAL_BANK_DIGEST_KEY_RED",
+  "observations": [
+    {
+      "python": "/sw/external/python/anaconda3/bin/python3.9",
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--tb=short",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/real-bank-red/env1.xml",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/real-bank-red/tmp-env1",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py::test_real_bank_accepts_the_declared_groups_file_digest"
+      ],
+      "exit_code": 1,
+      "tests": 1,
+      "failure": "test_full_score_entry198.py:16: in test_real_bank_accepts_the_declared_groups_file_digest\n    binding = guard.verify_existing_bank(c)\n../gpu/common.py:181: in verify_existing_bank\n    return _bank_binding(c, allow_score=False)\n../gpu/common.py:160: in _bank_binding\n    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)\nE   KeyError: 'groups_sha256'"
+    },
+    {
+      "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--tb=short",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/real-bank-red/env2.xml",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/real-bank-red/tmp-env2",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py::test_real_bank_accepts_the_declared_groups_file_digest"
+      ],
+      "exit_code": 1,
+      "tests": 1,
+      "failure": "test_full_score_entry198.py:16: in test_real_bank_accepts_the_declared_groups_file_digest\n    binding = guard.verify_existing_bank(c)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../gpu/common.py:181: in verify_existing_bank\n    return _bank_binding(c, allow_score=False)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../gpu/common.py:160: in _bank_binding\n    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)\n                         ^^^^^^^^^^^^^^^^^^\nE   KeyError: 'groups_sha256'"
+    }
+  ]
+}

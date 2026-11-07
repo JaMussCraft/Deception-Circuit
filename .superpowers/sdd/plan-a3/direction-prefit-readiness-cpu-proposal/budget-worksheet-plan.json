@@ -1,0 +1,43 @@
+{
+  "kind": "nonexecuting_structural_cost_limits_not_timing_evidence",
+  "CPU_must_verify_four_frozen_timing_ids_per_source": true,
+  "complete_selected_nine_DOM_records_required_if_continuation_eligible": true,
+  "prefit_candidate_sites": 43,
+  "prefit_serial_forward_lower_bound": 16770,
+  "selected_serial_forward_lower_bound": 272610,
+  "total_serial_lower_bound": 289380,
+  "serial_replays": 5,
+  "source_groups_per_seed": {
+    "mechanism_minimum": 20,
+    "ioi": 2,
+    "mmlu_floors": 4
+  },
+  "direction_M1_total_GPU_hours": 0.5,
+  "total_reserved_minutes": 30,
+  "startups": 2,
+  "finish_seconds_each": 90,
+  "available_seconds_after_only_finish": 1620,
+  "combined_ms_ceiling_with_all_other_work_zero": 5.598175409496164,
+  "illustrative_not_admissible_split": {
+    "prefit_minutes": 10,
+    "selected_minutes": 20,
+    "prefit_ms_ceiling_with_all_other_work_zero": 30.41144901610018,
+    "selected_ms_ceiling_with_all_other_work_zero": 4.0717508528667326,
+    "rounded_hours_sum": 0.5
+  },
+  "matched_model_profile_bound_supplied": false,
+  "GPU_ready": false,
+  "mask_original_and_replacement_charges": 1.5,
+  "N5_additional_attempt_consumed": true,
+  "A3_total_cap": 40,
+  "no_refund_or_transfer": true,
+  "exclusions": [
+    "packed replays",
+    "tail/dummy comparisons",
+    "optional nuisance and secondary/steering",
+    "captures/positive controls/warmup",
+    "both model loads",
+    "proof/serialization/guards",
+    "root authority and publication"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at_utc": "2026-11-06T19:58:28.569047+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "lfs quota -p 560453 /ocean"
+  ],
+  "returncode": 0,
+  "output": "Disk quotas for prj 560453 (pid 560453):\n     Filesystem  kbytes   quota   limit   grace   files   quota   limit   grace\n         /ocean 35903408  1048576000 1048576000       -   82474  6070000 6070000       -\n"
+}

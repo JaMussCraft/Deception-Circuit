@@ -1,0 +1,24 @@
+{
+  "kind": "a3_pilot_target_preparation_v1",
+  "schema": "PROPOSED_METADATA_ONLY_NOT_A_LIVE_AUTHORITY",
+  "part": "prefit|selected",
+  "target_stage": "fit-select|remaining",
+  "source_identity": "workload.inventory_identity(design,protocol), full final source commit and code hashes",
+  "frozen_inputs": "complete original design/protocol references and hashes; selected full bundle reference only for selected; fits=None exactly as existing run_pilot",
+  "target_reference": "existing object_reference(work_dir/pilot-target-inventory/part), including raw payload/marker hashes and sizes",
+  "canonical_inventory_sha256": "existing complete inventory hash, independently reconstructed on CPU",
+  "summary": "exact counts, forward/operation counts and all original storage requirements; no optimistic subset",
+  "planned_geometry": "original model/revision/tokenizer identities, hidden/head/layer dimensions, numeric profile, all widths/tiles and finish reserve",
+  "CPU_provenance": "actual CPU run_manifest with normal completion, source before/after, input refs, timings and cgroup peak; producer has no model argument",
+  "execution_authorized": false,
+  "model_loaded": false,
+  "not_serialized": [
+    "model/tensors/new weights",
+    "ledger/lease/allocation authorization",
+    "_AuthorityContext",
+    "_FileWitness",
+    "_PreparedPilotTarget",
+    "validation booleans as a substitute for root anchoring"
+  ],
+  "receiver_measurement": "Separate immutable measurement reference anchored alongside this producer descriptor in the later root admission; not inserted retrospectively into an already completed producer descriptor and not a live lease."
+}

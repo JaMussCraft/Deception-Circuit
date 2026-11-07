@@ -1,0 +1,20 @@
+[
+  "sbatch",
+  "--parsable",
+  "--account=beto-delta-cpu",
+  "--partition=cpu-interactive",
+  "--nodes=1",
+  "--ntasks=1",
+  "--cpus-per-task=1",
+  "--mem=4G",
+  "--time=00:05:00",
+  "--no-requeue",
+  "--export=ALL",
+  "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+  "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1-green-r3/green-slurm-%j.log",
+  "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1-green-r3/cpu.sbatch",
+  "--mode",
+  "GREEN",
+  "--output",
+  "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1-green-r3/green-run-01"
+]

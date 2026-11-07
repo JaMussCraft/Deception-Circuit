@@ -1,0 +1,30 @@
+{
+  "kind": "root_standing_CPU_resource_only_R3_ruling",
+  "status": "UNEXECUTED_VARIANT_AWAIT_INDEPENDENT160",
+  "supersedes_unexecuted_packet": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/delta-model-phase-preflight-r2",
+  "CPU_seconds": 3600,
+  "CPU_minutes": 60,
+  "CPUs": 4,
+  "memory_GiB": 16,
+  "allowed_actual_partitions": [
+    "cpu",
+    "cpu-interactive"
+  ],
+  "phase_window_seconds": 270,
+  "absolute_child_cap_seconds": 720,
+  "CPU_finish_reserve_seconds": 60,
+  "kill_grace_seconds": 15,
+  "sticky_request_GPU_source_G3_config_unchanged": true,
+  "once_only_no_retry": true,
+  "no_source_or_scientific_change": true,
+  "alignment": "Root aligns helper READY near actual H100 availability after all bindings. Do not start now merely because an interactive slot opens. Root test-only forecasts are not availability guarantees; either helper or GPU may miss its finite window and fail closed.",
+  "window_reasoning": {
+    "helper_usable_seconds": 3540,
+    "H100_total_seconds": 3600,
+    "required_prefix_entry_floor_seconds": 1950,
+    "latest_prefix_entry_from_initial_GPU_start_seconds": 1650,
+    "maximum_start_gap_if_helper_must_cover_that_latest_entry_seconds": 1890,
+    "interpretation": "The CPU helper is needed only through its prefix preflight, not throughout prefix GPU compute. With a fixed60min GPU job and1950s final prefix floor, any admitted prefix enters by initialGPUstart+1650s (or earlier if currentEnd shortens). A60min helper has3540s before its own60s reserve. Thus a GPU start within roughly1890s of helper start can cover that latest entry in principle; activation, publication, queue uncertainty, shortened leases and proof failures reduce usable margin. This is alignment guidance, never a guarantee or permission to extend/retry."
+  },
+  "root_forecast_observation": "Root reports normal75min CPU forecasts Nov5-6; H10060min under382 forecast18:26:28EST,37219:16,36119:58. Do not embed these dated forecasts as execution authority."
+}

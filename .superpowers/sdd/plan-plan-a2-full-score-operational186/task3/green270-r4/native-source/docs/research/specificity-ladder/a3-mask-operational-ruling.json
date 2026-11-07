@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "a3_mask_operational_ruling_v1",
+  "session": "codex-01a1987e",
+  "recorded_at": "2026-11-02T03:56:36.767790+00:00",
+  "status": "prospective before any A3 model fit or GPU work",
+  "parent_plan": "docs/research/specificity-ladder/plan-a3.md",
+  "validation": {
+    "split": "validation",
+    "mechanism_donor": "same condition opposite designation",
+    "ioi_donor": "frozen validation item-swap map",
+    "gaps": "own intact validation condition versus its corresponding neutral baseline",
+    "eligibility": [
+      "D fraction at least0.5",
+      "I fraction below0.25",
+      "absolute H accuracy movement below0.05",
+      "absolute F accuracy movement below0.05",
+      "absolute IOI accuracy movement below0.05"
+    ],
+    "selection": "earliest passing scheduled validation checkpoint; native deterministic binary export; complete all200 updates",
+    "mmlu_selection_gate_added": false,
+    "mmlu_assessment_floors_required": true,
+    "neutral_donor_role": "training objective and secondary diagnostic; identity/unsupported H or F does not establish preservation"
+  },
+  "random_controls": {
+    "count": 19,
+    "universe": "frozen FAR A1 deciding set union quartet",
+    "match_counts_separately": [
+      "head",
+      "whole_mlp"
+    ],
+    "canonical_order": "sort typed component keys; iterate head then whole_mlp",
+    "generator": "torch CPU Generator",
+    "seed_rule": "20000 + mask_seed",
+    "mask_seeds": [
+      42,
+      1,
+      123
+    ],
+    "reset_per_arm": true,
+    "sampling": "sequential randperm per component type per draw; take each type count without replacement within subset",
+    "duplicate_subsets_across_draws": "retain, no rejection/redraw",
+    "freeze_before_assessment": true,
+    "empty_all_or_small_support": "record degeneracy and actual memberships; no invented alternatives"
+  },
+  "paired_cohort": {
+    "D_I_ids_and_order": "identical complete matched cohort with both streams",
+    "D_I_token_lengths": "may differ because their conversational layouts differ",
+    "within_condition": "each recipient and own neutral donor must satisfy its verified shape/token/map evidence",
+    "prohibited": [
+      "D/I token splice",
+      "truncation to force equality",
+      "attention-mask falsification"
+    ],
+    "weighting": "unchanged equal stream average within each identity, full-cohort objective"
+  },
+  "observed_integration_evidence": {
+    "source": "ladder-5f450dc/design.json",
+    "example": "FAR train D98 versus I118 tokens; reported from frozen source by mask driver implementer",
+    "consequence": "reviewed numerical core cross-condition token-count equality requires a narrow independently reviewed correction"
+  },
+  "scope": "No change to assessment membership, optimizer/updates, scientific thresholds, seeds, budgets, New30 ancestry or protected-set policy; no execution admission."
+}

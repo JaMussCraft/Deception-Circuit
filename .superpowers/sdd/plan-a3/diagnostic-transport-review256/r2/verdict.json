@@ -1,0 +1,44 @@
+{
+  "findings": {
+    "B1": {
+      "minimum_correction": "Use declared target set(paths); retain raw mountinfo and effective statvfs; positively test extra controller RW and negatively test each declared target RW.",
+      "reason": "Effective statvfs correctly resolves hidden stacked rows, but target union includes undeclared v1 controllers. Actual container root flags15 and memory4111 are readonly; other controller flags4110 are writable and rejected before selected tests. Existing command binds only root and memory RO.",
+      "severity": "high",
+      "source": "inner.py:20-22",
+      "status": "NOT_ADDRESSED"
+    },
+    "B2": {
+      "reason": "After both log opens, fresh allocation and wall/monotonic checks clamp nonincreasing deadline and prevent expired Popen.",
+      "source": "host.py:85-93",
+      "status": "ADDRESSED"
+    },
+    "B3": {
+      "reason": "Fixed started+20 absolute cleanup final; cleanup_started prevents retry; primary and cleanup exceptions preserved separately.",
+      "source": "host.py:50-67,102-115",
+      "status": "ADDRESSED"
+    }
+  },
+  "production_source_edited": false,
+  "remaining_root_gates": [
+    "distinct corrected source review",
+    "actual host3.6 and container gates on corrected packet",
+    "actual held job/config/source/environment/alias binding",
+    "diagnostic partial only; no GREEN/GPU/scientific authority"
+  ],
+  "scope": "r2 corrections to original256 B1/B2/B3 only; no admission",
+  "source_manifest_sha256": "7ae57ad0089826888d8917e0c01da15d3d5108ff292200a8c26b99d5aeed9eea",
+  "verdict": "BLOCKED_B1_NOT_ADDRESSED",
+  "verification": {
+    "actual_container_receipt": {
+      "child_exit": 1,
+      "inner_mounts": null,
+      "outer_exit": 1,
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-deployment262/container-pure-check.json",
+      "sha256": "a820519de32db45166db81c45d642597a41893d1113fba399c7ea58330fc691b",
+      "stderr": "Traceback (most recent call last):\n  File \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2/inner.py\", line 26, in <module>\n    if __name__=='__main__':main()\n                            ^^^^^^\n  File \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2/inner.py\", line 22, in main\n    assert all(flag & os.ST_RDONLY for flag in flags.values()),flags\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'/sys/fs/cgroup': 15, '/sys/fs/cgroup/blkio': 4110, '/sys/fs/cgroup/cpu,cpuacct': 4110, '/sys/fs/cgroup/cpuset': 4110, '/sys/fs/cgroup/devices': 4110, '/sys/fs/cgroup/freezer': 4110, '/sys/fs/cgroup/hugetlb': 4110, '/sys/fs/cgroup/memory': 4111, '/sys/fs/cgroup/net_cls,net_prio': 4110, '/sys/fs/cgroup/perf_event': 4110, '/sys/fs/cgroup/pids': 4110, '/sys/fs/cgroup/rdma': 4110, '/sys/fs/cgroup/systemd': 4110}\n"
+    },
+    "author_raw_log_attribution": "Read test-results.log: 8 existing plus 7 targeted per interpreter; inspected red-base.log showing original three failures. These are author raw evidence, not fresh independent rerun of the original eight.",
+    "fresh_checks": "7 targeted + 4 independent in each supported interpreter; all exit0; includes expected reproduction of residual B1 rejection, not a B1 fix claim.",
+    "run_manifest": "run_manifest.json"
+  }
+}

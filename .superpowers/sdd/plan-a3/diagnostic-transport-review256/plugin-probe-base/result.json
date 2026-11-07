@@ -1,0 +1,29 @@
+{
+  "probe_only": true,
+  "production_suite_executed": false,
+  "collected": 3,
+  "executed_selected": 1,
+  "expected_pytest_exit": 1,
+  "observed_pytest_exit": 1,
+  "all_original_session_items_preserved": true,
+  "preflight_and_setup_call_teardown_protocol_preserved": true,
+  "failed_call_JSONL_visible_before_teardown_process_exit": true,
+  "periodic_traceback_disabled": true,
+  "command": [
+    "/sw/external/python/anaconda3/bin/python3.9",
+    "-B",
+    "-m",
+    "pytest",
+    "-vv",
+    "-p",
+    "no:cacheprovider",
+    "-p",
+    "diagnostic253",
+    "-o",
+    "faulthandler_timeout=0",
+    "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport-review256/plugin-probe-base/suite",
+    "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport-review256/plugin-probe-base/suite",
+    "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport-review256/plugin-probe-base/tmp",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport-review256/plugin-probe-base/suite/test_mini.py"
+  ]
+}

@@ -1,0 +1,238 @@
+--- oracle/component_analysis/a3_direction_runtime.py
++++ candidate/component_analysis/a3_direction_runtime.py
+@@ -51,6 +51,235 @@
+     root=Path(path); artifacts._complete(root)
+     return dict(path=str(root.resolve()),files={p.name:dict(sha256=common.file_hash(p),nbytes=p.stat().st_size)
+         for p in root.iterdir() if p.is_file()})
++
++
++def _publish_prepared_target_object(path, payload):
++    """Publish ordinary operational bytes, binding the bytes emitted by this call.
++
++    This is data publication only. A completed object or descriptor does not
++    grant execution permission. Keep the generic publisher's JSON format.
++    """
++    emitted=(json.dumps(payload,sort_keys=True,allow_nan=False)+'\n').encode('utf-8')
++    emitted_hash=hashlib.sha256(emitted).hexdigest()
++    def writer(root):
++        (root/'payload.json').write_bytes(emitted)
++        artifacts._finish(root)
++    common.publish(Path(path),writer)
++    reference=object_reference(path)
++    require(reference['files']['payload.json']==dict(sha256=emitted_hash,nbytes=len(emitted)),
++        'prepared publication differs from emitted payload bytes')
++    return dict(reference=reference,emitted_payload_sha256=emitted_hash,emitted_payload_bytes=len(emitted))
++
++
++def _prepared_lexical_path(value):
++    text=os.fspath(value)
++    require(isinstance(text,str) and os.path.isabs(text) and os.path.normpath(text)==text,
++        'prepared namespace needs normalized absolute lexical paths')
++    return Path(text)
++
++
++def _prepared_namespace_identity(work_dir, target_root, preparation_root, allowed_aliases):
++    """Entry-local directory/alias identity; unrelated sibling writes are legal.
++
++    Resolve each path component explicitly so links in link targets also belong
++    to the ordered alias policy. Directory identities omit size/mtime/ctime.
++    """
++    import stat
++    from collections import deque
++    try:
++        roots=tuple(_prepared_lexical_path(value) for value in (work_dir,target_root,preparation_root))
++        work,target,preparation=roots
++        require(target.parent==work/'pilot-target-inventory'
++            and preparation.parent==work/'pilot-target-preparation' and target.name==preparation.name,
++            'prepared roots differ from canonical work-directory namespace')
++        expected=[]
++        for pair in allowed_aliases:
++            require(isinstance(pair,(tuple,list)) and len(pair)==2 and isinstance(pair[1],str),
++                'invalid prepared namespace alias policy')
++            expected.append((str(_prepared_lexical_path(pair[0])),pair[1]))
++        aliases=[];directories={};seen_aliases=set();resolved=[]
++        def directory(path,st):
++            require(stat.S_ISDIR(st.st_mode),'prepared namespace ancestor/root must be an ordinary directory')
++            identity=(st.st_dev,st.st_ino,stat.S_IFMT(st.st_mode))
++            key=str(path)
++            require(key not in directories or directories[key]==identity,'prepared namespace changed while resolving')
++            directories[key]=identity
++        for label,root in zip(('work_dir','target_root','preparation_root'),roots):
++            require(stat.S_ISDIR(root.lstat().st_mode),'prepared artifact/work roots must be ordinary directories')
++            current=Path(root.anchor);directory(current,current.lstat())
++            pending=deque(root.parts[1:]);hops=0
++            while pending:
++                part=pending.popleft()
++                if part in ('','.'):continue
++                if part=='..':current=current.parent;continue
++                child=current/part;st=child.lstat()
++                if stat.S_ISLNK(st.st_mode):
++                    hops+=1;require(hops<=40,'prepared namespace symlink cycle/depth')
++                    literal=os.readlink(child)
++                    row=(str(child),literal,_stat_identity(child))
++                    if str(child) not in seen_aliases:
++                        aliases.append(row);seen_aliases.add(str(child))
++                    else:
++                        require(next(item for item in aliases if item[0]==str(child))==row,
++                            'prepared namespace alias changed while resolving')
++                    link=Path(literal)
++                    if link.is_absolute():
++                        current=Path(link.anchor);directory(current,current.lstat());parts=link.parts[1:]
++                    else:parts=link.parts
++                    pending.extendleft(reversed(parts))
++                else:
++                    directory(child,st);current=child
++            resolved.append((label,str(root),str(current)))
++        require(tuple((path,literal) for path,literal,_ in aliases)==tuple(expected),
++            'prepared namespace contains unlisted/retargeted/reordered alias')
++        return (tuple(resolved),tuple(aliases),tuple(sorted(directories.items())))
++    except (OSError,RuntimeError,TypeError) as error:
++        raise ValueError('invalid or changed prepared namespace') from error
++
++
++def _prepared_object_stats(root):
++    """Capture exact ordinary root/leaf identities without reading payload bytes."""
++    import stat
++    root=Path(root)
++    require(stat.S_ISDIR(root.lstat().st_mode),'prepared object root must be ordinary')
++    require({child.name for child in root.iterdir()}=={'payload.json','COMPLETE.json'},
++        'unexpected operational artifact children')
++    identities={name:_stat_identity(root/name) for name in ('COMPLETE.json','payload.json')}
++    require(all(stat.S_ISREG(value[2]) for value in identities.values()),
++        'prepared object children must be ordinary files')
++    return _stat_identity(root),identities
++
++
++def _prepared_json_buffer(raw, temporaries):
++    """Parse the hashed bytes once and retain the actual decoder text for accounting."""
++    # _strict_json reads UTF-8 text; json.loads(bytes) otherwise also accepts UTF-16
++    # and BOM encodings that that existing text reader rejects.
++    require(json.detect_encoding(raw)=='utf-8','prepared JSON differs from existing UTF-8 text contract')
++    class Decoder(json.JSONDecoder):
++        def decode(self,text,*args,**kwargs):
++            temporaries.extend((self,text))
++            return super().decode(text,*args,**kwargs)
++    def reject(value):raise ValueError('nonfinite JSON value: '+value)
++    return json.loads(raw,cls=Decoder,parse_constant=reject)
++
++
++def _prepared_graph_bytes(roots, workspace=None):
++    """Cycle-safe actual unique-object accounting for the identified reader graph."""
++    import sys
++    seen=set()
++    def size(value):
++        if id(value) in seen:return 0
++        seen.add(id(value));total=sys.getsizeof(value)
++        if isinstance(value,dict):total+=sum(size(k)+size(v) for k,v in value.items())
++        elif isinstance(value,(list,tuple,set,frozenset)):total+=sum(size(v) for v in value)
++        elif isinstance(value,(_FileWitness,json.JSONDecoder)):total+=size(vars(value))
++        return total
++    total=size(roots)
++    if workspace is not None:workspace.append(sys.getsizeof(seen)+sum(sys.getsizeof(identity) for identity in seen))
++    return total
++
++
++def _prepared_process_observation():
++    """Labeled actual observations, never a sampled-memory upper-bound claim."""
++    import resource
++    observation=dict(pid=os.getpid(),process_peak_rss_bytes=int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)*1024,
++        process_peak_scope='process lifetime high-water RSS on Linux',process_rss_bytes=None,
++        cgroup_path=None,cgroup_current_bytes=None,cgroup_peak_bytes=None,cgroup_scope=None)
++    try:
++        fields=dict(line.split(':',1) for line in Path('/proc/self/status').read_text().splitlines() if ':' in line)
++        observation['process_rss_bytes']=int(fields['VmRSS'].split()[0])*1024
++    except (OSError,KeyError,ValueError):pass
++    try:
++        memberships=[line.split(':',2) for line in Path('/proc/self/cgroup').read_text().splitlines()]
++        group=next(path for hierarchy,controllers,path in memberships if hierarchy=='0' and controllers=='')
++        root=Path('/sys/fs/cgroup')/group.lstrip('/')
++        observation.update(cgroup_path=str(root),cgroup_current_bytes=int((root/'memory.current').read_text()),
++            cgroup_peak_bytes=int((root/'memory.peak').read_text()),cgroup_scope='entire current cgroup, including other processes; lifetime peak')
++    except (OSError,StopIteration,ValueError):pass
++    return observation
++
++
++def _read_prepared_target_object(target_reference, preparation_reference, namespace_policy):
++    """Read and freeze entry-bound DATA; mint no model/admission authority.
++
++    One target buffer supplies its hash and parse. The untouched file witness
++    mints the second read/hash pass. Its later explicit final check is pass three.
++    Initial file stats/hashes, witness rows and cheap post-mint stats must agree;
++    a re-signed current file can never replace the entry-bound reference.
++    """
++    try:
++        require(isinstance(namespace_policy,dict),'missing prepared namespace policy')
++        namespace=_prepared_namespace_identity(namespace_policy['work_dir'],namespace_policy['target_root'],
++            namespace_policy['preparation_root'],namespace_policy['allowed_aliases'])
++        resolved={name:real for name,lexical,real in namespace[0]}
++        require(namespace_policy.get('expected_resolved')==resolved,'prepared namespace resolved target differs')
++        roots=(Path(resolved['target_root']),Path(resolved['preparation_root']))
++        originals=(target_reference,preparation_reference)
++        initial=tuple(_prepared_object_stats(root) for root in roots)
++        process_before=_prepared_process_observation()
++        raw_buffers=[];decoder_buffers=[];values=[];references={};witness_rows=[]
++        payload_reads=0;payload_hashes=0;payload_parses=0
++        for index,(label,root,expected,(root_stat,leaf_stats)) in enumerate(zip(
++                ('target','preparation'),roots,originals,initial)):
++            require(isinstance(expected,dict) and set(expected)=={'path','files'} and expected['path']==str(root),
++                'prepared entry reference path/fields differ')
++            files={};data={}
++            for name in ('payload.json','COMPLETE.json'):
++                raw=(root/name).read_bytes();raw_buffers.append(raw)
++                digest=hashlib.sha256(raw).hexdigest()
++                if index==0 and name=='payload.json':payload_reads+=1;payload_hashes+=1
++                files[name]=dict(sha256=digest,nbytes=len(raw))
++                data[name]=_prepared_json_buffer(raw,decoder_buffers)
++                if index==0 and name=='payload.json':payload_parses+=1
++            require(expected['files']==files,'prepared entry reference byte/hash/count differs')
++            marker=data['COMPLETE.json']
++            require(isinstance(marker,dict) and marker.get('schema_version')==1 and marker.get('kind')=='a3_complete',
++                'invalid bundle completion marker')
++            require(marker.get('files')=={'payload.json':dict(sha256=files['payload.json']['sha256'],bytes=files['payload.json']['nbytes'])},
++                'bundle child bytes/hash mismatch')
++            references[label]=dict(path=str(root),files=files);values.append(data['payload.json'])
++            rows=[('directory',str(root),root_stat,('COMPLETE.json','payload.json'))]
++            rows.extend(('file',str(root/name),leaf_stats[name],files[name]['sha256']) for name in ('COMPLETE.json','payload.json'))
++            witness_rows.append(tuple(rows))
++        require(tuple(_prepared_object_stats(root) for root in roots)==initial,'prepared object changed while parsing')
++        witness=_make_file_witness(roots)
++        require(witness.identities==tuple(witness_rows),'prepared entry witness differs from decoded entry bytes/identity')
++        # Witness identities above prove one full payload read/hash in the
++        # existing witness algorithm; the test's actual observers check it too.
++        payload_reads+=1;payload_hashes+=1
++        require(tuple(_prepared_object_stats(root) for root in roots)==initial,'prepared object changed while minting witness')
++        require(_prepared_namespace_identity(namespace_policy['work_dir'],namespace_policy['target_root'],
++            namespace_policy['preparation_root'],namespace_policy['allowed_aliases'])==namespace,
++            'prepared namespace changed during entry')
++        decoded=dict(value=values[0],entry_references=references);memo={}
++        frozen=_freeze_json(decoded,memo=memo)
++        observed=dict(full_payload_reads=payload_reads,SHA_passes=payload_hashes,parse_passes=payload_parses,
++            freeze_passes=1,target_writes=0)
++        import sys
++        resources=dict(recipe='a3_prepared_reader_unique_graph_buffers_v1',
++            scope='returned graph, immutable entry references, namespace, phase witness and observation records; retained actual raw/decoder text/decoded/freeze memo coexistence',
++            retained_metadata_bytes=0,extra_transient_bytes=0,accounting_workspace_bytes=0,raw_buffer_bytes=sum(sys.getsizeof(raw) for raw in raw_buffers),
++            decoded_text_bytes=sum(sys.getsizeof(value) for value in decoder_buffers if isinstance(value,str)),
++            process_before=process_before,process_after=_prepared_process_observation(),
++            observations_are_upper_bounds=False,model_loaded=False,execution_authorized=False)
++        result=(frozen['value'],frozen['entry_references'],namespace,witness,observed,resources)
++        # Measure actual retained roots and the overlapping temporary graph
++        # separately, with no subtraction for presumed aliases or baselines.
++        temporaries=(raw_buffers,decoder_buffers,values,references,decoded,memo,witness_rows,initial)
++        workspace=[]
++        resources['extra_transient_bytes']=_prepared_graph_bytes(temporaries,workspace)
++        previous=None
++        while previous!=resources['retained_metadata_bytes']:
++            previous=resources['retained_metadata_bytes'];resources['retained_metadata_bytes']=_prepared_graph_bytes(result,workspace)
++        resources['accounting_workspace_bytes']=max(workspace)
++        resources['extra_transient_bytes']+=resources['accounting_workspace_bytes']
++        resources['process_after']=_prepared_process_observation()
++        previous=None
++        while previous!=resources['retained_metadata_bytes']:
++            previous=resources['retained_metadata_bytes'];resources['retained_metadata_bytes']=_prepared_graph_bytes(result)
++        return result
++    except (OSError,RuntimeError,KeyError,TypeError) as error:
++        raise ValueError('invalid or changed prepared transport object') from error
+ 
+ 
+ def read_bundle(path):

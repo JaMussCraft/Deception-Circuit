@@ -1,0 +1,28 @@
+{
+  "additional_correction_RED_cases": 5,
+  "automatic_retry": false,
+  "correction_RED_child_timeout_seconds": 600,
+  "cpus_per_job": 2,
+  "estimate": "Retain r3 59minute bound:10min RED+90s oracle+45min GREEN/preflight+~150s supervisor margin. Compared with r3, five cgroup comparability cases are appended and correctionRED shrinks from10 to5; no new measurement or transport scans are introduced. Original observed preflight5-6/264-290s evidence remains the only full-shape timing basis; no implementation GREEN runtime or RAM requirement is claimed. No retry.",
+  "evidence": {
+    "preflight_prefit_seconds": {
+      "base": 5.757390294020297,
+      "mgnp": 4.984120952984085
+    },
+    "preflight_selected_seconds": {
+      "base": 290.2412397899898,
+      "mgnp": 264.31878689597943
+    },
+    "red_actual_parent_seconds": 723,
+    "red_job": "23618388",
+    "red_runner_seconds": 687.4813663959503
+  },
+  "expected_cases_per_environment": 223,
+  "independent_shard_walltime": "00:59:00",
+  "memory_per_job": "32G",
+  "memory_scope": "Keep prior completed32GiB diagnostic headroom; extra fixture receiver calls are sequential but actual peak unmeasured. No proven upper bound, resource admission or GPU feasibility claim.",
+  "oracle_child_timeout_seconds": 90,
+  "parent_combined_walltime": "01:58:00",
+  "per_environment_pytest_child_timeout_seconds": 2700,
+  "queue_strategy": "Two independent59minute shards; each requires five actual intended r3correctionRED failures then223 r4GREEN passes; unchanged218priorcases and all21old regression families."
+}

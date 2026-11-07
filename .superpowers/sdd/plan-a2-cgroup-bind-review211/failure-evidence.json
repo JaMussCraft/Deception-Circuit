@@ -1,0 +1,43 @@
+{
+  "job": "50311480",
+  "terminal_accounting": "FAILED 2:0 after5seconds",
+  "evidence_files_independently_rehashed": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r3/actual-50311480/submission-result.json": {
+      "sha256": "1a688d1cc2ed31938daf3231673963b506068199ce6179a63c98f396f2888ed9",
+      "bytes": 1377
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r3/actual-50311480/submission-intent.json": {
+      "sha256": "1cabaccb2816beddbf3355f8e2b0153324c30764d90f7ae325c639dc57e6d5ac",
+      "bytes": 1237
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r3/actual-50311480/job-50311480.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r3/actual-50311480/execution/probe-result.json": {
+      "sha256": "e921e05dd79d0ab4b9e8230b6ce9d0dcf1241c7f7bc2d88e654d5a9f1425683b",
+      "bytes": 519
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r3/actual-50311480/execution/container-cgroup.json": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r3/actual-50311480/execution/allocation.json": {
+      "sha256": "764b84f8d7e6e26d4360cc1ba337ecd3d6be4515c315d9bc871da092cc256550",
+      "bytes": 4895
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r3/actual-50311480/execution/host-cgroup.json": {
+      "sha256": "4870b2df33e794d6a3a6b74e21626c4d3a1c0c04d00d205d0b6cf65d5d6078e8",
+      "bytes": 982
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r3/actual-50311480/execution/command.json": {
+      "sha256": "35b8d63fa82257a0e2c45ba39f4ac2272ad677d28e365c6f4e8d251833d35283",
+      "bytes": 3758
+    }
+  },
+  "failure": "Apptainer mount fails before container Python because /sys/fs/cgroup/memory destination absent. Actual host own-job memory controller counters readable.",
+  "scope": "Proposed same-path parent cgroup bind diagnostic correction only; actual corrected container visibility remains unproven.",
+  "upstream_reference": "https://apptainer.org/docs/user/main/bind_paths_and_mounts.html",
+  "upstream_source_reference": "https://github.com/apptainer/apptainer/blob/main/internal/pkg/runtime/engine/apptainer/container_linux.go",
+  "reference_limit": "Current upstream describes bind ro flag and recursive user bind implementation; actual Bridges version/effective nested-controller mount options not verified by these references. Actual diagnostic mountinfo must resolve that observation."
+}

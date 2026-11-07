@@ -1,0 +1,55 @@
+{
+  "status": "handed-back",
+  "verdict": "ACCEPT_SCOPED_SUCCESSOR_SOURCE_CLOSURE_FOR_EXECUTION",
+  "pins_sha256": "05b53e5f2b2c2d737782753cde63cb6c1b428038d71d7666c644777deb1184c9",
+  "observer_sha256": "4d4aee62a1b544db8a84dd53f1cb3a1e9544ab57deaeec2d89e31c8e05f816be",
+  "baseline_context": [
+    {
+      "name": "held_out.json",
+      "sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "bytes": 32,
+      "baseline_ordinary": true,
+      "candidate_oracle_alias_content_same": true
+    },
+    {
+      "name": "directions.json",
+      "sha256": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0",
+      "bytes": 21212,
+      "baseline_ordinary": true,
+      "candidate_oracle_alias_content_same": true
+    }
+  ],
+  "all_prior_baseline_candidate_oracle_pin_values_preserved": true,
+  "original_RED_and_GREEN_test_bytes_and_counts_preserved": true,
+  "independent_stdlib_tests": {
+    "cases": 5,
+    "exit_code": 0,
+    "reported_seconds": 0.011
+  },
+  "actual_stdlib_observer_dryrun": {
+    "exit_code": 0,
+    "expected_test_count": 223,
+    "baseline_context": {
+      "files": {
+        "docs/research/held_out.json": {
+          "sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+          "bytes": 32
+        },
+        "docs/research/directions.json": {
+          "sha256": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0",
+          "bytes": 21212
+        }
+      },
+      "protected_sets": 0,
+      "native_imports": false
+    },
+    "native_imports": false
+  },
+  "inventory": {
+    "ordinary_files": 1116,
+    "aliases": 8,
+    "all_local_file_and_alias_values_match": true
+  },
+  "deployment_note": "alias registry targets are not ordinary inventory rows; root staging must verify/update their exact target bytes to content pins, plus actual primary registry context, before execution",
+  "native_execution": false
+}

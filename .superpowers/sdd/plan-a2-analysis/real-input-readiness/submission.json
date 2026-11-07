@@ -1,0 +1,29 @@
+{
+  "job_id": "23459504",
+  "cluster": "delta",
+  "submitted_utc": "2026-11-03T02:38:37.445612+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--export=ALL",
+    "--account=beto-delta-cpu",
+    "--partition=cpu",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=32G",
+    "--time=00:15:00",
+    "--job-name=lad-a2-compare-freeze",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/cpu-job.sh"
+  ],
+  "manifest_sha256": "62b757f7176306ace414e50c28a52359a53534e1a41b42f97df8ce1cdf139535",
+  "cpus": 4,
+  "memory_GiB": 32,
+  "gpus": 0,
+  "time_minutes": 15,
+  "account": "beto-delta-cpu",
+  "partition": "cpu"
+}

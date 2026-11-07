@@ -1,0 +1,48 @@
+[
+  {
+    "argv": [
+      "sbatch",
+      "--test-only",
+      "--account=beto-delta-cpu",
+      "--partition=gpuH200x8-interactive",
+      "--constraint=projects",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=4",
+      "--mem=192G",
+      "--time=00:30:00",
+      "--no-requeue",
+      "--export=ALL,CUDA_VISIBLE_DEVICES=",
+      "--wrap=true"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "sbatch: error: Jobs requesting no GPU resources must only be submitted to CPU partitions\nallocation failure: Access/permission denied\n",
+    "observed_unix": 1794055904.3610063,
+    "GPUs_requested": 0,
+    "scope": "CPU-only placement feasibility preview; no job or authority"
+  },
+  {
+    "argv": [
+      "sbatch",
+      "--test-only",
+      "--account=beto-delta-cpu",
+      "--partition=gpuH200x8",
+      "--constraint=projects",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=4",
+      "--mem=192G",
+      "--time=00:30:00",
+      "--no-requeue",
+      "--export=ALL,CUDA_VISIBLE_DEVICES=",
+      "--wrap=true"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "sbatch: error: Jobs requesting no GPU resources must only be submitted to CPU partitions\nallocation failure: Access/permission denied\n",
+    "observed_unix": 1794055904.3937337,
+    "GPUs_requested": 0,
+    "scope": "CPU-only placement feasibility preview; no job or authority"
+  }
+]

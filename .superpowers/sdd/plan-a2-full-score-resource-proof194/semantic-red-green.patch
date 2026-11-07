@@ -1,0 +1,139 @@
+--- red-initial-schema.py
++++ proof_schema.py
+@@ -1,3 +1,78 @@
+-"""Initial deliberately incomplete schema gate: tests must expose omissions."""
+-def verify_runner_schema(text):return None
+-def verify_append_schema(text):return None
++"""NON-SCIENTIFIC schema envelopes. No model/forward/outcome interfaces."""
++import ast,copy,hashlib,json,sys
++FLOAT_SLOT='UNKNOWN_FINITE_FLOAT_SLOT'
++INT_SLOT='UNKNOWN_INTEGER_SLOT_UPPER'
++BOOL_SLOT='UNKNOWN_BOOLEAN_SLOT'
++BASE=set('task instance_id condition stream group group_members operation expected_token opposite_token honest_token pressure_id source_provenance donor_provenance donor_seed self_replay_margin_error assay_valid supported degenerate gate_valid'.split())
++ALIAS=set('group_source a2_group_sha256 a2_receipt_sha256 training_seed compute_alias'.split())
++CONTROL=set('task instance_id stream max_abs_logit_error valid donor_choice_differs donor_provenance sender_keys mechanism_task condition'.split())
++def need(ok,message):
++ if not ok:raise ValueError(message)
++def metric_types(choice=False):
++ d={k:'float' for k in ('margin','raw_margin','native_margin','native_raw_margin')};d.update(argmax='int',native_argmax='int',correct='bool',binary_win='bool')
++ if choice:d.update(choice_margin='float',choice_correct='bool')
++ return d
++def function(text,name):return next(n for n in ast.parse(text).body if isinstance(n,ast.FunctionDef) and n.name==name)
++def verify_runner_schema(text):
++ node=function(text,'score_cell');assign=next(n for n in ast.walk(node) if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='record' for t in n.targets))
++ need(isinstance(assign.value,ast.Call) and {k.arg for k in assign.value.keywords}==BASE,'unmodelled native record fields')
++ stats=function(text,'_stats');a=next(n for n in ast.walk(stats) if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='result' for t in n.targets))
++ need({k.arg for k in a.value.keywords}==set(metric_types()),'native _stats base fields drift')
++ extra={n.targets[0].slice.value for n in ast.walk(stats) if isinstance(n,ast.Assign) and isinstance(n.targets[0],ast.Subscript) and isinstance(n.targets[0].slice,ast.Constant) and isinstance(n.targets[0].slice.value,str)}
++ need(extra=={'choice_margin','choice_correct'},'native choice branch drift')
++ return {'record_fields':sorted(BASE),'metric_types':metric_types(True)}
++def verify_append_schema(text):
++ node=function(text,'score');append=next(n for n in ast.walk(node) if isinstance(n,ast.FunctionDef) and n.name=='append')
++ calls=[n for n in ast.walk(append) if isinstance(n,ast.Call) and isinstance(n.func,ast.Attribute) and n.func.attr=='deepcopy']
++ need(any(ast.dump(c.args[0])==ast.dump(ast.parse('group["members"]',mode='eval').body) for c in calls),'alias members no longer deep-copied')
++ need(any(ast.dump(c.args[0])==ast.dump(ast.parse('references[group["task"]]',mode='eval').body) for c in calls),'compact bank reference conversion drift')
++ return {'alias_fields':sorted(ALIAS),'member_semantics':'deepcopy','source_provenance_semantics':'shallow reference'}
++def verify_function_pins(texts,contract):
++ for file,functions in contract.items():
++  for name,pin in functions.items():
++   actual=hashlib.sha256(ast.dump(function(texts[file],name),include_attributes=False).encode()).hexdigest()
++   need(actual==pin,'native emitted branch/function drift: '+file+':'+name)
++def bound_row(row,source,mapping,operation,name,group,compute,receipt_sha,bank_reference,choice):
++ members=group['members'];supported=mapping is None or mapping['supported']
++ r=dict(task=row['task'],instance_id=row['instance_id'],condition=row['condition'],stream=row['stream'],group=name,group_members=copy.deepcopy(members),operation=operation,expected_token=row['expected_token'],opposite_token=row['opposite_token'],honest_token=row['honest_token'],pressure_id=str(source.get('pressure_id',row['instance_id'])),source_provenance=source,donor_provenance=mapping,donor_seed=mapping.get('seed') if mapping else None,self_replay_margin_error=FLOAT_SLOT,assay_valid=BOOL_SLOT,supported=bool(supported),degenerate=operation in ('self_replay','empty') or not members,gate_valid=operation not in ('self_replay','empty') and bool(members),group_source='matched_pressure_twin',a2_group_sha256=group['membership_sha256'],a2_receipt_sha256=receipt_sha,training_seed=group['training_seed'],compute_alias=compute)
++ if mapping is not None:r.update(degenerate=mapping.get('degenerate',False) or not members,gate_valid=mapping.get('gate_valid',False) and bool(members))
++ if not supported:r['unsupported_reason']=mapping.get('unsupported_reason')
++ else:
++  for prefix in ('intact','patched'):
++   for k,t in metric_types(choice).items():r[prefix+'_'+k]={'float':FLOAT_SLOT,'int':INT_SLOT,'bool':BOOL_SLOT}[t]
++  if operation=='h_mean':r['mean_bank_provenance']=copy.deepcopy(bank_reference)
++ validate_row_fields(r,choice);return r
++def validate_row_fields(row,choice):
++ expected=BASE|ALIAS
++ if not row['supported']:expected=expected|{'unsupported_reason'}
++ else:
++  expected=expected|{p+'_'+k for p in ('intact','patched') for k in metric_types(choice)}
++  if row['operation']=='h_mean':expected=expected|{'mean_bank_provenance'}
++ need(set(row)==expected,'missing/unmodelled metadata/metric fields')
++def bound_control(row,mapping,keys,task):
++ c=dict(task=row['task'],instance_id=row['instance_id'],stream=row['stream'],max_abs_logit_error=FLOAT_SLOT,valid=BOOL_SLOT,donor_choice_differs=BOOL_SLOT,donor_provenance=mapping,sender_keys=[list(k) for k in keys],mechanism_task=task,condition=row['condition']);validate_control(c,keys);return c
++def validate_control(control,keys):
++ need(set(control)==CONTROL and control['sender_keys']==[list(k) for k in keys],'control field/sender coverage drift')
++def json_size(value,*,ensure_ascii=True,compact=False):
++ enc=json.JSONEncoder(sort_keys=True,allow_nan=False,ensure_ascii=ensure_ascii,**({'separators':(',',':')} if compact else {}));return sum(len(c.encode()) for c in enc.iterencode(value))
++def encoder_accounting(value,*,compact=False):
++ enc=json.JSONEncoder(sort_keys=True,allow_nan=False,**({'separators':(',',':')} if compact else {}));n=0;volume=0;chunks=0
++ for c in enc.iterencode(value):n+=1;volume+=len(c.encode());chunks+=sys.getsizeof(c)
++ # All output ASCII under actual default ensure_ascii; retain every pure-python
++ # scalar chunk as a conservative C-encoder chunk/list envelope, plus full str,
++ # UTF8 bytes and list over-allocation. No streaming-hash substitution.
++ return dict(bytes=volume,chunks=n,chunk_object_bytes=chunks,full_encoding_overlap_bound=chunks+16*n+3*volume+4096)
++def graph_sizes(value):
++ seen=set();active=set();memo={};unique=[0]
++ def walk(v):
++  ident=id(v)
++  need(ident not in active,'cyclic graph forbidden')
++  if ident in memo:return memo[ident]
++  active.add(ident)
++  own=sys.getsizeof(v)
++  if ident not in seen:seen.add(ident);unique[0]+=own
++  if isinstance(v,dict):total=own+sum(walk(k)+walk(x) for k,x in v.items())
++  elif isinstance(v,(list,tuple,set,frozenset)):total=own+sum(walk(x) for x in v)
++  else:need(v is None or isinstance(v,(str,int,float,bool)),'non-JSON graph class');total=own
++  active.remove(ident);memo[ident]=total;return total
++ no_share=walk(value);return unique[0],no_share
+--- red-initial-supervisor.py
++++ supervisor.py
+@@ -1,2 +1,50 @@
+-"""Initial incomplete completion gate, intentionally exposed by tests first."""
+-def normal_child(code,term,finished,deadline,report):return None
++"""One proposed4CPU48GiB45min CPU proof, bounded child2400+15; no retry."""
++import argparse,datetime,json,os,re,signal,socket,subprocess,time,traceback
++from pathlib import Path
++import proof_guards as g
++CHILD=None
++LABELS=dict(MODEL_LOADED=False,EFFECTS_READ=False,SYNTHETIC_SCHEMA_ONLY=True,NUMERICAL_CONTROLS_TESTED=False,GPU_ADMITTED=False)
++def normal_child(code,term,finished,deadline,report):
++ if not(code==0 and term is None and finished<=deadline and report.get('status')=='CHILD_NORMAL_POSTGUARDS_AWAIT_SUPERVISOR' and report.get('complete') is False and all(report.get(k) is v for k,v in LABELS.items())):raise ValueError('partial/terminated/late/non-schema child cannot complete')
++def allocation():
++ job=os.environ['SLURM_JOB_ID'];assert re.fullmatch('[0-9]+',job)
++ raw=subprocess.check_output(['scontrol','show','job',job,'-o'],universal_newlines=True,timeout=15,env=dict(os.environ,TZ='UTC'));f=dict(v.split('=',1) for v in raw.split() if '=' in v);t=dict(v.split('=',1) for v in f.get('AllocTRES',f.get('TRES','')).split(',') if '=' in v)
++ assert f['JobId']==job and f['JobState']=='RUNNING' and re.search(r'\('+str(os.getuid())+r'\)',f['UserId'])
++ assert f['NumCPUs']=='4' and t['cpu']=='4' and f['NumNodes']=='1' and f['Partition'] in ('cpu','cpu-interactive') and f['Account'].endswith('-cpu') and f['Requeue']=='0' and f['Restarts']=='0'
++ assert t.get('mem') in ('48G','49152M') and not any(k.startswith('gres/gpu') and float(v)>0 for k,v in t.items())
++ assert f['TimeLimit'] in ('00:45:00','45:00') and Path(f['WorkDir']).resolve()==g.R.resolve() and os.environ.get('SLURM_CLUSTER_NAME')=='delta'
++ assert os.environ.get('SLURM_CPUS_PER_TASK')=='4' and os.environ.get('CUDA_VISIBLE_DEVICES','')==''
++ for k in ('SLURM_JOB_GPUS','SLURM_STEP_GPUS'):assert not os.environ.get(k)
++ for k in ('SLURM_GPUS','SLURM_GPUS_ON_NODE','SLURM_GPUS_PER_NODE','SLURM_GPUS_PER_TASK'):assert os.environ.get(k,'') in ('','0')
++ hosts=subprocess.check_output(['scontrol','show','hostnames',f['NodeList']],universal_newlines=True,timeout=15).split();assert socket.gethostname().split('.')[0] in {x.split('.')[0] for x in hosts}
++ end=datetime.datetime.strptime(f['EndTime'],'%Y-%m-%dT%H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp();return dict(job=job,host=socket.gethostname(),raw=raw,fields=f,tres=t,end_epoch=end,captured_unix=time.time())
++def terminate():
++ if CHILD is not None and CHILD.poll() is None:
++  os.killpg(CHILD.pid,signal.SIGTERM)
++  try:CHILD.wait(timeout=10)
++  except subprocess.TimeoutExpired:os.killpg(CHILD.pid,signal.SIGKILL);CHILD.wait(timeout=5)
++def interrupted(sig,frame):raise TimeoutError('supervisor signal '+str(sig))
++def main():
++ global CHILD
++ ap=argparse.ArgumentParser();ap.add_argument('--output',required=True);ap.add_argument('--manifest-sha256',required=True);a=ap.parse_args();g.packet(a.manifest_sha256);out=Path(a.output);assert out.is_absolute();out=out.resolve();assert not out.is_relative_to(g.G.resolve()) and not out.is_relative_to(g.R.resolve()) and not out.exists();out.mkdir(parents=True,exist_ok=False)
++ initial=allocation();g.write(out/'allocation-before.json',initial);assert initial['end_epoch']-time.time()>=2520
++ for sig in (signal.SIGTERM,signal.SIGINT):signal.signal(sig,interrupted)
++ deadline=min(time.monotonic()+2400,time.monotonic()+initial['end_epoch']-time.time()-120);started=time.time();term=None
++ cmd=['/u/swong2/.conda/envs/mgnp/bin/python','-B',str(g.P/'proof_worker.py'),'--output',str(out),'--manifest-sha256',a.manifest_sha256,'--deadline-monotonic',str(deadline)]
++ try:
++  with (out/'child.log').open('x') as log:
++   CHILD=subprocess.Popen(cmd,cwd=str(g.R),env=dict(os.environ,PYTHONPATH=str(g.R),CUDA_VISIBLE_DEVICES='',PYTHONDONTWRITEBYTECODE='1'),stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
++   while CHILD.poll() is None:
++    current=allocation();deadline=min(deadline,time.monotonic()+current['end_epoch']-time.time()-120)
++    if time.monotonic()>=deadline:term=time.time();terminate();break
++    time.sleep(2)
++  finished=time.monotonic();after=allocation();g.write(out/'allocation-after.json',after)
++  child_report=g.read(out/'CHILD-REPORT.json') if (out/'CHILD-REPORT.json').is_file() else {}
++  execution=dict(command=cmd,exit_code=CHILD.returncode,term_sent_at=term,started_unix=started,finished_unix=time.time(),deadline_monotonic=deadline,timely=finished<=deadline,actual_CPU_job_id=initial['job'],**LABELS);g.write(out/'child-execution.json',execution)
++  normal_child(CHILD.returncode,term,finished,deadline,child_report);assert after['end_epoch']-time.time()>=90
++  g.packet(a.manifest_sha256);last=allocation();assert min(initial['end_epoch'],last['end_epoch'])-time.time()>=30 and time.time()-started<=2670,'late supervisor publication';g.write(out/'allocation-final.json',last);result=dict(child_report,complete=True,status='COMPLETE_CPU_SCHEMA_RESOURCE_PROOF_ONLY',actual_CPU_job_id=initial['job'],child_report_sha256=g.sha(out/'CHILD-REPORT.json'),child_execution_sha256=g.sha(out/'child-execution.json'),packet_sha256=a.manifest_sha256,GPU_ADMITTED=False)
++  g.write(out/'COMPLETE-PROOF.json',result)
++ except BaseException as e:
++  terminate();g.write(out/'FAILED-supervisor.json',dict(complete=False,error=repr(e),traceback=traceback.format_exc(),**LABELS));raise
++ finally:terminate()
++if __name__=='__main__':main()

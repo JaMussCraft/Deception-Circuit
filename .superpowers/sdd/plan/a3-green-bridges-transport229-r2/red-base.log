@@ -1,0 +1,27 @@
+test_reaped_leader_live_child (test_host.ProcessGroups) ... FAIL
+test_term_leader_exits_ignoring_child (test_host.ProcessGroups) ... FAIL
+
+======================================================================
+FAIL: test_reaped_leader_live_child (test_host.ProcessGroups)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/a3-cleanup-red-vkpjtr08/test_host.py", line 88, in test_reaped_leader_live_child
+    def test_reaped_leader_live_child(self):self.exercise(True)
+  File "/tmp/a3-cleanup-red-vkpjtr08/test_host.py", line 83, in exercise
+    else:self.fail('grandchild survived process-group cleanup')
+AssertionError: grandchild survived process-group cleanup
+
+======================================================================
+FAIL: test_term_leader_exits_ignoring_child (test_host.ProcessGroups)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/a3-cleanup-red-vkpjtr08/test_host.py", line 89, in test_term_leader_exits_ignoring_child
+    def test_term_leader_exits_ignoring_child(self):self.exercise(False)
+  File "/tmp/a3-cleanup-red-vkpjtr08/test_host.py", line 83, in exercise
+    else:self.fail('grandchild survived process-group cleanup')
+AssertionError: grandchild survived process-group cleanup
+
+----------------------------------------------------------------------
+Ran 2 tests in 6.275s
+
+FAILED (failures=2)

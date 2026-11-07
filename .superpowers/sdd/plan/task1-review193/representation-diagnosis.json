@@ -1,0 +1,23 @@
+{
+  "native_tuple_fixture": {
+    "requirements": [
+      {
+        "target_keys": [
+          [
+            "example only"
+          ]
+        ]
+      }
+    ]
+  },
+  "finding": "Native builder constructs tuple target/shard keys at workload607/609. Existing JSON serialization normalizes tuple arrays to list. Failed chain requires pre-serialization Python equality that unchanged read_object cannot satisfy.",
+  "pure_counterexample": {
+    "Python_native_repr": "{'requirements': [{'target_keys': [('prefit', ('head', 1, 0))]}]}",
+    "ordinary_JSON_roundtrip_repr": "{'requirements': [{'target_keys': [['prefit', ['head', 1, 0]]]}]}",
+    "native_equals_roundtrip": false
+  },
+  "actual_saved_fixture_payload_bytes": 6035280,
+  "actual_saved_fixture_JSON_freeze_equals_JSON_value": true,
+  "probe_scope": "Only existing unchanged freeze function extracted via AST plus stdlib JSON on saved fixture; no model or native builder rerun.",
+  "recommended_root_ruling": "Test-only change: assert frozen equals untouched read_object(target), retain canonical native digest and exact ordinary publisher bytes/count/reference comparisons. Do not preserve tuples in reader or change builder/generic methods."
+}

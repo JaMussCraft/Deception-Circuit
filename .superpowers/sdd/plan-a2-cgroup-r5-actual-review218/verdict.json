@@ -1,0 +1,70 @@
+{
+  "verdict": "ACCEPT_ACTUAL_R5_DIAGNOSTIC_NATIVE_VISIBILITY_AND_TOP_MOUNT_RO_ONLY",
+  "packet_manifest_sha256": "889ee0c986fd392ba1cf00300d93ae46f6714cae10a58175862a3a9ba7a88db7",
+  "actual_job_id": "50311864",
+  "audit_result_sha256": "e8a4124b7fa6b10ca9dabb011faee4146ed3814c3a54ec0546ee9da966a34c1e",
+  "receipt_sha256": "d18af62d386cedb976915539d7bac3a1acb25d3ca164697cb6a858a3b5e37798",
+  "findings": [],
+  "accepted": {
+    "normal_terminal": "COMPLETED0:0after5seconds",
+    "exact_r5_submission_manifest_and_launch": true,
+    "all8_fetched_files_and_all8_packet_members_rehashed": true,
+    "actual_Bridges_allocation_identity_and_zeroGPU": true,
+    "host_exit": 0,
+    "container_exit": 0,
+    "correct_job_membership": "/slurm/uid_105853/job_50311864/step_batch/task_0",
+    "actual_native_worker_path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50311864/step_batch/task_0",
+    "required_actual_counters_visible": true,
+    "samefile_checks_individually_host_and_container": true,
+    "cross_context_inode_stat_recorded": false,
+    "top_mount": {
+      "id": 1682,
+      "parent_id": 1676,
+      "path": "/sys/fs/cgroup/memory",
+      "per_mount": "ro",
+      "superblock": "rw,memory"
+    },
+    "hidden_lower_mount": {
+      "id": 1676,
+      "parent_id": 1669,
+      "path": "/sys/fs/cgroup/memory",
+      "per_mount": "rw",
+      "superblock": "rw,memory"
+    },
+    "no_graph_no_model_no_proof_admission": true
+  },
+  "mount_interpretation": "The topmost same-location mount is not a parent of another same-location mount.1682 sits above1676 and is readonly. Hidden lower per-mount rw and filesystem superblock rw do not negate top per-mount ro. The requested ordered parent+memory child bind actually executed in this diagnostic.",
+  "proposed_live_entry_barrier_assessment": {
+    "matches_existing_readonly_contract": true,
+    "permitted_proposal": "assert os.statvfs(inner['frozen_worker_path']).f_flag & os.ST_RDONLY",
+    "scope": "Fresh container-only path lookup at actual selected native worker directory, after unique actual membership/samefile/device-inode checks and before worker_entry_permitted/exec. Host controller remains normally writable; do not require host readonly.",
+    "failure_behavior": "OSError/missing flag or zero ST_RDONLY must fail closed and preserve entry failure; no counter write or runtime mount operation.",
+    "record_for_audit": "Record actual selected path, f_flag and ST_RDONLY result in container entry observation.",
+    "authority_change": false,
+    "implementation_reviewed": false,
+    "actual_statvfs_readonly_bit_observed_in_this_probe": false
+  },
+  "verification": {
+    "base_audit_exit_code": 0,
+    "mgnp_audit_exit_code": 0,
+    "audit_script_sha256": "57d6f79f50a1bb9b2a25a8c2b3f50511a9b76ede7cd8e44a2511896cb650c9d4",
+    "metadata_evidence_only": true,
+    "new_jobs_remote_or_model": false
+  },
+  "remaining": [
+    "Root must authorize and freeze distinct combined catalogue+cgroup adapter213; exact final source/bindings/provenance/tests still need independent review.",
+    "Fresh actual entry remains required in every genuine CPU proof, including effective readonly barrier and unchanged source/input/catalogue/bank/protection/deadline/cgroup/resource guards.",
+    "Actual root transfer closure, four fresh stable Delta catalogue snapshots, actual job/output and exact diagnostic/review/transfer bindings remain original prerequisites.",
+    "No full graph/resource result or GPU/full-score admission follows from this diagnostic acceptance."
+  ],
+  "references": {
+    "mountinfo": "https://man7.org/linux/man-pages/man5/proc_pid_mountinfo.5.html",
+    "statvfs": "https://man7.org/linux/man-pages/man3/statvfs.3.html"
+  },
+  "implementation_edits": false,
+  "scheduler_actions": false,
+  "remote_actions": false,
+  "last_live_usage_percent": 20,
+  "next_checkpoint_percent": 33,
+  "ordinary_cap_percent": 80
+}

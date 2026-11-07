@@ -1,0 +1,39 @@
+{
+  "launch": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-fit-select-highmem-cpu-proposal/launch.sbatch",
+  "supervisor": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-fit-select-highmem-cpu-proposal/supervisor.py",
+  "prepare": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-fit-select-highmem-cpu-proposal/prepare.py",
+  "config": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-fit-select-highmem-cpu-proposal/config.json",
+  "settings_sha256": "38d0e759e9ae2892d8ac5fd541d7a9a1010f843b08fdb23a4b6ab1ebdaacdc54",
+  "commands": [
+    {
+      "name": "inventory-fit-select",
+      "argv": [
+        "bash",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/scripts/jobs/specificity_a3.sh",
+        "--experiment",
+        "directions",
+        "--design",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical/design.json",
+        "--commit",
+        "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+        "--work-dir",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical",
+        "--registry",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+        "--stage",
+        "prepare",
+        "--action",
+        "inventory",
+        "--inventory-stage",
+        "fit-select",
+        "--inventory",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-fit-select-highmem-861f84a3938a-proposed/inventory/fit-select"
+      ],
+      "cwd": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime"
+    }
+  ],
+  "validation_requested": false,
+  "model_requested": false,
+  "AST_parses": 3,
+  "bash_syntax_exit": 0
+}

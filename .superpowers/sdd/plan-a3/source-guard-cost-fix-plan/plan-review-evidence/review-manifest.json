@@ -1,0 +1,37 @@
+{
+  "kind": "independent_source_guard_repair_plan_review",
+  "baseline_commit": "87fceb28b3b46f4a406c0280db785697a0bbd3fc",
+  "candidate_root": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/source-guard-cost-fix-source",
+  "source_files": 509,
+  "source_matches_baseline": true,
+  "implementation_absent": true,
+  "repair_plan_sha256": "6504f7ec2d8f25114dff3de7bd86074fc762171f88b7a3ba227a798fc689712f",
+  "scope_sha256": "1adc3191450dbf4314ce6f8f204cf42591931a54b072fc25fd09692106ce03a0",
+  "evidence": {
+    "source-guard-cpu-profile.json": "7542aabe61d83dd750059a07de116714258d2ff997c61a5548d35a78d3746be7",
+    "source-guard-cpu-timing.json": "c0390261bf4994c1e03bdcaf1df8ac3bba792a5639849f9099da0fbd0218f381",
+    "source-unchanged.json": "1f7243f698f39da9fc60bc87f27da1d9a3020d8a37ad7df40af0cbffcf2cf639",
+    "first-validate-prepared-timing.json": "8ace5e296604ca816a04e69d6ed3df6dbd2d73115ffcf39b9dcf31ddb78e0ce7",
+    "source-guard-profile.txt": "79df98bc8bda43b4bddf0007a232ed0830db44c47bb3c3ed43b6a565da9762cf"
+  },
+  "scoped_plan_verdict": "ACCEPT with explicit implementation acceptance clarifications",
+  "implementation_or_model_authority": false,
+  "reviewed_documents": {
+    "plan-review.md": "03e7876bca37aabfb7044e32d3a286b9a1a77241f1cdecda8a3382a904f21d2f",
+    "118-source-cost-plan-review-handback.md": "b7ea4eb49d18d72cc196d20b97659b94f89b7489c3ae2888cdaeb8f59215e506"
+  },
+  "live_usage": {
+    "source": "codex app-server account/rateLimits/read",
+    "checked_at": "2026-11-02T19:40:21.978822+00:00",
+    "limit_id": "codex",
+    "pause_at_used_percent": 80.0,
+    "weekly": {
+      "used_percent": 57,
+      "remaining_percent": 43,
+      "resets_at": 1793981261,
+      "resets_at_utc": "2026-11-06T16:07:41+00:00"
+    },
+    "should_pause": false,
+    "status": "ok"
+  }
+}

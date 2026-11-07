@@ -1,0 +1,21 @@
+{
+  "job": "50309188",
+  "proc_self_cgroup": "12:blkio:/system.slice/slurmd.service\n11:memory:/slurm/uid_105853/job_50309188/step_batch/task_0\n10:freezer:/slurm/uid_105853/job_50309188/step_batch\n9:pids:/system.slice/slurmd.service\n8:devices:/slurm/uid_105853/job_50309188/step_batch/task_0\n7:net_cls,net_prio:/\n6:perf_event:/\n5:hugetlb:/\n4:cpuset:/slurm/uid_105853/job_50309188/step_batch\n3:rdma:/\n2:cpu,cpuacct:/slurm/uid_105853/job_50309188/step_batch/task_0\n1:name=systemd:/system.slice/slurmd.service\n",
+  "records": [
+    {
+      "controller": "v1",
+      "path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50309188/step_batch/task_0",
+      "frozen_worker_path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50309188/step_batch/task_0",
+      "same_as_frozen_worker_path": true,
+      "membership": "/slurm/uid_105853/job_50309188/step_batch/task_0",
+      "job_scoped": true,
+      "values": {
+        "memory.usage_in_bytes": "51961856\n",
+        "memory.max_usage_in_bytes": "51961856\n",
+        "memory.failcnt": "0\n",
+        "memory.oom_control": "oom_kill_disable 0\nunder_oom 0\noom_kill 0\n"
+      }
+    }
+  ],
+  "required_194_counter_visible": true
+}

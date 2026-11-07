@@ -1,0 +1,11 @@
+{
+  "complete": false,
+  "stage": "immutable-worker",
+  "error": "ValueError('partial/terminated/late/non-schema child cannot complete',)",
+  "traceback": "Traceback (most recent call last):\n  File \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/host_supervisor.py\", line 126, in main\n    normal_child(child.returncode,term,finished,deadline,report);assert after['end_epoch']-time.time()>=90;stage='final-guards';check_packet(packet,a.manifest_sha256);assert sha(a.bindings)==a.bindings_sha256\n  File \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r3/host_supervisor.py\", line 49, in normal_child\n    if not(code==0 and term is None and finished<deadline and report.get('status')=='CHILD_NORMAL_POSTGUARDS_AWAIT_SUPERVISOR' and report.get('complete') is False and all(report.get(k) is v for k,v in LABELS.items())):raise ValueError('partial/terminated/late/non-schema child cannot complete')\nValueError: partial/terminated/late/non-schema child cannot complete\n",
+  "MODEL_LOADED": false,
+  "EFFECTS_READ": false,
+  "SYNTHETIC_SCHEMA_ONLY": true,
+  "NUMERICAL_CONTROLS_TESTED": false,
+  "GPU_ADMITTED": false
+}

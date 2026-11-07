@@ -1,0 +1,83 @@
+{
+  "status": "ATTRIBUTABLE_R198_RED",
+  "observations": [
+    {
+      "python": [
+        3,
+        9,
+        18
+      ],
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--tb=short",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-red-r2/env1.xml",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-red-r2/tmp-env1",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py"
+      ],
+      "exit_code": 1,
+      "tests": 14,
+      "failed": [
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[release-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[release-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[config-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[config-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-allocation]",
+        "test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[allocation]",
+        "test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[context]",
+        "test_real_entry_reobserves_shortened_allocation_after_consume",
+        "test_real_entry_allowed_shortening_sets_exact_Popen_timeout"
+      ],
+      "errors": []
+    },
+    {
+      "python": [
+        3,
+        12,
+        13
+      ],
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--tb=short",
+        "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-red-r2/env2.xml",
+        "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green-r2/local-red-r2/tmp-env2",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_entry198.py"
+      ],
+      "exit_code": 1,
+      "tests": 14,
+      "failed": [
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[release-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[release-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[config-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[config-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[WAITING-allocation]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-bank]",
+        "test_real_entry_rechecks_immutable_files_after_costly_IO[catalogue-allocation]",
+        "test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[allocation]",
+        "test_real_entry_slow_consume_cannot_drop_below_reviewed_floor[context]",
+        "test_real_entry_reobserves_shortened_allocation_after_consume",
+        "test_real_entry_allowed_shortening_sets_exact_Popen_timeout"
+      ],
+      "errors": []
+    }
+  ],
+  "new_test_sha256": "e6a5768d3f35a95a0d2305db097642b0c90632e8192c909ef801e3da6a189919",
+  "original_tests_unchanged": true,
+  "real_entry_guard_unreplaced": true,
+  "bank_allocation_native_audit_IO_isolated": true
+}

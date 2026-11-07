@@ -1,0 +1,18 @@
+[
+  "sbatch",
+  "--parsable",
+  "--account=bjhz-delta-cpu",
+  "--partition=cpu-interactive",
+  "--constraint=projects",
+  "--nodes=1",
+  "--ntasks=1",
+  "--cpus-per-task=4",
+  "--mem=32G",
+  "--time=00:15:00",
+  "--no-requeue",
+  "--export=ALL,CUDA_VISIBLE_DEVICES=",
+  "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime",
+  "--job-name=lad-A2-data239",
+  "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/slurm-%j.log",
+  "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/dispatch.sh"
+]

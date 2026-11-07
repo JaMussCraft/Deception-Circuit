@@ -1,0 +1,412 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/supervisor.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/supervisor.py
+@@ -54,43 +54,60 @@
+             group_signal(pgid, signal.SIGKILL); killed = True
+         time.sleep(min(.05, max(0, final_end - time.monotonic())))
+ 
+-def execute(argv, stdout, stderr, cap, initial_end, allocation, env=None, cwd=None):
+-    _, current_end = allocation()
+-    bound = stage_bound(time.time(), initial_end, current_end, cap)
+-    mono = time.monotonic() + max(0, bound - time.time())
+-    child = None; cleaning = False; raw = dict(argv=argv, exit_code=None, normal_completion=False,
+-        started=time.time(), deadline=bound)
++def execute(argv, stdout, stderr, cap, initial_end, allocation, env=None, cwd=None,
++            wall_deadline=None, monotonic_deadline=None):
++    # Production callers supply both bounds captured before source/command/log I/O.
++    # The default starts a fresh stage here for direct pure callers with no prior
++    # preparation. Neither path may renew a bound after any allocation query.
++    started = time.time(); started_mono = time.monotonic()
++    supplied = wall_deadline is not None or monotonic_deadline is not None
++    bound = started + cap if wall_deadline is None else wall_deadline
++    mono = started_mono + cap if monotonic_deadline is None else monotonic_deadline
++    bound = min(bound, initial_end - FINAL_RESERVE - CLEANUP_RESERVE)
++    child = None; cleaning = False
++    raw = dict(argv=argv, exit_code=None, normal_completion=False, started=started,
++        deadline=bound, monotonic_deadline=mono)
+     def interrupt(signum, frame):
+         raise RuntimeError('supervisor signal %d' % signum)
++    def remaining():
++        left = min(bound - time.time(), mono - time.monotonic())
++        if left <= 0:
++            raise TimeoutError('stage deadline expired')
++        return left
+     handlers = {sig: signal.signal(sig, interrupt) for sig in (signal.SIGTERM, signal.SIGINT)}
+     try:
+-        # Expensive command construction and source checks happen at the caller.
+-        _, current_end = allocation()
+-        bound = min(bound, stage_bound(time.time(), initial_end, current_end, cap))
++        assert not supplied or (wall_deadline is not None and monotonic_deadline is not None), 'both original bounds required'
++        left = remaining()
++        _, current_end = allocation(timeout=min(15, left))
++        if not supplied:
++            # Budget feasibility is tested against the original start, not now.
++            bound = min(bound, stage_bound(started, initial_end, current_end, cap))
++        bound = min(bound, current_end - FINAL_RESERVE - CLEANUP_RESERVE)
+         raw['deadline'] = bound
++        # Final clock checks are after allocation I/O and immediately before Popen.
++        remaining()
+         child = subprocess.Popen(argv, stdout=stdout, stderr=stderr, env=env, cwd=cwd, start_new_session=True)
+         while child.poll() is None:
+-            left = min(bound - time.time(), mono - time.monotonic())
+-            if left <= 0:
+-                raise TimeoutError('stage deadline')
++            left = remaining()
+             _, current_end = allocation(timeout=min(15, left))
+             bound = min(bound, current_end - FINAL_RESERVE - CLEANUP_RESERVE)
+-            if time.time() >= bound or time.monotonic() >= mono:
+-                raise TimeoutError('shortened allocation')
++            raw['deadline'] = bound
++            left = remaining()
+             time.sleep(min(.2, left))
+         raw.update(exit_code=child.returncode, finished=time.time(), deadline=bound)
+-        # A leader that exits with live descendants is incomplete and fails.
+         assert not group_signal(child.pid, 0), 'live child descendants'
+-        _, current_end = allocation()
++        left = remaining()
++        _, current_end = allocation(timeout=min(15, left))
+         bound = min(bound, current_end - FINAL_RESERVE - CLEANUP_RESERVE)
+-        raw['deadline'] = bound
+-        assert timely(child.returncode, time.time(), bound) and time.monotonic() < mono, 'late/nonzero child'
++        raw.update(deadline=bound, finished=time.time())
++        remaining()
++        assert timely(child.returncode, raw['finished'], bound), 'late/nonzero child'
+         raw['normal_completion'] = True
+     except BaseException as ex:
+-        raw.update(error=repr(ex), finished=time.time(), exit_code=None if child is None else child.poll())
++        raw.update(error=repr(ex), finished=time.time(), deadline=bound,
++            exit_code=None if child is None else child.poll())
+         if child is not None and not cleaning:
+             cleaning = True
+-            # A signal cannot interrupt and restart the shared cleanup budget.
+             for sig in handlers:
+                 signal.signal(sig, signal.SIG_IGN)
+             try:
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/bridges/host.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/bridges/host.py
+@@ -20,7 +20,7 @@
+ import supervisor
+ import transport229 as old
+ 
+-PACKET_REL = Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded')
++PACKET_REL = Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded')
+ 
+ def durable(path, value):
+     with path.open('x') as stream:
+@@ -69,8 +69,15 @@
+         assert all(x['physical'] == x['virtual'] for x in c['files'] + c['aliases'])
+         old.check_records(c['files'], c['aliases'])
+ 
++def job_layout(output, job_id):
++    out = Path(output)
++    assert out.is_absolute() and '..' not in out.parts and str(out) == output, 'canonical absolute output required'
++    child = out.parent; root = child.parent
++    assert out.name == 'execution' and child.name == 'child' and root.name == 'job-'+job_id, 'private child output layout required'
++    return root, child, out
++
+ def command(c, stage, kind, deadline):
+-    out = Path(c['output']); packet = old.VIRT/PACKET_REL
++    _, child, out = job_layout(c['output'], c['job_id']); packet = old.VIRT/PACKET_REL
+     env = {k: v for k, v in os.environ.items() if k.startswith('SLURM_')}
+     env.update(CUDA_VISIBLE_DEVICES='', PYTHONDONTWRITEBYTECODE='1', PYTEST_DISABLE_PLUGIN_AUTOLOAD='1',
+         HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1',
+@@ -86,7 +93,7 @@
+     if kind == 'v1':
+         cg += ',/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro'
+     physical = old.virtual_to_physical(str(out.parent))
+-    # Only this actual job's private output parent is writable in the container.
++    # Host receipts stay at the job root, outside this child-only writable bind.
+     cmd = ['apptainer', 'exec', '--cleanenv', '--contain', '--no-home', '--writable-tmpfs', '--pwd', str(packet),
+         '--bind', str(old.PHYS)+':'+str(old.VIRT)+':ro', '--bind', '/ocean:/ocean:ro',
+         '--bind', '/ocean/projects/cis260361p/swong2/hf/hub:/work/nvme/beto/swong2:ro',
+@@ -95,6 +102,27 @@
+     for k, v in sorted(env.items()):
+         cmd.extend(['--env', k+'='+v])
+     return cmd + [old.IMAGE, old.PY, '-B', str(packet/'bridges/inner.py'), kind, str(out.parent)] + argv, None
++
++def execute_stage(c, stage, kind, root, initial_end, end):
++    _, current = allocation(c); end = min(end, current)
++    started = time.time(); started_mono = time.monotonic()
++    deadline = supervisor.stage_bound(started, initial_end, end, supervisor.CAPS[stage])
++    monotonic_deadline = started_mono + max(0, deadline - started)
++    # All preparation consumes these original bounds, including source/image
++    # validation, command construction, durable receipts and opening logs.
++    check_source(c)
++    if c['environment'] == 'mgnp':
++        assert old.sha(old.IMAGE) == old.IMAGE_SHA
++    argv, env = command(c, stage, kind, deadline)
++    durable(root/(stage+'-command.json'), dict(argv=argv, deadline=deadline, monotonic_deadline=monotonic_deadline))
++    with (root/(stage+'.stdout')).open('xb') as stdout, (root/(stage+'.stderr')).open('xb') as stderr:
++        result = supervisor.execute(argv, stdout, stderr, supervisor.CAPS[stage], initial_end,
++            lambda timeout=15: allocation(c, timeout), env=env,
++            wall_deadline=deadline, monotonic_deadline=monotonic_deadline)
++    durable(root/(stage+'-terminal.json'), result)
++    virtual_root, _, _ = job_layout(c['output'], c['job_id'])
++    terminal_ref = dict(path=str(virtual_root/(stage+'-terminal.json')), sha256=old.sha(root/(stage+'-terminal.json')))
++    return result, end, terminal_ref
+ 
+ def main():
+     ap = argparse.ArgumentParser()
+@@ -115,27 +143,18 @@
+     c = json.loads(path.read_text()); check_source(c)
+     f, end = allocation(c); initial_end = end
+     virtual_out = Path(c['output']); physical_out = Path(old.virtual_to_physical(str(virtual_out))) if c['environment'] == 'mgnp' else virtual_out
+-    root = physical_out.parent
+-    assert root.name == 'job-'+c['job_id'] and virtual_out.name == 'execution'
++    _, _, _ = job_layout(c['output'], c['job_id'])
++    root = physical_out.parent.parent
+     assert root.is_dir() and root.stat().st_uid == os.getuid() and root.resolve() == root and all(not p.is_symlink() for p in [root]+list(root.parents))
+     assert not list(root.iterdir())
++    physical_out.parent.mkdir(mode=0o700)
+     kind = old.actual_controller(c['job_id']); supervisor.enable_subreaper()
+     durable(root/'host-before.json', dict(allocation=f, end_bound=end, config_sha256=a.config_sha256, cgroup_kind=kind))
+     error = None; stage_refs = {}
+     try:
+         for stage in ('baseline', 'oracle', 'suite'):
+-            check_source(c)
+-            if c['environment'] == 'mgnp':
+-                assert old.sha(old.IMAGE) == old.IMAGE_SHA
+-            _, current = allocation(c); end = min(end, current)
+-            deadline = supervisor.stage_bound(time.time(), initial_end, end, supervisor.CAPS[stage])
+-            argv, env = command(c, stage, kind, deadline)
+-            durable(root/(stage+'-command.json'), dict(argv=argv, deadline=deadline))
+-            with (root/(stage+'.stdout')).open('xb') as stdout, (root/(stage+'.stderr')).open('xb') as stderr:
+-                result = supervisor.execute(argv, stdout, stderr, supervisor.CAPS[stage], initial_end,
+-                    lambda timeout=15: allocation(c, timeout), env=env)
+-            durable(root/(stage+'-terminal.json'), result)
+-            stage_refs[stage] = dict(path=str(virtual_out.parent/(stage+'-terminal.json')), sha256=old.sha(root/(stage+'-terminal.json')))
++            result, end, terminal_ref = execute_stage(c, stage, kind, root, initial_end, end)
++            stage_refs[stage] = terminal_ref
+             assert result['normal_completion'] is True, result
+     except BaseException as ex:
+         error = repr(ex)
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/aggregate.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/aggregate.py
+@@ -7,6 +7,8 @@
+ 
+ ENVS = {'base': '/sw/external/python/anaconda3/bin/python3.9',
+         'mgnp': '/u/swong2/.conda/envs/mgnp/bin/python'}
++REPAIRED_FAMILIES = ['test_prepared_receiver_resource_identity_and_capacity',
++    'test_prepared_final_barrier_after_all_costly_work']
+ BASELINE_COUNTS = {
+     'test_prepared_anchored_cgroup_scope_mismatch_rejects_before_loader': 2,
+     'test_prepared_anchored_cold_warm_cgroup_scope_disagreement_rejects': 1,
+@@ -20,6 +22,7 @@
+         raise ValueError(message)
+ 
+ def validate_partition(p):
++    require(p['repaired_families'] == REPAIRED_FAMILIES, 'exact correction265 repaired families')
+     nodes = p['full_collection']
+     require(len(nodes) == len(set(nodes)) == 223, 'original collection must be unique 223')
+     require(dict(Counter(n.split('::')[1].split('[')[0] for n in nodes)) == p['per_function_counts'], 'parameter multiplicities')
+@@ -80,7 +83,7 @@
+     Root must authenticate the complete map before calling this pure function.
+     """
+     validate_partition(expected_partition)
+-    require(expected_source['revision'] == 'r6-sharded', 'wrong packet revision')
++    require(expected_source['revision'] == 'r6-r2-sharded', 'wrong packet revision')
+     observed = {}; jobs = set(); outputs = set()
+     for ref in records:
+         m = read_ref(ref)
+@@ -99,6 +102,10 @@
+         require(m['source_before'] == m['source_after'] == expected_source, 'source/fixture/partition identity changed')
+         require(m['child_exit_code'] == 0 and m['child_normal_completion'] is True
+                 and m['child_started'] < m['child_finished'] < m['child_deadline'], 'late/nonzero/incomplete child')
++        output_path = Path(bound['output'])
++        require(output_path.name == 'execution' and output_path.parent.name == 'child'
++                and output_path.parent.parent.name == 'job-'+bound['job_id'], 'private child output layout')
++        require(Path(bound['host']['path']) == output_path.parent.parent/'host-after.json', 'host receipt outside child output')
+         nodes = expected_partition['shards'][shard]['execution_order']
+         require(m['collected'] == expected_partition['full_collection'] and m['executed'] == nodes, 'whole collection/executed identity')
+         artifacts = m['artifacts']; output = bound['output']
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/partition.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/partition.json
+@@ -1,6 +1,6 @@
+ {
+   "schema": 1,
+-  "revision": "r6-sharded",
++  "revision": "r6-r2-sharded",
+   "full_collection": [
+     "test_a3_prepared_pilot_target.py::test_prepared_writer_matches_untouched_publisher[payload0-{\"a\": -0.0, \"z\": 1.25}\\n]",
+     "test_a3_prepared_pilot_target.py::test_prepared_writer_matches_untouched_publisher[payload1-{\"text\": \"\\u03bb\\u96ea\"}\\n]",
+@@ -227,7 +227,7 @@
+     "test_a3_direction_runtime.py::test_bounded_pilot_cases_resume_authenticates_original_numbers_and_full_coverage"
+   ],
+   "repaired_families": [
+-    "test_prepared_correct_identity_understated_observed_resources_rejects",
++    "test_prepared_receiver_resource_identity_and_capacity",
+     "test_prepared_final_barrier_after_all_costly_work"
+   ],
+   "per_function_counts": {
+@@ -408,9 +408,17 @@
+         "test_a3_direction_runtime.py::test_bounded_pilot_cases_resume_authenticates_original_numbers_and_full_coverage"
+       ],
+       "execution_order": [
+-        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[retained]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[applicable-peak]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[wrong-scope]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[None-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[missing-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[reader-code-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[freeze-code-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[source-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[environment-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[recipe-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[scope-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[storage-family-100-True]",
+         "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-guard-union]",
+         "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-final-live-guard]",
+         "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[descriptor-marker-before-publication]",
+@@ -456,17 +464,9 @@
+         "test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[wrong-pid]",
+         "test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[wrong-part]",
+         "test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[pickle]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[None-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[missing-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[reader-code-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[freeze-code-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[source-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[environment-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[recipe-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[scope-100-True]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[storage-family-100-True]",
++        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[retained]",
++        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[applicable-peak]",
++        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[wrong-scope]",
+         "test_a3_prepared_pilot_target.py::test_prepared_dispatch_guard_and_geometry_order[cancel-during-reader]",
+         "test_a3_prepared_pilot_target.py::test_prepared_dispatch_guard_and_geometry_order[post-load-geometry]",
+         "test_a3_prepared_pilot_target.py::test_prepared_production_has_no_build_fallback[missing-handle]",
+@@ -637,8 +637,17 @@
+         "test_a3_direction_runtime.py::test_runtime_shard_evidence_counts_its_final_live_guard[2]"
+       ],
+       "execution_order": [
+-        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[transient]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[unavailable]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[None-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[missing-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[reader-code-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[freeze-code-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[source-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[environment-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[recipe-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[scope-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[storage-family-99-False]",
+         "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-before-publication]",
+         "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[descriptor-marker-guard-union]",
+         "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[descriptor-marker-final-live-guard]",
+@@ -683,17 +692,8 @@
+         "test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[wrong-context]",
+         "test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[reinitialize]",
+         "test_a3_prepared_pilot_target.py::test_prepared_handle_is_one_graph[fork]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[None-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[missing-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[reader-code-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[freeze-code-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[source-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[environment-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[recipe-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[scope-99-False]",
+-        "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[storage-family-99-False]",
++        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[transient]",
++        "test_a3_prepared_pilot_target.py::test_prepared_correct_identity_understated_observed_resources_rejects[unavailable]",
+         "test_a3_prepared_pilot_target.py::test_prepared_dispatch_guard_and_geometry_order[None]",
+         "test_a3_prepared_pilot_target.py::test_prepared_dispatch_guard_and_geometry_order[shorten-lease-during-reader]",
+         "test_a3_prepared_pilot_target.py::test_prepared_production_has_no_build_fallback[missing-preparation]",
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/run_packet.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/run_packet.py
+@@ -102,7 +102,7 @@
+ 
+ 
+ def source_identity():
+-    return dict(revision='r6-sharded', runtime_sha256=sha(CANDIDATE/'component_analysis/a3_direction_runtime.py'),
++    return dict(revision='r6-r2-sharded', runtime_sha256=sha(CANDIDATE/'component_analysis/a3_direction_runtime.py'),
+         fixture_sha256=sha(PACKET/'suite'/TEST), partition_sha256=sha(PACKET/'partition.json'),
+         source_pins_sha256=sha(PACKET/'source-pins.json'))
+ 
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/test_packet.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_packet.py
+@@ -46,13 +46,14 @@
+     with pytest.raises((AssertionError,ValueError)):a.validate_partition(p)
+ 
+ def terminal(tmp_path):
+-    a=module('aggregate'); p=contract(); source={'revision':'r6-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
++    a=module('aggregate'); p=contract(); source={'revision':'r6-r2-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+     bindings={}; records=[]
+     for env,py in a.ENVS.items():
+         bindings[py]={}
+         for shard in ('0','1'):
+-            out=tmp_path/env/shard; out.mkdir(parents=True)
+-            job=str(100+len(records)); cluster='delta' if env=='base' else 'bridges2'
++            job=str(100+len(records)); out=tmp_path/env/('job-'+job)/'child/execution'; out.mkdir(parents=True)
++            host_root=out.parent.parent
++            cluster='delta' if env=='base' else 'bridges2'
+             nodes=p['shards'][shard]['execution_order']
+             events=[dict(event='start',collected=p['full_collection'],requested=nodes,python=py,executable=py)]
+             for n in nodes:
+@@ -70,8 +71,8 @@
+             oracle=put(out/'oracle.json',dict(complete=True,exit_code=0,model_loaded=False,execution_authorized=False))
+             preflight=put(out/'preflight.json',dict(status='FIXTURE_PREFLIGHT_COMPLETE',normal_completion=True,exit_code=0,source_pins_before_after_equal=True))
+             config=put(out/'config.json',dict(job_id=job,cluster=cluster,environment=env,shard=int(shard),cpus=2 if env=='base' else 18,memory_gib=32,allocation_seconds=4800))
+-            stages={stage:put(out/(stage+'-terminal.json'),dict(normal_completion=True,exit_code=0,started=.5,finished=2.5,deadline=3)) for stage in ('baseline','oracle','suite')}
+-            host=put(out/'host.json',dict(status='HOST_COMPLETE',normal_completion=True,exit_code=0,job_id=job,cluster=cluster,output=str(out),source_checks_complete=True,allocation_checks_complete=True,config_sha256=config['sha256'],stages=stages))
++            stages={stage:put(host_root/(stage+'-terminal.json'),dict(normal_completion=True,exit_code=0,started=.5,finished=2.5,deadline=3)) for stage in ('baseline','oracle','suite')}
++            host=put(host_root/'host-after.json',dict(status='HOST_COMPLETE',normal_completion=True,exit_code=0,job_id=job,cluster=cluster,output=str(out),source_checks_complete=True,allocation_checks_complete=True,config_sha256=config['sha256'],stages=stages))
+             accounting=put(out/'accounting.json',dict(job_id=job,cluster=cluster,state='COMPLETED',exit_code='0:0',gpus=0))
+             m=dict(status='SHARD_GREEN',full_suite_accepted=False,execution_authorized=False,model_loaded=False,normal_completion=True,exit_code=0,environment=env,shard=int(shard),python=py,executable=py,job_id=job,cluster=cluster,output=str(out),source_before=source,source_after=source,child_exit_code=0,child_normal_completion=True,child_started=1,child_finished=2,child_deadline=3,collected=p['full_collection'],executed=nodes,artifacts=dict(events=dict(path=str(ep),sha256=a.digest(ep)),junit=dict(path=str(xp),sha256=a.digest(xp)),baseline=baseline,oracle=oracle,preflight=preflight))
+             ref=put(out/'run_manifest.json',m); records.append(ref)
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/proposal.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/proposal.json
+@@ -1,6 +1,6 @@
+ {
+   "status": "UNBOUND_NOT_RUNNABLE",
+-  "revision": "r6-sharded",
++  "revision": "r6-r2-sharded",
+   "allocation_seconds": 4800,
+   "stage_caps_seconds": {
+     "baseline": 610,
+@@ -45,5 +45,7 @@
+   "expected_bindings": null,
+   "execution_authorized": false,
+   "full_suite_accepted": false,
+-  "no_retry": true
++  "no_retry": true,
++  "output_layout": "job-<actual-job>/child/execution",
++  "host_receipt_layout": "job-<actual-job>/<stage>-terminal.json outside child subtree"
+ }
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/resource-proposal.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/resource-proposal.json
+@@ -1,6 +1,6 @@
+ {
+   "status": "UNBOUND_NOT_RUNNABLE",
+-  "revision": "r6-sharded",
++  "revision": "r6-r2-sharded",
+   "allocation_seconds": 4800,
+   "stage_caps_seconds": {
+     "baseline": 610,
+@@ -45,5 +45,7 @@
+   "expected_bindings": null,
+   "execution_authorized": false,
+   "full_suite_accepted": false,
+-  "no_retry": true
++  "no_retry": true,
++  "output_layout": "job-<actual-job>/child/execution",
++  "host_receipt_layout": "job-<actual-job>/<stage>-terminal.json outside child subtree"
+ }
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-sharded/bridges/manifest.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/bridges/manifest.json
+@@ -1,6 +1,6 @@
+ {
+-  "../supervisor.py": "a139e58329c6883fc7fda1f0cfcc41aab938421192f64b873e6893c1bd22a954",
+-  "host.py": "b42484de07ef09be88201ec91af402e6bd99ce710f180faad73c47bb395bda52",
++  "../supervisor.py": "9c4099cbc1214e3111727c978325d855c0949193b0683832c75926818bf226a6",
++  "host.py": "2cc1908a13bfe83f86375e4c82684973e2b5f6e9d6cdcda2e47a271d16114e9d",
+   "inner.py": "0268945f1bdf4c79ec1e2dc0e0540c5a4d2932afb619383d34971d0a928b6a93",
+   "launch.sh": "43ed6e7816db0ec391cf27973fedc12b2bd7a2978364e822b2254a4982a84b20",
+   "transport229.py": "83594af1e7b665faf684af15f84b6c42534cf493db31298afb0c38c5c596bee4"

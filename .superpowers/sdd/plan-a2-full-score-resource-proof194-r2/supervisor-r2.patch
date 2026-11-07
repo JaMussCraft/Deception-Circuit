@@ -1,0 +1,23 @@
+--- 194/supervisor.py
++++ 194-r2/supervisor.py
+@@ -5,7 +5,7 @@
+ CHILD=None
+ LABELS=dict(MODEL_LOADED=False,EFFECTS_READ=False,SYNTHETIC_SCHEMA_ONLY=True,NUMERICAL_CONTROLS_TESTED=False,GPU_ADMITTED=False)
+ def normal_child(code,term,finished,deadline,report):
+- if not(code==0 and term is None and finished<=deadline and report.get('status')=='CHILD_NORMAL_POSTGUARDS_AWAIT_SUPERVISOR' and report.get('complete') is False and all(report.get(k) is v for k,v in LABELS.items())):raise ValueError('partial/terminated/late/non-schema child cannot complete')
++ if not(code==0 and term is None and finished<deadline and report.get('status')=='CHILD_NORMAL_POSTGUARDS_AWAIT_SUPERVISOR' and report.get('complete') is False and all(report.get(k) is v for k,v in LABELS.items())):raise ValueError('partial/terminated/late/non-schema child cannot complete')
+ def allocation():
+  job=os.environ['SLURM_JOB_ID'];assert re.fullmatch('[0-9]+',job)
+  raw=subprocess.check_output(['scontrol','show','job',job,'-o'],universal_newlines=True,timeout=15,env=dict(os.environ,TZ='UTC'));f=dict(v.split('=',1) for v in raw.split() if '=' in v);t=dict(v.split('=',1) for v in f.get('AllocTRES',f.get('TRES','')).split(',') if '=' in v)
+@@ -38,9 +38,9 @@
+     current=allocation();deadline=min(deadline,time.monotonic()+current['end_epoch']-time.time()-120)
+     if time.monotonic()>=deadline:term=time.time();terminate();break
+     time.sleep(2)
+-  finished=time.monotonic();after=allocation();g.write(out/'allocation-after.json',after)
++  finished=time.monotonic();after=allocation();deadline=min(deadline,time.monotonic()+after['end_epoch']-time.time()-120);g.write(out/'allocation-after.json',after)
+   child_report=g.read(out/'CHILD-REPORT.json') if (out/'CHILD-REPORT.json').is_file() else {}
+-  execution=dict(command=cmd,exit_code=CHILD.returncode,term_sent_at=term,started_unix=started,finished_unix=time.time(),deadline_monotonic=deadline,timely=finished<=deadline,actual_CPU_job_id=initial['job'],**LABELS);g.write(out/'child-execution.json',execution)
++  execution=dict(command=cmd,exit_code=CHILD.returncode,term_sent_at=term,started_unix=started,finished_unix=time.time(),deadline_monotonic=deadline,timely=finished<deadline,actual_CPU_job_id=initial['job'],**LABELS);g.write(out/'child-execution.json',execution)
+   normal_child(CHILD.returncode,term,finished,deadline,child_report);assert after['end_epoch']-time.time()>=90
+   g.packet(a.manifest_sha256);last=allocation();assert min(initial['end_epoch'],last['end_epoch'])-time.time()>=30 and time.time()-started<=2670,'late supervisor publication';g.write(out/'allocation-final.json',last);result=dict(child_report,complete=True,status='COMPLETE_CPU_SCHEMA_RESOURCE_PROOF_ONLY',actual_CPU_job_id=initial['job'],child_report_sha256=g.sha(out/'CHILD-REPORT.json'),child_execution_sha256=g.sha(out/'child-execution.json'),packet_sha256=a.manifest_sha256,GPU_ADMITTED=False)
+   g.write(out/'COMPLETE-PROOF.json',result)

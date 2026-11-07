@@ -1,0 +1,26 @@
+{
+  "observed_utc": "2026-11-06T20:31:49.326808+00:00",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "--account=beto-delta-cpu",
+    "--partition=cpu",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=192G",
+    "--time=01:00:00",
+    "--no-requeue",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--job-name=lad-A3-base-compare",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01-%j.log",
+    "--wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-candidate-base-cpu-r4/oracle_cpu.sh --packet-sha256 a52c8696e83b525f64347ec8d714fb9bc450befa2e4638d6a46a6192eea8befe --config /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01-config.json --config-sha256 ac2a0bf852e53a863dc0e46c4a303e54de015b5493a8bdfee67a837d20ba6773 --mode candidate --environment base --output /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/candidate-base-r4-01"
+  ],
+  "returncode": 0,
+  "output": "23613360\n",
+  "review_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-optionA-base-oracle-binding-review195/verdict.json",
+  "review_sha256": "25664275d32632162ef084c765a15798acdff55c7f6f17a59f57072e65695fb9",
+  "placement_reason": "Beto regular CPU has the earlier tested forecast; interactive CPU currently has pending transport test23613149. Root may add permitted interactive placement only after prior short job is terminal; no automatic retry."
+}

@@ -1,0 +1,81 @@
+--- r2/host.py
++++ r3/host.py
+@@ -4,7 +4,7 @@
+ from pathlib import Path
+ import transport229 as old
+ 
+-REL=Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2')
++REL=Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3')
+ DIAG=old.VIRT/'Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/green-timeout-diagnosis253'
+ RECIPE=DIAG/'root-diagnostic-recipe-r2.json'
+ PINS={'manifest.json':'d28cfe84647c1961a7c68520acf6dbedc10c8ace49eaa5f7ab029f932b485446','root-diagnostic-recipe-r2.json':'96c57370c5bbc3883eab47774d85d5c38d7c27c2ee5fa1586f246e2082f2c7fb','diagnostic253.py':'63568713bd1c40f143c43932a909f6faf7e831d3f217b6f311256b419c1f4bac','full-collected-nodeids.json':'c7db91d43948f91618dcb891486de6cf1135ee1f6d7d3d7aeecc0e1e4ad5f5eb','suspect-nodeids.json':'8b8e1d6e986219d614fc38ff5d6f57cc4977ffe6c7f3e28ff66b165abd5593cc','next-nodeid.json':'d241c971d92ce5ca2649175cb003003d95b7ed6ab86558a9011be3f0e893246d'}
+--- r2/inner.py
++++ r3/inner.py
+@@ -15,9 +15,9 @@
+  kind,out=sys.argv[1:3]; assert kind in ('v1','v2')
+  lines=Path('/proc/self/mountinfo').read_text().splitlines()
+  paths=['/sys/fs/cgroup']+(['/sys/fs/cgroup/memory'] if kind=='v1' else [])
+- # Stat each visible cgroup mountpoint, not hidden layers sharing a path.
++ # Stat the declared readonly bind targets, not unrelated controllers.
+  relevant=[line for line in lines if line.split()[4].replace('\\040',' ')==('/sys/fs/cgroup') or line.split()[4].replace('\\040',' ').startswith('/sys/fs/cgroup/')]
+- targets=set(paths)|{line.split()[4].replace('\\040',' ') for line in relevant}
++ targets=set(paths)
+  flags={p:os.statvfs(p).f_flag for p in sorted(targets)}
+  assert all(flag & os.ST_RDONLY for flag in flags.values()),flags
+  with (Path(out)/'inner-mounts.json').open('x') as f:
+--- r2/launch.sh
++++ r3/launch.sh
+@@ -1,5 +1,5 @@
+ #!/bin/bash
+ set -euo pipefail
+ : "${SLURM_JOB_ID:?actual Bridges CPU allocation required}"
+-P=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r2
++P=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport254-r3
+ exec python3 -B "$P/host.py" --config "$1" --config-sha256 "$2" --manifest-sha256 "$3"
+--- r2/test_transport.py
++++ r3/test_transport.py
+@@ -45,7 +45,7 @@
+     subprocess.check_call(['bash',str(launch),'/absolute/config','abc','def'],env=env)
+     args=(d/'capture').read_text().splitlines()
+     self.assertEqual(args[-6:],['--config','/absolute/config','--config-sha256','abc','--manifest-sha256','def'])
+-    self.assertTrue(args[1].endswith('/diagnostic-transport254-r2/host.py'))
++    self.assertTrue(args[1].endswith('/diagnostic-transport254-r3/host.py'))
+  def test_swapped_config_rejected_before_allocation(self):
+   with tempfile.TemporaryDirectory() as d:
+    p=pathlib.Path(d)/'c';p.write_text('{}'); m=hashlib.sha256((HERE/'manifest.json').read_bytes()).hexdigest()
+--- r2/test_regressions.py
++++ r3/test_regressions.py
+@@ -21,6 +21,18 @@
+    with mock.patch.object(host,'source_check'),mock.patch.object(host.old,'sha',return_value=host.old.IMAGE_SHA),mock.patch.object(host,'command',return_value=['fake']),mock.patch.object(host,'allocation',return_value=({},1500)),mock.patch.object(host.time,'time',return_value=0),mock.patch.object(host.subprocess,'Popen',return_value=child),mock.patch.object(host,'cleanup_group',side_effect=RuntimeError('cleanup fixture')) as cleanup:
+     with self.assertRaises(RuntimeError):host.execute_phase({},dict(label='phase'),0,'v2',root,1500)
+     report=json.loads((root/'phase-0.json').read_text());self.assertIn('primary fixture',report['error']);self.assertIn('cleanup fixture',report['cleanup_error']);cleanup.assert_called_once()
++ def test_unrelated_writable_controller_is_allowed(self):
++  lines=['1 0 0:1 / /sys/fs/cgroup ro - tmpfs cgroup ro','2 1 0:2 / /sys/fs/cgroup/memory ro - cgroup memory ro','3 1 0:3 / /sys/fs/cgroup/cpu rw - cgroup cpu rw']
++  with tempfile.TemporaryDirectory() as td,mock.patch.object(Path,'read_text',return_value='\n'.join(lines)),mock.patch.object(sys,'argv',['inner.py','v1',td,'never']),mock.patch.object(inner.os,'statvfs',side_effect=lambda p:types.SimpleNamespace(f_flag=0 if p.endswith('/cpu') else os.ST_RDONLY)),mock.patch.object(inner.os,'execvpe') as execute:
++   inner.main();execute.assert_called_once()
++   with (Path(td)/'inner-mounts.json').open() as f:receipt=json.load(f)
++   self.assertEqual(receipt['mountinfo'],lines);self.assertEqual(set(receipt['statvfs_flags']),{'/sys/fs/cgroup','/sys/fs/cgroup/memory'})
++ def test_each_declared_target_writable_rejected(self):
++  lines=['1 0 0:1 / /sys/fs/cgroup ro - tmpfs cgroup ro','2 1 0:2 / /sys/fs/cgroup/memory ro - cgroup memory ro']
++  for kind,target in [('v1','/sys/fs/cgroup'),('v1','/sys/fs/cgroup/memory'),('v2','/sys/fs/cgroup')]:
++   with self.subTest(kind=kind,target=target),tempfile.TemporaryDirectory() as td,mock.patch.object(Path,'read_text',return_value='\n'.join(lines)),mock.patch.object(sys,'argv',['inner.py',kind,td,'never']),mock.patch.object(inner.os,'statvfs',side_effect=lambda p:types.SimpleNamespace(f_flag=0 if p==target else os.ST_RDONLY)),mock.patch.object(inner.os,'execvpe') as execute:
++    with self.assertRaises(AssertionError):inner.main()
++    execute.assert_not_called()
+  def phase(self,kind):
+   clock=types.SimpleNamespace(now=0.);timer=types.SimpleNamespace(time=lambda:clock.now,monotonic=lambda:clock.now,sleep=lambda _:None);allocations=[1500,1500,1300] if kind=='post-reap-cut' else [1500,1500]
+   def allocation(*a,**k):return {},allocations.pop(0) if len(allocations)>1 else allocations[0]
+--- r2/README.md
++++ r3/README.md
+@@ -1,10 +1,10 @@
+-# Diagnostic transport 254 r2: unbound candidate
++# Diagnostic transport 254 r3: unbound candidate
+ 
+ This package runs only the two revision-2 diagnostic selections and never produces GREEN or admission. It is not reviewed or authorized for execution. The earlier recipe revision 1 is historical and must not be executed. The existing deployment245 inventory is extended by six frozen diagnostic files; the complete 1,126-file and eight-alias inventory is pinned in `host.py` and `source-inventory.unbound.json`.
+ 
+ The host requires a real Bridges-2 `cis260361p` / `RM-shared` / `rm` 18-CPU, 32-GiB, 25-minute, one-task, no-GPU, no-requeue allocation. Before the first child it requires strictly more than 1,360 seconds: two times 600 seconds, one absolute 15 seconds TERM and five seconds KILL/reap, plus 120 seconds final reserve. Before the second it requires strictly more than 740 seconds. Source checking, image hashing and command setup precede allocation/deadline checks; a fresh check after opening logs clamps the original deadline immediately before spawn. Deadlines can shrink with actual scheduler end, never extend. A diagnostic failure or timeout is data; the second distinct selection is attempted only when its complete remaining budget fits.
+ 
+-The inner process checks effective cgroup mount flags using statvfs for each visible target, retaining raw cgroup mountinfo. Hidden stacked mounts are not rejected. The inner process checks effective cgroup mount flags before `exec` of the original pytest command. Each phase has a separate mode-0700 writable directory; host receipts and the other phase remain outside that bind. The supervisor uses Linux child subreaper semantics to reap its own process group after leader exit and TERM/KILL on timeout. It records raw return codes and diagnostic-only receipts; original plugin phase reports fsync their tracebacks. There is no periodic traceback thread.
++The inner process checks effective cgroup mount flags using statvfs for each declared bind target, retaining raw cgroup mountinfo. Hidden stacked mounts and unrelated controllers are not rejected. It checks these flags before `exec` of the original pytest command. Each phase has a separate mode-0700 writable directory; host receipts and the other phase remain outside that bind. The supervisor uses Linux child subreaper semantics to reap its own process group after leader exit and TERM/KILL on timeout. It records raw return codes and diagnostic-only receipts; original plugin phase reports fsync their tracebacks. There is no periodic traceback thread.
+ 
+ Independent source review is required before any binding, staging, or scheduler action. The coordinator must check the source inventory and remote physical files and aliases, the actual host Python 3.6 compatibility and `prctl` behavior, apptainer bind and effective mount behavior, actual scheduler fields, and the private output parent and job ownership. The pure mock tests do not establish those conditions. The coordinator alone stages files and performs SSH, scheduling, and publication. No native tests ran locally.
+ 

@@ -1,0 +1,13 @@
+................F.........                                               [100%]
+=================================== FAILURES ===================================
+_________________ test_relocated_launcher_uses_absolute_packet _________________
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:61: in test_relocated_launcher_uses_absolute_packet
+    assert json.loads(capture.read_text())==[str(P/'runner.py'),'--config','unbound','--config-sha256','a'*64]
+E   AssertionError: assert ['/projects/b...aaaaaaaaaaaa'] == ['/projects/b...aaaaaaaaaaaa']
+E     
+E     At index 0 diff: '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239/runner.py' != '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/runner.py'
+E     Use -v to get more diff
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/pure-green-base.xml -
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py::test_relocated_launcher_uses_absolute_packet
+1 failed, 25 passed in 0.42s

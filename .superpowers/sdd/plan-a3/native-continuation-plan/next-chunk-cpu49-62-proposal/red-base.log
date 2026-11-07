@@ -1,0 +1,296 @@
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+______________ test_requires_parent_success_before_any_model_work ______________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_requires_parent_success_b0/work'), PosixPath('/tmp/pytest-of-swong2...quires_parent_success_b0/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+
+    def test_requires_parent_success_before_any_model_work(lineage):
+     w,r,e,a=lineage
+     with pytest.raises((ValueError,AssertionError),match='parent|COMPLETED|successful'):
+>     gate.check_parent(w,r,e,a.replace('COMPLETED','RUNNING'))
+E     Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:25: Failed
+______________ test_complete_parent_accepts_only_exact_case_scope ______________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_complete_parent_accepts_o0/work'), PosixPath('/tmp/pytest-of-swong2...mplete_parent_accepts_o0/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+
+    def test_complete_parent_accepts_only_exact_case_scope(lineage):
+>    w,r,e,a=lineage;result=gate.check_parent(w,r,e,a);assert result['authenticated_parent_case_ids']==e['case_ids'][32:49];assert result['new_model_forwards']==0
+E    KeyError: 'authenticated_parent_case_ids'
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:28: KeyError
+______________ test_refuses_incomplete_or_changed_parent[source] _______________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha0/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha0/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'source'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+_____________ test_refuses_incomplete_or_changed_parent[scenario] ______________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha1/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha1/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'scenario'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+__________ test_refuses_incomplete_or_changed_parent[missing_result] ___________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha2/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha2/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'missing_result'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+___________ test_refuses_incomplete_or_changed_parent[nonzero_exit] ____________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha3/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha3/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'nonzero_exit'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+____________ test_refuses_incomplete_or_changed_parent[case_bytes] _____________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha4/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha4/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'case_bytes'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+__________ test_refuses_incomplete_or_changed_parent[missing_marker] ___________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha5/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha5/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'missing_marker'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+__________ test_refuses_incomplete_or_changed_parent[missing_sidecar] __________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha6/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha6/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'missing_sidecar'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+____________ test_refuses_incomplete_or_changed_parent[case_order] _____________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha7/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha7/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'case_order'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+___________ test_refuses_incomplete_or_changed_parent[forward_count] ___________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha8/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha8/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'forward_count'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+_____________ test_refuses_incomplete_or_changed_parent[authority] _____________
+
+lineage = (PosixPath('/tmp/pytest-of-swong2/pytest-2666/test_refuses_incomplete_or_cha9/work'), PosixPath('/tmp/pytest-of-swong2...fuses_incomplete_or_cha9/work/scenario/diagnostics/parent', ...}, '23470779|COMPLETED|0:0\n23470779.0|COMPLETED|0:0\n')
+change = 'authority'
+
+    @pytest.mark.parametrize('change',['source','scenario','missing_result','nonzero_exit','case_bytes','missing_marker','missing_sidecar','case_order','forward_count','authority'])
+    def test_refuses_incomplete_or_changed_parent(lineage,change):
+     w,r,e,a=lineage;p=Path(e['parent_directory'])
+     if change in ('source','scenario'):
+      path=w/'source.py' if change=='source' else r/'scenario/payload.json';path.write_text('changed')
+     elif change=='missing_result':(p/'result.json').unlink()
+     elif change=='nonzero_exit':
+      x=json.loads((p/'result.json').read_text());x['exit_code']=1;write(p/'result.json',x)
+     elif change=='case_bytes':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'case.json').write_text('changed')
+     elif change=='missing_marker':(r/'pilot-verification-cases/selected'/e['case_ids'][32]/'COMPLETE.json').unlink()
+     elif change=='missing_sidecar':(p/('slurm-case-'+e['case_ids'][32]+'.json')).unlink()
+     else:
+      x=json.loads((p/'coordinator-result.json').read_text())
+      if change=='case_order':x['new_case_ids'].reverse()
+      elif change=='forward_count':x['actual_new_forward_calls']+=1
+      elif change=='authority':x['scientific_execution']=True
+      write(p/'coordinator-result.json',x)
+>    with pytest.raises((ValueError,AssertionError,FileNotFoundError)):gate.check_parent(w,r,e,a)
+E    Failed: DID NOT RAISE (<class 'ValueError'>, <class 'AssertionError'>, <class 'FileNotFoundError'>)
+
+.superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py:47: Failed
+=========================== short test summary info ============================
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_requires_parent_success_before_any_model_work
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_complete_parent_accepts_only_exact_case_scope
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[source]
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[scenario]
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[missing_result]
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[nonzero_exit]
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[case_bytes]
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[missing_marker]
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[missing_sidecar]
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[case_order]
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[forward_count]
+FAILED .superpowers/sdd/plan-a3/native-continuation-plan/next-chunk-cpu49-62-proposal/test_parent_gate.py::test_refuses_incomplete_or_changed_parent[authority]
+12 failed in 0.52s

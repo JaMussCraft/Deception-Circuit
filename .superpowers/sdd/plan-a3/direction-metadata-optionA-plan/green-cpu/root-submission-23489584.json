@@ -1,0 +1,22 @@
+{
+  "job_id": "23489584",
+  "command": [
+    "sbatch",
+    "--account=bimc-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=32G",
+    "--time=00:20:00",
+    "--no-requeue",
+    "--job-name=lad-A3-optionA-green",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu/slurm-%j.log",
+    "--wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/green-cpu/green_cpu.sh"
+  ],
+  "manifest_sha256": "7c15c904e28cbcf6f8142b3010a912cbbc55629819a0a1b7222be4b95a07c610",
+  "submitted_unix": 1793747448.1099086,
+  "CPU_only": true
+}

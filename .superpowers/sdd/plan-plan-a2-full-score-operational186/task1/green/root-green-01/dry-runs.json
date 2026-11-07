@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "bash",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green/launch_cpu_green.sh",
+      "--dry-run",
+      "--output",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green/executions/delta-green-01"
+    ],
+    "returncode": 0,
+    "output": "{\n  \"packet\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green\",\n  \"commands\": [\n    [\n      \"/sw/external/python/anaconda3/bin/python3.9\",\n      \"-m\",\n      \"pytest\",\n      \"-q\",\n      \"-p\",\n      \"no:cacheprovider\",\n      \"--noconftest\",\n      \"--tb=short\",\n      \"--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green/executions/delta-green-01/env1.xml\",\n      \"--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green/executions/delta-green-01/tmp-env1\",\n      \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_controller.py\"\n    ],\n    [\n      \"/u/swong2/.conda/envs/mgnp/bin/python\",\n      \"-m\",\n      \"pytest\",\n      \"-q\",\n      \"-p\",\n      \"no:cacheprovider\",\n      \"--noconftest\",\n      \"--tb=short\",\n      \"--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green/executions/delta-green-01/env2.xml\",\n      \"--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green/executions/delta-green-01/tmp-env2\",\n      \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_controller.py\"\n    ]\n  ],\n  \"per_environment_timeout_seconds\": 120,\n  \"expected_cases\": 82,\n  \"gpu\": false\n}\n"
+  },
+  {
+    "command": [
+      "sbatch",
+      "--test-only",
+      "--parsable",
+      "--account=beto-delta-cpu",
+      "--partition=cpu",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=2",
+      "--mem=4G",
+      "--time=00:08:00",
+      "--no-requeue",
+      "--job-name=a2-fullscore-t1-green",
+      "--export=ALL",
+      "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green",
+      "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green/cpu-green-%j.out",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green/launch_cpu_green.sh",
+      "--output",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task1/green/executions/delta-green-01"
+    ],
+    "returncode": 0,
+    "output": "sbatch: Job 23613975 to start at 2026-11-17T03:15:29 a using 2 processors on nodes cn096 in partition cpu\n"
+  }
+]

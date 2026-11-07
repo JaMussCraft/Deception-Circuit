@@ -1,0 +1,25 @@
+test_native_added_field_must_not_escape_bound (__main__.SchemaTests.test_native_added_field_must_not_escape_bound) ... FAIL
+test_alias_shallow_copy_mutation_must_fail (__main__.SchemaTests.test_alias_shallow_copy_mutation_must_fail) ... FAIL
+
+======================================================================
+FAIL: test_native_added_field_must_not_escape_bound (__main__.SchemaTests.test_native_added_field_must_not_escape_bound)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-resource-proof194/test_proof_schema.py", line 9, in test_native_added_field_must_not_escape_bound
+    with self.assertRaises(ValueError):core.verify_runner_schema(changed)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_alias_shallow_copy_mutation_must_fail (__main__.SchemaTests.test_alias_shallow_copy_mutation_must_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-resource-proof194/test_proof_schema.py", line 13, in test_alias_shallow_copy_mutation_must_fail
+    with self.assertRaises(ValueError):core.verify_append_schema(changed)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.010s
+
+FAILED (failures=2)

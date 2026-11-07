@@ -1,0 +1,18 @@
+F......                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift[None] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:220: in test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift
+    assert producer.publish()['published'] is True
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:560: in publish
+    remote=self.inspect([physical(self.g,p) for p in sorted(all_paths)])
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:560: in <listcomp>
+    remote=self.inspect([physical(self.g,p) for p in sorted(all_paths)])
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:306: in physical
+    rel=Path(virtual).relative_to(ROOT);need(Path(virtual).is_absolute() and '..' not in rel.parts,'remote namespace traversal')
+/sw/external/python/anaconda3/lib/python3.9/pathlib.py:939: in relative_to
+    raise ValueError("{!r} is not in the subpath of {!r}"
+E   ValueError: '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/plan.json' is not in the subpath of '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/brief-green270-r3/base-tmp/test_full_fake_transport_keeps0' OR one path is relative and the other is absolute.
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/brief-green270-r3/base.xml -
+=========================== short test summary info ============================
+FAILED ../../../../dev::test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift[None]
+1 failed, 6 passed in 3.67s

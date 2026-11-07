@@ -1,0 +1,43 @@
+{
+  "packet_command": "PYTHON -B -m unittest discover -s /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/proof-adapter-r4 -p 'test_*.py' -v",
+  "dispatcher_command": "PYTHON -B /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-proof-dispatch227/test_dispatch.py -v",
+  "independent_command": "PYTHON -B /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-proof-ast-review230/independent_checks.py",
+  "interpreters": [
+    "/sw/external/python/anaconda3/bin/python3.9",
+    "/u/swong2/.conda/envs/mgnp/bin/python"
+  ],
+  "packet_expected_each": 34,
+  "packet_observed_base": {
+    "pass": 33,
+    "skip": 1,
+    "exit": 0,
+    "seconds": 1.798
+  },
+  "packet_observed_mgnp": {
+    "pass": 34,
+    "skip": 0,
+    "exit": 0,
+    "seconds": 1.741
+  },
+  "dispatcher_expected_observed_each": 9,
+  "dispatcher_exit_codes": [
+    0,
+    0
+  ],
+  "dispatcher_seconds_base_mgnp": [
+    2.031,
+    2.004
+  ],
+  "independent_expected_observed_each": 4,
+  "independent_final_exit_codes": [
+    0,
+    0
+  ],
+  "independent_final_seconds_base_mgnp": [
+    0.324,
+    0.285
+  ],
+  "source_algorithm_or_graph_executed": false,
+  "author227_report_read": false,
+  "inherited27_metadata_not_used_as_new_verification": true
+}

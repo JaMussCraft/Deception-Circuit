@@ -329,3 +329,93 @@ def test_canonical_assessment_exclusions_include_external_donors():
     assert any('external-donor-source' in ids for ids,_ in identities)
     assert any('external donor prompt'.encode().hex() in prompts for _,prompts in identities)
     assert any('ioi-source' in ids for ids,_ in identities)
+
+
+def test_generated_validation_ioi_retains_source_split(canonical_preparation):
+    kwargs,_,_=canonical_preparation
+    result=p.prepare(**kwargs)
+    assert all(r['split']=='generated' and r['analysis_split']=='validation' for r in result['ioi_validation'])
+    from component_analysis.a3_direction_pipeline import _selection_sources
+    assert len(_selection_sources(result,'ioi'))==100
+
+
+def test_operational_contract_freezes_cache_and_profile_groups():
+    from tests.test_a3_direction_workload import fixture
+    from tests.test_a3_direction_artifacts import scientific_metadata
+    from component_analysis.a3_direction_runtime import freeze_operational_contract
+    design,_,_=fixture()
+    source=scientific_metadata()['identity']
+    design.update(a1_identity=source['a1_identity'],parent_evidence=source['parent_evidence'])
+    protocol=dict(commit=source['commit'],code_hashes=source['code_hashes'],numeric_profile={})
+    settings=dict(microbatch_size=2,axis_tile_size=2,head_width=2,hidden_size=64,
+        num_layers=32,vocabulary_size=128,dtype_bytes=4,hardware={'gpu':'injected-cpu','count':1},
+        warmup_batches=1,serialization_batches=1,finish_reserve_seconds=10,probe_max_bytes=1048576,
+        dtype='torch.float32',backend='eager',jobs=1)
+    freeze_operational_contract(design,protocol,settings)
+    assert protocol['workload']['microbatch_size']==2
+    assert protocol['workload']['axis_tile_size']==2
+    assert protocol['fit_cache']['capture_identity']['numeric_profile']['physical_batch_size']==1
+    assert len(protocol['selection_cache']['groups'])==sum(len(x['direction_sites'])*3 for x in design['tasks'].values())
+    assert protocol['workload']['widths']['far_v2']['train']>=max(len(s['tokens']) for rows in design['access_rows'].values() for r in rows if r['split'] in ('train','validation') for s in r['streams'].values())
+
+
+def test_operational_score_widths_cover_both_splits_and_padding_branch():
+    from tests.test_a3_direction_workload import fixture
+    from tests.test_a3_direction_artifacts import scientific_metadata
+    from component_analysis.a3_direction_runtime import freeze_operational_contract
+    design,_,_=fixture();source=scientific_metadata()['identity']
+    design.update(a1_identity=source['a1_identity'],parent_evidence=source['parent_evidence'])
+    design['utility']['ioi'][0]['streams']['clean'].update(tokens=list(range(9)),readout=8)
+    protocol=dict(commit=source['commit'],code_hashes=source['code_hashes'],numeric_profile={})
+    settings=dict(microbatch_size=2,axis_tile_size=2,head_width=2,hidden_size=64,num_layers=32,vocabulary_size=128,dtype_bytes=4,
+        hardware={'gpu':'injected-cpu','count':1},warmup_batches=1,serialization_batches=1,finish_reserve_seconds=10,probe_max_bytes=1048576,
+        dtype='torch.float32',backend='eager',jobs=1)
+    freeze_operational_contract(design,protocol,settings)
+    assert protocol['workload']['widths']['ioi']['validation']==10
+    assert protocol['workload']['widths']['ioi']['assessment']==10
+
+
+def test_operational_stage_tiles_and_separate_job_startups_are_frozen():
+    from tests.test_a3_direction_workload import fixture
+    from tests.test_a3_direction_artifacts import scientific_metadata
+    from component_analysis.a3_direction_runtime import freeze_operational_contract
+    from component_analysis.a3_direction_workload import build_inventory
+    d,_,_=fixture();s=scientific_metadata()['identity'];d.update(a1_identity=s['a1_identity'],parent_evidence=s['parent_evidence'])
+    pr=dict(commit=s['commit'],code_hashes=s['code_hashes'],numeric_profile={})
+    cfg=dict(microbatch_size=2,axis_tile_size=2,axis_tile_sizes={'prefit':2,'fit-select':2,'selected-pilot':32,'remaining':32},
+        jobs=2,head_width=2,hidden_size=64,num_layers=32,vocabulary_size=128,dtype_bytes=4,hardware={'gpu':'injected-cpu','count':1},
+        warmup_batches=1,serialization_batches=0,finish_reserve_seconds=10,probe_max_bytes=1048576,dtype='torch.float32',backend='eager')
+    freeze_operational_contract(d,pr,cfg)
+    assert len(build_inventory(d,pr,stage='prefit')['jobs'])==1
+    assert len(build_inventory(d,pr,stage='fit-select')['jobs'])==2
+    assert pr['selection_cache']['groups'][0]['numeric_profile']['axis_tile_size']==2
+    assert pr['workload']['axis_tile_sizes']['remaining']==32
+
+
+def test_production_tokenizer_adapter_cannot_spoof_pinned_metadata_and_known_rows(monkeypatch):
+    from component_analysis import a3_pipeline as p
+    class Adapter:
+        name_or_path='pinned';init_kwargs={'_commit_hash':'a'*40}
+        def encode(self,text,**kw):return [1,2] if text=='known source' else [999]
+    adapter=Adapter();assert adapter.encode('known source')==[1,2] and adapter.encode('new generated string')==[999]
+    with pytest.raises(ValueError,match='adapter'):
+        p._validated_prepare_tokenizer(adapter,dict(model='pinned',tokenizer_revision='a'*40,injected=False))
+    assert p._validated_prepare_tokenizer(adapter,dict(injected=True)) is adapter
+
+
+def test_real_pinned_standard_tokenizer_override_is_validated_independently():
+    from component_analysis import a3_pipeline as p
+    from types import SimpleNamespace
+    parent_path=p.ladder.REPO/'outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json'
+    if not parent_path.exists():pytest.skip('preserved local pinned A1 tokenizer fixture unavailable')
+    parent=p.ladder.read_artifact(parent_path)
+    tokenizer=p.common.load_tokenizer(SimpleNamespace(model=parent['model'],tokenizer_revision=parent['tokenizer_revision']))
+    validated=p._validated_prepare_tokenizer(tokenizer,parent)
+    assert type(validated) is type(tokenizer) and validated is not tokenizer
+    prompt='A new generated comparison string.'
+    assert validated.encode(prompt)==tokenizer.encode(prompt)
+    import copy,types
+    altered=copy.copy(tokenizer);original=tokenizer.encode
+    altered.encode=types.MethodType(lambda self,text,**kw:original(text,**kw) if text=='known source' else [999],altered)
+    assert altered.encode('known source')==tokenizer.encode('known source')
+    with pytest.raises(ValueError,match='override'):p._validated_prepare_tokenizer(altered,parent)

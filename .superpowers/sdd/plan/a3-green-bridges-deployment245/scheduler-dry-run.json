@@ -1,0 +1,21 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,sys,subprocess,time\nx=json.load(sys.stdin);a=x['\"'\"'argv'\"'\"'];a.insert(1,'\"'\"'--test-only'\"'\"');r=subprocess.run(a,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=30);print(json.dumps({'\"'\"'argv'\"'\"':a,'\"'\"'exit_code'\"'\"':r.returncode,'\"'\"'stdout'\"'\"':r.stdout,'\"'\"'stderr'\"'\"':r.stderr,'\"'\"'observed_unix'\"'\"':time.time()}));sys.exit(r.returncode)\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"argv\": [\"sbatch\", \"--test-only\", \"--parsable\", \"--account=cis260361p\", \"--partition=RM-shared\", \"--qos=rm\", \"--nodes=1\", \"--ntasks=1\", \"--cpus-per-task=18\", \"--mem=32G\", \"--time=00:59:00\", \"--no-requeue\", \"--export=ALL,CUDA_VISIBLE_DEVICES=\", \"--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3\", \"--job-name=lad-A3-mgnp-r5\", \"--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/jobs/job-%j.log\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/launch.sh\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-deployment245/config.json\", \"6e1e7858314f7ee426a60dfd646cd1612e8648a9e652281550e61940b9666f62\", \"bd3533cc18025d7d2bf97515060a46f793abd4f4a43609e8dc6c9626d8a6e6e2\"], \"exit_code\": 0, \"stdout\": \"\", \"stderr\": \"sbatch: Job 50316969 to start at 2026-11-06T23:19:46 using 18 processors on nodes r290 in partition RM-shared\\n\", \"observed_unix\": 1794025186.4272556}\n",
+  "stderr": "",
+  "observed_unix": 1794025186.4442773
+}

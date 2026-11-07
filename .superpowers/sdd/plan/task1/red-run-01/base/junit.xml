@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="55" skipped="0" tests="55" time="18.648" timestamp="2026-11-06T13:53:07.476357-06:00" hostname="cn093.delta.ncsa.illinois.edu"><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_matches_untouched_publisher[payload0-{&quot;a&quot;: -0.0, &quot;z&quot;: 1.25}\n]" time="0.006"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_matches_u0')
+payload = {'a': -0.0, 'z': 1.25}, expected = b'{"a": -0.0, "z": 1.25}\n'
+
+    @pytest.mark.parametrize('payload,expected', [
+        ({'z': 1.25, 'a': -0.0}, b'{"a": -0.0, "z": 1.25}\n'),
+        ({'text': 'λ雪'}, b'{"text": "\\u03bb\\u96ea"}\n'),
+        ({'rows': (True, None, 7)}, b'{"rows": [true, null, 7]}\n'),
+        ({'nested': [{'a': 1}]}, b'{"nested": [{"a": 1}]}\n'),
+        (['plain', 2.0], b'["plain", 2.0]\n'),
+    ])
+    def test_prepared_writer_matches_untouched_publisher(tmp_path, payload, expected):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:74: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_matches_untouched_publisher[payload1-{&quot;text&quot;: &quot;\u03bb\u96ea&quot;}\n]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_matches_u1')
+payload = {'text': 'λ雪'}, expected = b'{"text": "\\u03bb\\u96ea"}\n'
+
+    @pytest.mark.parametrize('payload,expected', [
+        ({'z': 1.25, 'a': -0.0}, b'{"a": -0.0, "z": 1.25}\n'),
+        ({'text': 'λ雪'}, b'{"text": "\\u03bb\\u96ea"}\n'),
+        ({'rows': (True, None, 7)}, b'{"rows": [true, null, 7]}\n'),
+        ({'nested': [{'a': 1}]}, b'{"nested": [{"a": 1}]}\n'),
+        (['plain', 2.0], b'["plain", 2.0]\n'),
+    ])
+    def test_prepared_writer_matches_untouched_publisher(tmp_path, payload, expected):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:74: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_matches_untouched_publisher[payload2-{&quot;rows&quot;: [true, null, 7]}\n]" time="0.006"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_matches_u2')
+payload = {'rows': (True, None, 7)}, expected = b'{"rows": [true, null, 7]}\n'
+
+    @pytest.mark.parametrize('payload,expected', [
+        ({'z': 1.25, 'a': -0.0}, b'{"a": -0.0, "z": 1.25}\n'),
+        ({'text': 'λ雪'}, b'{"text": "\\u03bb\\u96ea"}\n'),
+        ({'rows': (True, None, 7)}, b'{"rows": [true, null, 7]}\n'),
+        ({'nested': [{'a': 1}]}, b'{"nested": [{"a": 1}]}\n'),
+        (['plain', 2.0], b'["plain", 2.0]\n'),
+    ])
+    def test_prepared_writer_matches_untouched_publisher(tmp_path, payload, expected):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:74: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_matches_untouched_publisher[payload3-{&quot;nested&quot;: [{&quot;a&quot;: 1}]}\n]" time="0.006"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_matches_u3')
+payload = {'nested': [{'a': 1}]}, expected = b'{"nested": [{"a": 1}]}\n'
+
+    @pytest.mark.parametrize('payload,expected', [
+        ({'z': 1.25, 'a': -0.0}, b'{"a": -0.0, "z": 1.25}\n'),
+        ({'text': 'λ雪'}, b'{"text": "\\u03bb\\u96ea"}\n'),
+        ({'rows': (True, None, 7)}, b'{"rows": [true, null, 7]}\n'),
+        ({'nested': [{'a': 1}]}, b'{"nested": [{"a": 1}]}\n'),
+        (['plain', 2.0], b'["plain", 2.0]\n'),
+    ])
+    def test_prepared_writer_matches_untouched_publisher(tmp_path, payload, expected):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:74: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_matches_untouched_publisher[payload4-[&quot;plain&quot;, 2.0]\n]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_matches_u4')
+payload = ['plain', 2.0], expected = b'["plain", 2.0]\n'
+
+    @pytest.mark.parametrize('payload,expected', [
+        ({'z': 1.25, 'a': -0.0}, b'{"a": -0.0, "z": 1.25}\n'),
+        ({'text': 'λ雪'}, b'{"text": "\\u03bb\\u96ea"}\n'),
+        ({'rows': (True, None, 7)}, b'{"rows": [true, null, 7]}\n'),
+        ({'nested': [{'a': 1}]}, b'{"nested": [{"a": 1}]}\n'),
+        (['plain', 2.0], b'["plain", 2.0]\n'),
+    ])
+    def test_prepared_writer_matches_untouched_publisher(tmp_path, payload, expected):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:74: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_accepts_existing_frozen_json" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_accepts_e0')
+
+    def test_prepared_writer_accepts_existing_frozen_json(tmp_path):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:89: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_nonfinite_never_completes[nan]" time="0.006"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_nonfinite0')
+value = nan
+
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), float('-inf')])
+    def test_prepared_writer_nonfinite_never_completes(tmp_path, value):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:99: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_nonfinite_never_completes[inf]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_nonfinite1')
+value = inf
+
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), float('-inf')])
+    def test_prepared_writer_nonfinite_never_completes(tmp_path, value):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:99: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_nonfinite_never_completes[-inf]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_nonfinite2')
+value = -inf
+
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), float('-inf')])
+    def test_prepared_writer_nonfinite_never_completes(tmp_path, value):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:99: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_rejects_resigned_postwrite_value[finish]" time="0.007"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_rejects_r0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fbb0cd22640&gt;
+seam = 'finish'
+
+    @pytest.mark.parametrize('seam', ['finish', 'reference'])
+    def test_prepared_writer_rejects_resigned_postwrite_value(tmp_path, monkeypatch, seam):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:107: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_writer_rejects_resigned_postwrite_value[reference]" time="0.008"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_writer_rejects_r1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fbb0cc2d7c0&gt;
+seam = 'reference'
+
+    @pytest.mark.parametrize('seam', ['finish', 'reference'])
+    def test_prepared_writer_rejects_resigned_postwrite_value(tmp_path, monkeypatch, seam):
+&gt;       r = runtime(); publish = r._publish_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_publish_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:107: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_same_buffer_and_marker_contract" time="0.003"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_same_buffer_and_0')
+
+    def test_prepared_same_buffer_and_marker_contract(tmp_path):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:126: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[missing-child-target]" time="0.003"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e0')
+damage = 'missing-child', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[missing-child-preparation]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e1')
+damage = 'missing-child', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[extra-file-target]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e2')
+damage = 'extra-file', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[extra-file-preparation]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e3')
+damage = 'extra-file', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[extra-directory-target]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e4')
+damage = 'extra-directory', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[extra-directory-preparation]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e5')
+damage = 'extra-directory', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[payload-link-target]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e6')
+damage = 'payload-link', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[payload-link-preparation]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e7')
+damage = 'payload-link', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[marker-link-target]" time="0.006"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e8')
+damage = 'marker-link', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[marker-link-preparation]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e9')
+damage = 'marker-link', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[root-link-target]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e10')
+damage = 'root-link', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[root-link-preparation]" time="0.006"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e11')
+damage = 'root-link', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[bad-marker-kind-target]" time="0.006"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e12')
+damage = 'bad-marker-kind', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[bad-marker-kind-preparation]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e13')
+damage = 'bad-marker-kind', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[bad-marker-schema-target]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e14')
+damage = 'bad-marker-schema', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[bad-marker-schema-preparation]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e15')
+damage = 'bad-marker-schema', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[bad-marker-hash-target]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e16')
+damage = 'bad-marker-hash', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[bad-marker-hash-preparation]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e17')
+damage = 'bad-marker-hash', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[bad-payload-hash-target]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e18')
+damage = 'bad-payload-hash', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[bad-payload-hash-preparation]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e19')
+damage = 'bad-payload-hash', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[nonfinite-target]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e20')
+damage = 'nonfinite', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[nonfinite-preparation]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e21')
+damage = 'nonfinite', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[wrong-ref-hash-target]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e22')
+damage = 'wrong-ref-hash', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[wrong-ref-hash-preparation]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e23')
+damage = 'wrong-ref-hash', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[wrong-ref-size-target]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e24')
+damage = 'wrong-ref-size', artifact = 'target'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_exact_child_marker_and_reference_damage[wrong-ref-size-preparation]" time="0.009"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_e25')
+damage = 'wrong-ref-size', artifact = 'preparation'
+
+    @pytest.mark.parametrize('artifact', ['target', 'preparation'])
+    @pytest.mark.parametrize('damage', ['missing-child', 'extra-file', 'extra-directory', 'payload-link',
+        'marker-link', 'root-link', 'bad-marker-kind', 'bad-marker-schema', 'bad-marker-hash',
+        'bad-payload-hash', 'nonfinite', 'wrong-ref-hash', 'wrong-ref-size'])
+    def test_prepared_reader_rejects_exact_child_marker_and_reference_damage(tmp_path, damage, artifact):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:148: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_keeps_existing_json_semantics" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_keeps_exi0')
+
+    def test_prepared_reader_keeps_existing_json_semantics(tmp_path):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:179: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_rejects_resigned_change_during_parse" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_rejects_r0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fbb0cc69460&gt;
+
+    def test_prepared_reader_rejects_resigned_change_during_parse(tmp_path, monkeypatch):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:190: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_reader_declared_io_matches_actual" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_reader_declared_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fbb0cc68ee0&gt;
+
+    def test_prepared_reader_declared_io_matches_actual(tmp_path, monkeypatch):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:205: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_in_phase_identical_replacement_fails[target]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_in_pha0')
+scope = 'target'
+
+    @pytest.mark.parametrize('scope', ['target', 'preparation', 'target-leaf', 'marker-leaf'])
+    def test_prepared_namespace_in_phase_identical_replacement_fails(tmp_path, scope):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:260: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_in_phase_identical_replacement_fails[preparation]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_in_pha1')
+scope = 'preparation'
+
+    @pytest.mark.parametrize('scope', ['target', 'preparation', 'target-leaf', 'marker-leaf'])
+    def test_prepared_namespace_in_phase_identical_replacement_fails(tmp_path, scope):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:260: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_in_phase_identical_replacement_fails[target-leaf]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_in_pha2')
+scope = 'target-leaf'
+
+    @pytest.mark.parametrize('scope', ['target', 'preparation', 'target-leaf', 'marker-leaf'])
+    def test_prepared_namespace_in_phase_identical_replacement_fails(tmp_path, scope):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:260: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_in_phase_identical_replacement_fails[marker-leaf]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_in_pha3')
+scope = 'marker-leaf'
+
+    @pytest.mark.parametrize('scope', ['target', 'preparation', 'target-leaf', 'marker-leaf'])
+    def test_prepared_namespace_in_phase_identical_replacement_fails(tmp_path, scope):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:260: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_preentry_replacement_and_sibling_creation_allowed" time="0.003"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_preent0')
+
+    def test_prepared_namespace_preentry_replacement_and_sibling_creation_allowed(tmp_path):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:276: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_lifetime_policy[unlisted]" time="0.003"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_lifeti0')
+damage = 'unlisted'
+
+    @pytest.mark.parametrize('damage', ['unlisted', 'wrong-literal', 'retarget', 'wrong-resolved', 'relative-root', 'noncanonical-root'])
+    def test_prepared_namespace_lifetime_policy(tmp_path, damage):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:290: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_lifetime_policy[wrong-literal]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_lifeti1')
+damage = 'wrong-literal'
+
+    @pytest.mark.parametrize('damage', ['unlisted', 'wrong-literal', 'retarget', 'wrong-resolved', 'relative-root', 'noncanonical-root'])
+    def test_prepared_namespace_lifetime_policy(tmp_path, damage):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:290: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_lifetime_policy[retarget]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_lifeti2')
+damage = 'retarget'
+
+    @pytest.mark.parametrize('damage', ['unlisted', 'wrong-literal', 'retarget', 'wrong-resolved', 'relative-root', 'noncanonical-root'])
+    def test_prepared_namespace_lifetime_policy(tmp_path, damage):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:290: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_lifetime_policy[wrong-resolved]" time="0.005"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_lifeti3')
+damage = 'wrong-resolved'
+
+    @pytest.mark.parametrize('damage', ['unlisted', 'wrong-literal', 'retarget', 'wrong-resolved', 'relative-root', 'noncanonical-root'])
+    def test_prepared_namespace_lifetime_policy(tmp_path, damage):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:290: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_lifetime_policy[relative-root]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_lifeti4')
+damage = 'relative-root'
+
+    @pytest.mark.parametrize('damage', ['unlisted', 'wrong-literal', 'retarget', 'wrong-resolved', 'relative-root', 'noncanonical-root'])
+    def test_prepared_namespace_lifetime_policy(tmp_path, damage):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:290: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_lifetime_policy[noncanonical-root]" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_lifeti5')
+damage = 'noncanonical-root'
+
+    @pytest.mark.parametrize('damage', ['unlisted', 'wrong-literal', 'retarget', 'wrong-resolved', 'relative-root', 'noncanonical-root'])
+    def test_prepared_namespace_lifetime_policy(tmp_path, damage):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:290: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_approved_alias_entry_and_retarget_are_distinct" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_approv0')
+
+    def test_prepared_namespace_approved_alias_entry_and_retarget_are_distinct(tmp_path):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:306: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_native_prefit_inventory_seam_without_model" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_native_prefit_in0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fbb0cc8f340&gt;
+
+    def test_prepared_native_prefit_inventory_seam_without_model(tmp_path, monkeypatch):
+&gt;       r = runtime(); read = r._read_prepared_target_object
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_read_prepared_target_object'
+
+suite/test_a3_prepared_pilot_target.py:320: AttributeError</failure></testcase><testcase classname="test_a3_prepared_pilot_target" name="test_prepared_namespace_scopes_directory_identity_without_sibling_mtime" time="0.004"><failure message="AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_prepared_namespace_identity'">tmp_path = PosixPath('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task1/red-run-01/base/tmp/test_prepared_namespace_scopes0')
+
+    def test_prepared_namespace_scopes_directory_identity_without_sibling_mtime(tmp_path):
+&gt;       r = runtime(); identity = r._prepared_namespace_identity
+E       AttributeError: module 'component_analysis.a3_direction_runtime' has no attribute '_prepared_namespace_identity'
+
+suite/test_a3_prepared_pilot_target.py:336: AttributeError</failure></testcase></testsuite></testsuites>

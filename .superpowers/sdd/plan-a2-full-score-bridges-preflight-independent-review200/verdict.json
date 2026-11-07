@@ -1,0 +1,45 @@
+{
+  "status": "handed-back",
+  "verdict": "REVISE_TWO_NARROW_DIAGNOSTIC_GUARDS_THEN_ROOT_MAY_BIND_ONE_PREFLIGHT",
+  "blocking_findings": [
+    {
+      "id": "R200-A",
+      "site": "preflight/cgroup_probe.py: job_scoped",
+      "severity": "narrow correctness correction before diagnostic PASS can certify scope",
+      "problem": "bool(job and job in str(base)) is substring matching, so job123 accepts job_1234 or an unrelated ancestor containing123. Required counter visibility must mean exact actual job membership.",
+      "demonstration": {
+        "SLURM_JOB_ID": "123",
+        "path": "/sys/fs/cgroup/slurm/job_1234/step_batch",
+        "current_result": true,
+        "required_result": false
+      },
+      "correction": "Match complete supported job path components (such as job_123 or job123), using actual proc membership/mount mapping; reject unrelated parent/system counters. A hidden/unavailable container controller remains a legitimate diagnostic failure, never fabricate a peak.",
+      "tests": "Exact own job v1/v2 passes; shared prefix/ancestor/different-job path fails; missing peak/event/failcnt data returns nonzero."
+    },
+    {
+      "id": "R200-B",
+      "site": "preflight/host_probe.py output validation; preflight/launch.sh host Python entry",
+      "severity": "narrow output confinement correction or exact root-bound validation required before submission",
+      "problem": "Path.relative_to only checks lexical prefix: PHYS/REL/../../.../outside passes. Symlink ancestors can also escape. Host launch lacks -B/PYTHONDONTWRITEBYTECODE before importing sibling host_supervisor, allowing __pycache__ outside intended evidence output.",
+      "demonstration": "Pure Path.relative_to accepts the traversal suffix; this was checked without writing any escaped path.",
+      "correction": "Reject traversal/non-normalized arguments and resolve/verify output ancestors against the exact allowed root-owned fresh evidence namespace, reject symlink/alias escapes, preserve occupied/dangling-path refusal. Launch host python -B or set PYTHONDONTWRITEBYTECODE before interpreter/import. Root may instead bind and independently validate one exact ordinary fresh output path before this diagnostic launch, but that validation must be explicit recorded evidence, not inferred from lexical check.",
+      "tests": "Ordinary root-owned fresh output accepted; .. and symlink-parent escape and occupied/dangling leaf reject; host import creates no bytecode outside output."
+    }
+  ],
+  "author_handback_read": false,
+  "new_tests_run": "Only pure Path/string counterexamples and Python3.6 AST parsing, no job/probe/model execution",
+  "accepted_scope": [
+    "Absolute spool-safe launch resolves absolute physical preflight script and virtual inner script; same historical SIF/packed interpreter/original-work/cache binds.",
+    "Actual Slurm validation requires UID/job/Bridges cluster/host/WorkDir/26CPU48GiB5min/accountcis260361p/QoSrm/RM-shared/no GPU/restart/requeue.",
+    "Probe uses real proc membership/readable memory files; unavailable counters fail, no fake peak or Delta environment.",
+    "Only known SLURM facts/membership/counters/command/stderr observed; no environment/credential dump. Actual root submission must contain no secrets.",
+    "Imported helper has stdlib constants/functions and guarded main, so genuine proof adapter main is NOT run or admitted; source pin is c08c99... and must be included in staged diagnostic closure."
+  ],
+  "scope_exclusions": [
+    "No genuine194/199 proof adapter acceptance",
+    "No full graph or model",
+    "No full_score/GPU admission",
+    "No remote current-state assertion"
+  ],
+  "next_step": "Distinct minimal preflight revision or explicit root-bound path evidence plus exact job-component correction. No requirement to finish genuine proof adapter first."
+}

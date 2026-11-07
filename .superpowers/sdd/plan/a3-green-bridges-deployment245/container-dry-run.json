@@ -1,0 +1,21 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,subprocess,time\nfrom pathlib import Path\nt=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3'\"'\"');op=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-deployment245'\"'\"');sys.path.insert(0,str(t));import host as h\ncfg=op/'\"'\"'config.json'\"'\"';assert h.sha(cfg)=='\"'\"'6e1e7858314f7ee426a60dfd646cd1612e8648a9e652281550e61940b9666f62'\"'\"';c=json.loads(cfg.read_text());h.check_config(c)\nparent=t/'\"'\"'jobs/dryrun-245'\"'\"';parent.mkdir(parents=True,exist_ok=False);out=h.VIRT/h.REL/'\"'\"'jobs/dryrun-245/execution'\"'\"';cmd=h.container_command(c,out,'\"'\"'v1'\"'\"',{});cmd.append('\"'\"'--dry-run'\"'\"');r=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=30);dry={'\"'\"'argv'\"'\"':cmd,'\"'\"'exit_code'\"'\"':r.returncode,'\"'\"'stdout'\"'\"':r.stdout,'\"'\"'stderr'\"'\"':r.stderr};assert r.returncode==0,dry;assert not(parent/'\"'\"'execution'\"'\"').exists()\nbase=cmd[:cmd.index(h.PY)]\nprobe=base+[h.PY,'\"'\"'-B'\"'\"','\"'\"'-c'\"'\"','\"'\"'import sys,json,pytest,importlib.metadata as m; print(json.dumps({\"python\":sys.version,\"executable\":sys.executable,\"pytest_path\":pytest.__file__,\"versions\":{n:m.version(n) for n in (\"pytest\",\"numpy\",\"torch\",\"transformers\")}}))'\"'\"'];r=subprocess.run(probe,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=20);assert r.returncode==0,(r.stdout,r.stderr);env=json.loads(r.stdout)\ntestcode='\"'\"'import sys,unittest;sys.path.insert(0,'\"'\"'+repr(str(h.VIRT/h.REL))+'\"'\"');import test_host;s=unittest.TestSuite([test_host.Checks(\"test_actual_candidate_and_oracle_alias_inventory\")]);r=unittest.TextTestRunner(verbosity=2).run(s);raise SystemExit(not r.wasSuccessful())'\"'\"'\nr=subprocess.run(base+[h.PY,'\"'\"'-B'\"'\"','\"'\"'-c'\"'\"',testcode],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=20);inventory={'\"'\"'exit_code'\"'\"':r.returncode,'\"'\"'stdout'\"'\"':r.stdout,'\"'\"'stderr'\"'\"':r.stderr};assert r.returncode==0,inventory\nprint(json.dumps({'\"'\"'config_sha256'\"'\"':h.sha(cfg),'\"'\"'files_checked'\"'\"':len(c['\"'\"'files'\"'\"']),'\"'\"'aliases_checked'\"'\"':len(c['\"'\"'aliases'\"'\"']),'\"'\"'container_observer_dry_run'\"'\"':dry,'\"'\"'container_environment'\"'\"':env,'\"'\"'unchanged_alias_inventory_test_in_virtual_namespace'\"'\"':inventory,'\"'\"'observer_output_created'\"'\"':False,'\"'\"'host_inventory_test_failure_preserved_separately'\"'\"':True,'\"'\"'observed_unix'\"'\"':time.time()}))\n'"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n  File \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-transport229-r3/host.py\", line 15, in sha\n    with Path(path).open('rb') as f:\n  File \"/usr/lib64/python3.6/pathlib.py\", line 1183, in open\n    opener=self._opener)\n  File \"/usr/lib64/python3.6/pathlib.py\", line 1037, in _opener\n    return self._accessor.open(self, flags, mode)\n  File \"/usr/lib64/python3.6/pathlib.py\", line 387, in wrapped\n    return strfunc(str(pathobj), *args)\nFileNotFoundError: [Errno 2] No such file or directory: '/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/a3-green-bridges-deployment245/config.json'\n",
+  "observed_unix": 1794025105.9152045
+}

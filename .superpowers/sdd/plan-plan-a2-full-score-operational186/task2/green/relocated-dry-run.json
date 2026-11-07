@@ -1,0 +1,54 @@
+{
+  "command": [
+    "bash",
+    "/tmp/a2-task2-green-relocated-qvgr853q/slurm_script",
+    "--pins-sha256",
+    "52858183652f0ad2aa3a8ec1b264838245d2e34fb0d0bd7f5d7c9688938ad933",
+    "--dry-run",
+    "--output",
+    "/tmp/a2-task2-green-relocated-qvgr853q/not-created"
+  ],
+  "exit_code": 0,
+  "dry_run": {
+    "commands": [
+      [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests",
+        "--tb=short",
+        "--junitxml=/tmp/a2-task2-green-relocated-qvgr853q/not-created/env1.xml",
+        "--basetemp=/tmp/a2-task2-green-relocated-qvgr853q/not-created/tmp-env1",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_cpu.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_controller.py"
+      ],
+      [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--noconftest",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests",
+        "--tb=short",
+        "--junitxml=/tmp/a2-task2-green-relocated-qvgr853q/not-created/env2.xml",
+        "--basetemp=/tmp/a2-task2-green-relocated-qvgr853q/not-created/tmp-env2",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_cpu.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_controller.py"
+      ]
+    ],
+    "timeout_seconds_per_environment": 90,
+    "expected_cases": 204,
+    "Task2": 107,
+    "accepted_Task1_regressions": 97,
+    "no_native_import": true,
+    "no_model": true,
+    "no_GPU": true
+  },
+  "output_directory_created": false
+}

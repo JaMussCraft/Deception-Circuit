@@ -1,0 +1,27 @@
+...............................F.F..                                     [100%]
+=================================== FAILURES ===================================
+_________________ test_loader_resolution_not_just_approved_set _________________
+
+probe = <module 'fixture_runtime_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/runtime-probe.py'>
+
+    def test_loader_resolution_not_just_approved_set(probe):
+        raw='''libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000)\nlibm.so.6 => not found\n/lib64/ld-linux-x86-64.so.2 (0x000)'''
+>       assert probe.parse_ldd(raw)=={'libc.so.6':'/lib/x86_64-linux-gnu/libc.so.6','libm.so.6':None}
+E       AttributeError: module 'fixture_runtime_probe' has no attribute 'parse_ldd'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:153: AttributeError
+_________________ test_required_startup_files_must_be_entries __________________
+
+probe = <module 'fixture_runtime_probe' from '/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/runtime-probe.py'>
+tree = ({'/tmp/pytest-of-swong2/pytest-2697/test_required_startup_files_mu0/lib.so': {'bytes': 19, 'kind': 'file', 'physical_...startup_files_mu0/lib.so'), PosixPath('/tmp/pytest-of-swong2/pytest-2697/test_required_startup_files_mu0/libalias.so'))
+
+    def test_required_startup_files_must_be_entries(probe,tree):
+        entries,leaf,alias=tree
+>       with pytest.raises(probe.Rejected):probe.check_startup_entries(dict(pth=['/missing.pth'],preloaded=['_distutils_hack']),entries)
+E       AttributeError: module 'fixture_runtime_probe' has no attribute 'check_startup_entries'
+
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py:167: AttributeError
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_loader_resolution_not_just_approved_set
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/candidate/test_runtime_probe.py::test_required_startup_files_must_be_entries
+2 failed, 34 passed in 0.35s

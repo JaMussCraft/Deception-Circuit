@@ -1,0 +1,110 @@
+{
+  "status": "ACTUAL_R5_DIAGNOSTIC_AUDIT_PASS",
+  "job": "50311864",
+  "packet_manifest_sha256": "889ee0c986fd392ba1cf00300d93ae46f6714cae10a58175862a3a9ba7a88db7",
+  "receipt_sha256": "d18af62d386cedb976915539d7bac3a1acb25d3ca164697cb6a858a3b5e37798",
+  "all8_fetched_files_match": true,
+  "all8_source_members_match": true,
+  "actual_account": "cis260361p",
+  "actual_partition": "RM-shared",
+  "actual_qos": "rm",
+  "actual_host": "r247.ib.bridges2.psc.edu",
+  "actual_UID": 105853,
+  "actual_CPUs": 26,
+  "actual_memory": "48G",
+  "terminal_state": "COMPLETED",
+  "terminal_exit": "0:0",
+  "elapsed_seconds": 5,
+  "probe_host_exit": 0,
+  "probe_container_exit": 0,
+  "command_ordered_parent_then_child_bind": "/sys/fs/cgroup:/sys/fs/cgroup:ro,/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro",
+  "host_container_same_job_and_membership": true,
+  "native_worker_path": "/sys/fs/cgroup/memory/slurm/uid_105853/job_50311864/step_batch/task_0",
+  "host_container_individual_samefile_checks": true,
+  "cross_context_directory_inode_recorded": false,
+  "required_counters_visible": true,
+  "allocation_failure_or_oom_observed": false,
+  "container_memory_mount_stack": [
+    {
+      "id": 1676,
+      "parent": 1669,
+      "dev": "0:35",
+      "root": "/",
+      "mountpoint": "/sys/fs/cgroup/memory",
+      "mount_options": [
+        "rw",
+        "nosuid",
+        "nodev",
+        "noexec",
+        "relatime"
+      ],
+      "filesystem": "cgroup",
+      "super_options": [
+        "rw",
+        "memory"
+      ],
+      "raw": "1676 1669 0:35 / /sys/fs/cgroup/memory rw,nosuid,nodev,noexec,relatime master:301 - cgroup cgroup rw,memory"
+    },
+    {
+      "id": 1682,
+      "parent": 1676,
+      "dev": "0:35",
+      "root": "/",
+      "mountpoint": "/sys/fs/cgroup/memory",
+      "mount_options": [
+        "ro",
+        "nosuid",
+        "nodev",
+        "noexec",
+        "relatime"
+      ],
+      "filesystem": "cgroup",
+      "super_options": [
+        "rw",
+        "memory"
+      ],
+      "raw": "1682 1676 0:35 / /sys/fs/cgroup/memory ro,nosuid,nodev,noexec,relatime master:301 - cgroup cgroup rw,memory"
+    }
+  ],
+  "top_readonly_mount_id": 1682,
+  "hidden_writable_mount_id": 1676,
+  "readonly_interpretation": "topmost mount1682 is not parent of another same-location mount; its parent1676 is the hidden lower rw mount; per-superblock rw is distinct",
+  "future_live_statvfs_check_observed_in_probe": false,
+  "MODEL_LOADED": false,
+  "proof_admitted": false,
+  "GPU_ADMITTED": false,
+  "files": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r5/actual-50311864/submission-result.json": {
+      "sha256": "7cc98e19af934b132cad801756353887cc7dffddda11b74b0cd6a03bc27aac10",
+      "bytes": 1377
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r5/actual-50311864/job-50311864.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r5/actual-50311864/submission-intent.json": {
+      "sha256": "69b188e21231744da751afe7ab1c1c16c60f9c26310087126fe885e2328a075a",
+      "bytes": 1238
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r5/actual-50311864/execution/probe-result.json": {
+      "sha256": "eff5f3096335d320a5cd11b745c682d6588d04ba90d20f7a21a29b9d4e5fdf2c",
+      "bytes": 178
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r5/actual-50311864/execution/container-cgroup.json": {
+      "sha256": "f59231af8075e1cb3b701901e8d92be2e67ed416ac75bccf71f93e4be30ba8f7",
+      "bytes": 1103
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r5/actual-50311864/execution/allocation.json": {
+      "sha256": "cf5ad1be8751b11de4412a51d64ed971a35ea7f529c11b1aecaa358396258745",
+      "bytes": 4894
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r5/actual-50311864/execution/host-cgroup.json": {
+      "sha256": "d6fe49460ae002c07b43deefecc99a82f34d1a658729c463b592a1ab2614bf5b",
+      "bytes": 985
+    },
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-preflight-ops-r5/actual-50311864/execution/command.json": {
+      "sha256": "ee1c2f1dce8772daaab4d6d90a61ce0ceb38e19bff9981902723564984ecfd87",
+      "bytes": 3791
+    }
+  }
+}

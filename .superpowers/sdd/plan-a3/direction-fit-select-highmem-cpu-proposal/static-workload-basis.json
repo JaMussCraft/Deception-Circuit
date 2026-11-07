@@ -1,0 +1,46 @@
+{
+  "kind": "static_workload_algebra_not_inventory_execution",
+  "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "canonical_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-preparation-861f84a3938a-r158/canonical/design.json",
+  "canonical_design_sha256": "93825fb80c716f445f0d2b846fd338aae435f05dcf979dcc8765fa5de5ad4b95",
+  "workload_source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_workload.py",
+  "workload_source_sha256": "1b0f6110a39b5d50342b95fe7ee2d6b643fce20feb2ae4448403c1bc8c52d1b3",
+  "cohort_counts": {
+    "far_v2": {
+      "sites": 17,
+      "fit_ids": 177,
+      "selection_ids": 177,
+      "assessment_ids": 100
+    },
+    "sdr_v2": {
+      "sites": 8,
+      "fit_ids": 187,
+      "selection_ids": 187,
+      "assessment_ids": 100
+    },
+    "ser_v2": {
+      "sites": 18,
+      "fit_ids": 168,
+      "selection_ids": 167,
+      "assessment_ids": 100
+    }
+  },
+  "microbatch": 2,
+  "axis_tile_fit_select": 2,
+  "train_microbatch": 1,
+  "expected_raw_keys_by_task": {
+    "far_v2": 98634,
+    "sdr_v2": 48816,
+    "ser_v2": 99036
+  },
+  "expected_raw_keys": 246486,
+  "expected_shards_by_task": {
+    "far_v2": 32776,
+    "sdr_v2": 16224,
+    "ser_v2": 32904
+  },
+  "expected_scoring_shards": 81904,
+  "train_capture_batches": 4256,
+  "derivation": "Per site:3 seeds*(selectionN*5conditions*2streams + IOI100) +6 MMLUzero/hmean cells*32. Shards per site:2 seedtiles*10 realgroups*ceil(selectionN/2) +2*50 IOIgroups +3*16 MMLUgroups. All original controls/capture/serialization/guard work remains additional.",
+  "memory_reason": "Builder retains frozen inputs, rows/shards/profiles and deep source-record copies, serializes key lists/digests and derives storage. Subsequent original validator retains read inventory AND independently rebuilds it. Exact completed build/validation peaks remain unmeasured."
+}

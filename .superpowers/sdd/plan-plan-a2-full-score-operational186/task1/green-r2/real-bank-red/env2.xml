@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.497" timestamp="2026-11-06T15:36:27.525345-06:00" hostname="dt-login04.delta.ncsa.illinois.edu"><testcase classname="test_full_score_entry198" name="test_real_bank_accepts_the_declared_groups_file_digest" time="0.329"><failure message="KeyError: 'groups_sha256'">test_full_score_entry198.py:16: in test_real_bank_accepts_the_declared_groups_file_digest
+    binding = guard.verify_existing_bank(c)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:181: in verify_existing_bank
+    return _bank_binding(c, allow_score=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../gpu/common.py:160: in _bank_binding
+    require(sha(path) == c[key + '_sha256'], 'stale pinned ' + key)
+                         ^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_sha256'</failure></testcase></testsuite></testsuites>

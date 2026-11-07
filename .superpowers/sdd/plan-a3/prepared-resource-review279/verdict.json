@@ -1,0 +1,49 @@
+{
+  "findings": [
+    {
+      "file": "runner.py",
+      "id": "B1",
+      "line": 151,
+      "minimum_correction": "Snapshot actual cumulative counters and per-step deltas at entry/final boundaries, check expected entry2/final1 separately, retain observed partial counts/provenance and step status on errors. Keep declared native counters explicitly distinct. No native/authority changes.",
+      "priority": "medium",
+      "reason": "Entry/final timings are separate but real profiler counters are copied only after both. native_observed is returned native declared bookkeeping, not independent observed entry counters. A reader/final exception emits no actual_operations or observer provenance. Packet247 requires per-step actual observers plus failure provenance.",
+      "related": "runner.py:154-169",
+      "reproduction": "Synthetic stdlib file-backed3entry/0final reaches completed total3 with declared native_observed2; separate failure after observed read/hash emits statusfailed without counters. This is a recording/verification gap, not a claim the pinned native reader has incorrect2+1 behavior.",
+      "title": "Actual per-step counters absent; partial observed counters dropped on errors"
+    },
+    {
+      "file": "runner.py",
+      "id": "B2",
+      "line": 211,
+      "minimum_correction": "Separate text-character units or obtain actual encoded bytes for text writes; preserve explicit Path.write_bytes byte counts and honest measured scope. No generic I/O framework.",
+      "priority": "medium",
+      "reason": "PhaseObserver adds Path.write_text return value to file_write_bytes. That return is characters, not encoded byte count.",
+      "reproduction": "Synthetic UTF8 publication of \u03bb\u96ea reports file_write_bytes2 while actual file size5, in both interpreters.",
+      "title": "Path.write_text characters mislabeled as bytes"
+    }
+  ],
+  "manifest_sha256": "05010654ef2e177932055238bd2072a02f06b32be56059436b9296df368fa1ee",
+  "positive_checks": [
+    "module import and CLI dryruns stdlib only; unbound CLI rejects; shell missing/relative supervisor/interpreter refuses",
+    "producer exact-object primitive passes selectedNone; operational producer delegates unchanged native main and profiles inclusive originalcalls",
+    "receiver exactresult retained through single finalwitness; graph dropped/GC before samePIDrepeat; no handle/loader/minting helper",
+    "real target profiler counts separate from native bookkeeping; total3read/hash1parse/freeze0write checked on successful trial",
+    "true process lifetime/wholecgroup ancestry scopes,no cache eviction/upperbound/baseline subtraction claims",
+    "contractreferences247 immutable and all actualsource/job/resource/admission/launch fieldsnull; native aea07/workload765b hashesunchanged"
+  ],
+  "quality_verdict": "CHANGES_REQUIRED_COUNTER_RECORDING_AND_UNITS",
+  "remaining_binding_requirements": [
+    "distinct corrected runner source and scoped independent review",
+    "native dual-interpreter acceptance and exact exercised corrected fixture/publication/export/source-beforeafter",
+    "root authenticated existing supervisor/interpreter/resources/allocation/storage/namespace and authentic producer argv prepare/pilot-target/prefit with selectedNone",
+    "root actual new executable once before receiver data access; immediate parentPID check alone is not proof of freshness; use receive_native operational path,not raw API/NullSyntheticObserver as genuine evidence",
+    "actual target/preparation references/emitted bytes; no hash-sink streamSHA substitution",
+    "native lower-reader observations do not cover production handle overhead or final scope/live/deadline barrier",
+    "conservative resource bounds,actual9prefit+completeaggregate/reconciliation andpairedM1/GPU/selection gates remain separate"
+  ],
+  "runner_sha256": "c6b45b57b00677eb8d4fc0c4bd5f4001ed6ce9d150685a4ce6faaa21fce215e8",
+  "scope": "unbound preparation only; no native/source/measurement/resource/code-completion admission",
+  "spec_verdict": "CHANGES_REQUIRED_PER_STEP_ACTUAL_COUNTER_AND_FAILURE_RECORDS",
+  "verdict": "CHANGES_REQUIRED_BEFORE_MEASUREMENT_BINDING",
+  "verification": "10 supplied synthetic/API cases each3.9/3.12pass;3 independent recording/unit reproductions eachpass;actualshell2dryruns+missing/relativegatespass. No nativeimports or nativevalidation. Original5RED,+2boundaryRED,+3operationalRED evidence retained and inspected."
+}

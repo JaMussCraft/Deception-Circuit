@@ -1,0 +1,84 @@
+{
+  "used_function_hashes": {
+    "component_analysis/a3_direction_runtime.py::freeze_operational_contract": {
+      "native_W": "4249987bd2c975561d5083e15e705afe6e138a5f73c21f1e0e35611fb37246d5",
+      "N5_B": "4249987bd2c975561d5083e15e705afe6e138a5f73c21f1e0e35611fb37246d5"
+    },
+    "component_analysis/a3_direction_runtime.py::validate_reservation": {
+      "native_W": "a024c4ea68424ed178f91e3c01b478c06438c7b872ab07553a9c16ae51bf5ebc",
+      "N5_B": "d849b74187c0c76d45ed31ec7d300d427c21ac945fac3d295ce4c714dfce230d"
+    },
+    "component_analysis/a3_direction_runtime.py::live_guard": {
+      "native_W": "d2cb153797e82b2ac78e9729b37710f1622e909c47ae4595f6f4eef4d74499fd",
+      "N5_B": "d2cb153797e82b2ac78e9729b37710f1622e909c47ae4595f6f4eef4d74499fd"
+    },
+    "component_analysis/a3_direction_runtime.py::_pilot_invocation": {
+      "native_W": "f951282d38513422a17fa39582a133fed387748d2d86fe2e7800e004cbfefd9a",
+      "N5_B": "f951282d38513422a17fa39582a133fed387748d2d86fe2e7800e004cbfefd9a"
+    },
+    "component_analysis/a3_direction_runtime.py::_time_serialization": {
+      "native_W": "b8cc3e94fa2fcb81037922ee32098bc25239436d0e369627e407cd34d747bf13",
+      "N5_B": "b8cc3e94fa2fcb81037922ee32098bc25239436d0e369627e407cd34d747bf13"
+    },
+    "component_analysis/a3_direction_runtime.py::run_pilot": {
+      "native_W": "6456082e43b9227e684b5f69d4ecad02d04398887bc343c1c906ec21d8f7e560",
+      "N5_B": "6456082e43b9227e684b5f69d4ecad02d04398887bc343c1c906ec21d8f7e560"
+    },
+    "component_analysis/a3_direction_runtime.py::_measure_complete_guard_union": {
+      "native_W": "d86d768cc21cdf1e8a466fa8cb41a014d97fc0d5b3d56732a79c5f807fdadcd1",
+      "N5_B": "d86d768cc21cdf1e8a466fa8cb41a014d97fc0d5b3d56732a79c5f807fdadcd1"
+    },
+    "component_analysis/a3_direction_runtime.py::_pilot_origin": {
+      "native_W": "80a9f73a365fc5a107b34318b0fb3819a6a33ab0d647893f1853ebf84d507342",
+      "N5_B": "80a9f73a365fc5a107b34318b0fb3819a6a33ab0d647893f1853ebf84d507342"
+    },
+    "component_analysis/a3_direction_workload.py::derive_storage_requirements": {
+      "native_W": "7c168637e51e48c68342e4089a50fd6206a854ba6d46c270e7f6e45e9af251f8",
+      "N5_B": "7c168637e51e48c68342e4089a50fd6206a854ba6d46c270e7f6e45e9af251f8"
+    },
+    "component_analysis/a3_direction_workload.py::build_inventory": {
+      "native_W": "990e248dc55492bac00feafd977b0a74b76f66b3d4ba417aa05ca979d1ff6ce6",
+      "N5_B": "990e248dc55492bac00feafd977b0a74b76f66b3d4ba417aa05ca979d1ff6ce6"
+    }
+  },
+  "prior_source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "candidate_sites": {
+    "far_v2": 17,
+    "sdr_v2": 8,
+    "ser_v2": 18
+  },
+  "total_candidate_sites": 43,
+  "selection_cache_groups": 129,
+  "old_global_tile": 32,
+  "old_stage_tiles": {},
+  "prefit_cells_per_site": 3,
+  "old_tile_static_incompatibility": "3 learned seed cells per mechanism/IOI site are less than globaltile32; original packing builder rejects incomplete tile.",
+  "new_settings": {
+    "axis_tile_size": 2,
+    "backend": "sdpa",
+    "dtype": "torch.bfloat16",
+    "dtype_bytes": 2,
+    "finish_reserve_seconds": 90,
+    "hardware": {
+      "count": 1,
+      "gpu": "h200"
+    },
+    "head_width": 128,
+    "hidden_size": 4096,
+    "jobs": 2,
+    "microbatch_size": 2,
+    "num_layers": 32,
+    "probe_max_bytes": 1073741824,
+    "serialization_batches": 1,
+    "vocabulary_size": 128256,
+    "warmup_batches": 1,
+    "axis_tile_sizes": {
+      "prefit": 2,
+      "fit-select": 2,
+      "selected-pilot": 32,
+      "remaining": 32
+    }
+  },
+  "source_support": "freeze_operational_contract explicitly permits axis_tile_sizes and requires paired prefit/fit-select andselected-pilot/remaining tiles.",
+  "source_delta_scope": "Pilot numerical and reconciliation functions and builder are identical; N5 reservation/budget helpers differ under accepted policy. Older admission dry-run is outside this prefit-only CPU plan."
+}

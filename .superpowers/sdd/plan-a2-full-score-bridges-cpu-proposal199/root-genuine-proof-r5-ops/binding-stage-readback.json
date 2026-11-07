@@ -1,0 +1,21 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,base64,hashlib,os,subprocess,time\nfrom pathlib import Path\nx=json.load(sys.stdin);b=Path(x['\"'\"'root'\"'\"']);j=Path(x['\"'\"'jobdir'\"'\"']);held=subprocess.check_output(['\"'\"'scontrol'\"'\"','\"'\"'show'\"'\"','\"'\"'job'\"'\"',x['\"'\"'job'\"'\"'],'\"'\"'-o'\"'\"'],universal_newlines=True,timeout=15);assert '\"'\"'JobState=PENDING'\"'\"' in held and '\"'\"'Reason=JobHeldUser'\"'\"' in held;assert j.stat().st_uid==os.getuid() and not j.is_symlink() and not(j/'\"'\"'execution'\"'\"').exists();rows={}\nfor row in x['\"'\"'files'\"'\"']:\n assert row['\"'\"'name'\"'\"'] in ('\"'\"'transfer-attestation.json'\"'\"','\"'\"'bindings.json'\"'\"','\"'\"'bindings.sha256'\"'\"');raw=base64.b64decode(row['\"'\"'base64'\"'\"']);assert len(raw)==row['\"'\"'bytes'\"'\"'] and hashlib.sha256(raw).hexdigest()==row['\"'\"'sha256'\"'\"'];p=j/row['\"'\"'name'\"'\"']\n with p.open('\"'\"'xb'\"'\"') as f:f.write(raw);f.flush();os.fsync(f.fileno())\n assert p.read_bytes()==raw;rows[row['\"'\"'name'\"'\"']]={'\"'\"'path'\"'\"':str(p),'\"'\"'sha256'\"'\"':hashlib.sha256(p.read_bytes()).hexdigest(),'\"'\"'bytes'\"'\"':len(raw)}\nsys.path.insert(0,str(b/'\"'\"'proof-adapter-r5'\"'\"'));import host_supervisor as h\nos.environ['\"'\"'SLURM_JOB_ID'\"'\"']=x['\"'\"'job'\"'\"'];binding=h.load_bindings(str(j/'\"'\"'bindings.json'\"'\"'),x['\"'\"'binding_sha'\"'\"']);h.check_packet(b/'\"'\"'proof-adapter-r5'\"'\"',binding['\"'\"'adapter_manifest_sha256'\"'\"']);a=json.loads((j/'\"'\"'transfer-attestation.json'\"'\"').read_text())\nfor n,row in a['\"'\"'current_catalogues'\"'\"'].items():assert h.sha(row['\"'\"'physical'\"'\"'])==row['\"'\"'sha256'\"'\"'] and Path(row['\"'\"'physical'\"'\"']).stat().st_size==row['\"'\"'bytes'\"'\"']\nassert h.sha(j/'\"'\"'spooled-batch.sh'\"'\"')=='\"'\"'9631dbf0c26f3576bda79787d1f1b6b8de89ffd8b19cfced0cf156bf917e5862'\"'\"'\nresult={'\"'\"'files'\"'\"':rows,'\"'\"'job_id'\"'\"':x['\"'\"'job'\"'\"'],'\"'\"'held_job_confirmed'\"'\"':True,'\"'\"'binding_schema_validated_against_actual_held_job'\"'\"':True,'\"'\"'actual_running_allocation_claimed'\"'\"':False,'\"'\"'all_external_references_match'\"'\"':True,'\"'\"'all_four_remote_catalogues_match'\"'\"':True,'\"'\"'output_absent'\"'\"':True,'\"'\"'observed_unix'\"'\"':time.time()}\nwith(j/'\"'\"'binding-readback.json'\"'\"').open('\"'\"'x'\"'\"') as f:json.dump(result,f,indent=2)\nprint(json.dumps(result))\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"files\": {\"transfer-attestation.json\": {\"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-genuine-proof-r2/job-50316939/transfer-attestation.json\", \"sha256\": \"f4d4d143cd171bd116b989922720175364352f029524230959aa37677e1cbe30\", \"bytes\": 6996}, \"bindings.json\": {\"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-genuine-proof-r2/job-50316939/bindings.json\", \"sha256\": \"5a055aeff26499b3afc05901e2084e722e29deeaac6f18ce3172fdf33ce84188\", \"bytes\": 2844}, \"bindings.sha256\": {\"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-genuine-proof-r2/job-50316939/bindings.sha256\", \"sha256\": \"03fce98622c091e09ff344dbc4e97bc088b76b611af8ab535f00c55fb3bfc0cf\", \"bytes\": 65}}, \"job_id\": \"50316939\", \"held_job_confirmed\": true, \"binding_schema_validated_against_actual_held_job\": true, \"actual_running_allocation_claimed\": false, \"all_external_references_match\": true, \"all_four_remote_catalogues_match\": true, \"output_absent\": true, \"observed_unix\": 1794024693.8695312}\n",
+  "stderr": "",
+  "observed_unix": 1794024693.8875258
+}

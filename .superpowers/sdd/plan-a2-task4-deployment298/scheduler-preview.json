@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "sbatch",
+    "--test-only",
+    "--parsable",
+    "--account=beto-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=2",
+    "--mem=16G",
+    "--time=00:15:00",
+    "--no-requeue",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--job-name=lad-A2-task4",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment298/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet289-r2/run_cpu.sh",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment298/run-01"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "sbatch: Job 23636442 to start at 2026-11-07T04:38:27 a using 2 processors on nodes cn093 in partition cpu-interactive\n",
+  "observed_unix": 1794047847.3713977
+}

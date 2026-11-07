@@ -1,0 +1,29 @@
+{
+  "command": [
+    "sbatch",
+    "--account=beto-delta-cpu",
+    "--partition=cpu",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=192G",
+    "--time=01:15:00",
+    "--no-requeue",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--job-name=lad-A3-base75",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01-%j.log",
+    "--wrap=bash /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/oracle_cpu.sh --packet-sha256 fdebb58e74c75bdd83c3c616a496988e6dfb80a9a1c5fbcddda3a22181a925ef --config /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-base-cpu-r3/config.template.json --config-sha256 6e9c0de2ae7c208b8b0933f5ca3630cedcf6f655e35c7e947a90fee4addca58c --mode original --environment base --output /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01"
+  ],
+  "job_id": "23608994",
+  "submitted_unix": 1793987307.438549,
+  "mode": "original",
+  "environment": "base",
+  "new_output": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01",
+  "reviewed_packet_sha256": "fdebb58e74c75bdd83c3c616a496988e6dfb80a9a1c5fbcddda3a22181a925ef",
+  "config_sha256": "6e9c0de2ae7c208b8b0933f5ca3630cedcf6f655e35c7e947a90fee4addca58c",
+  "independent_verdict_sha256": "d113913f8d615772d053bb8e7da9632051e2c540a06fe63fcd552c828de2be91",
+  "automatic_retry": false,
+  "GPU_spend": 0
+}

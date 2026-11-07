@@ -1,0 +1,263 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_runtime.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate282/component_analysis/a3_direction_runtime.py
+@@ -2711,7 +2711,11 @@
+ def _completed_pilot_source(receipt_path,receipt,expected_pilot,origin,*,injected):
+     require(isinstance(origin,dict) and origin.get('kind')=='a3_direction_pilot_origin_v1','original pilot execution bindings required')
+     def resolved_object(name):
+-        ref=origin[name];path=ref['path'];require(object_reference(path)==ref,'completed pilot '+name+' bytes changed');return path,read_object(path)
++        ref=origin.get(name)
++        require(isinstance(ref,dict),'completed pilot '+name+' reference required')
++        path=ref.get('path')
++        require(isinstance(path,(str,os.PathLike)) and bool(path),'completed pilot '+name+' path required')
++        require(object_reference(path)==ref,'completed pilot '+name+' bytes changed');return path,read_object(path)
+     reservation_path,reservation=resolved_object('reservation_reference')
+     mapping_path,_=resolved_object('original_mapping_reference')
+     require(reservation.get('kind')=='a3_root_execution_reservation_v1' and reservation.get('identity')==expected_pilot['identity']
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183/tests/test_a3_prepared_pilot_target.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate282/tests/test_a3_prepared_pilot_target.py
+@@ -512,7 +512,8 @@
+     r = runtime(); validate = r._validate_prepared_receiver_resources
+     from tests.a3_prepared_integration_cases import environment_identity
+     c = integration_case(tmp_path, monkeypatch).anchor()
+-    record = copy.deepcopy(c.resource_record)
++    # Attack plain data: deepcopy intentionally preserves production frozen references.
++    record = json.loads(json.dumps(c.resource_record, allow_nan=False))
+     record.update(retained_metadata_bytes_bound=20, extra_transient_bytes_bound=30)
+     inputs = dict(references=dict(target=c.preparation_binding['target_reference'],
+         preparation=c.preparation_binding['preparation_reference']), source_identity=c.resource_record['source_identity'],
+@@ -616,7 +617,7 @@
+ def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+     r = runtime(); r._PreparedPilotTarget
+     request.getfixturevalue('fake')
+-    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load(); writer_calls = []; phase = {'final': False, 'mutated': False}
++    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load(); writer_calls = []; phase = {'final': False, 'mutated': False, 'final_live_guard_calls': 0}
+     def mutate():
+         if phase['mutated']: return
+         phase['mutated'] = True
+@@ -628,7 +629,7 @@
+             st = path.stat(); raw = path.read_bytes(); path.write_bytes(raw)
+             os.utime(path, ns=(st.st_atime_ns, st.st_mtime_ns))
+     original_union = r._measure_complete_guard_union; original_before = r._PilotReconciliationPass.before_publication
+-    original_barrier = r._PreparedPilotTarget.final_publication_barrier
++    original_barrier = r._PreparedPilotTarget.final_publication_barrier; original_live_guard = r.live_guard
+     def union(*args, **kwargs):
+         result = original_union(*args, **kwargs)
+         if seam == 'guard-union': mutate()
+@@ -641,17 +642,21 @@
+         phase['final'] = True
+         try: return original_barrier(instance, *args, **kwargs)
+         finally: phase['final'] = False
+-    def guard():
+-        result = c.guard()
+-        if seam == 'final-live-guard' and phase['final']: mutate()
++    def live_guard(*args, **kwargs):
++        result = original_live_guard(*args, **kwargs)
++        if seam == 'final-live-guard' and phase['final']:
++            phase['final_live_guard_calls'] += 1
++            mutate()
+         return result
++    monkeypatch.setattr(r, 'live_guard', live_guard)
+     monkeypatch.setattr(r, '_measure_complete_guard_union', union)
+     monkeypatch.setattr(r._PilotReconciliationPass, 'before_publication', before)
+     monkeypatch.setattr(r._PreparedPilotTarget, 'final_publication_barrier', barrier)
+     monkeypatch.setattr(r, '_publish_measured_pilot_receipt', lambda *args: writer_calls.append(args))
+     with pytest.raises(ValueError):
+         r.run_pilot(object(), c.design, c.protocol, c.pilot_inventory, root=c.root, args=c.args,
+-            guard=guard, startup_seconds=0, prepared_target=handle)
++            guard=c.guard, startup_seconds=0, prepared_target=handle)
++    if seam == 'final-live-guard': assert phase['final_live_guard_calls'] == 1
+     assert phase['mutated'] and writer_calls == []
+ 
+ 
+@@ -712,7 +717,8 @@
+     proofs = r._cost_packing_proofs(receipts)
+     measured = r.workload.project_cost(receipts, target, budget, packing_proofs=proofs)
+     baseline = copy.deepcopy(receipt); baseline['startup_seconds'] = 0.; baseline['proof_validation_seconds'] = 0.
+-    zero = r.workload.project_cost([baseline], target, budget, packing_proofs=proofs)
++    baseline_proofs = r._cost_packing_proofs([baseline])
++    zero = r.workload.project_cost([baseline], target, budget, packing_proofs=baseline_proofs)
+     assert measured['projected_seconds'] - zero['projected_seconds'] == pytest.approx(
+         len(target['jobs']) * (7. + receipt['proof_validation_seconds']))
+     assert not (c.root / 'new-target-after-model').exists()
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/suite/test_a3_prepared_pilot_target.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/suite/test_a3_prepared_pilot_target.py
+@@ -717,7 +717,8 @@
+     proofs = r._cost_packing_proofs(receipts)
+     measured = r.workload.project_cost(receipts, target, budget, packing_proofs=proofs)
+     baseline = copy.deepcopy(receipt); baseline['startup_seconds'] = 0.; baseline['proof_validation_seconds'] = 0.
+-    zero = r.workload.project_cost([baseline], target, budget, packing_proofs=proofs)
++    baseline_proofs = r._cost_packing_proofs([baseline])
++    zero = r.workload.project_cost([baseline], target, budget, packing_proofs=baseline_proofs)
+     assert measured['projected_seconds'] - zero['projected_seconds'] == pytest.approx(
+         len(target['jobs']) * (7. + receipt['proof_validation_seconds']))
+     assert not (c.root / 'new-target-after-model').exists()
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/run_packet.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/run_packet.py
+@@ -16,7 +16,7 @@
+ from closure_preflight import check_context
+ 
+ PACKET = Path(__file__).resolve().parent
+-CANDIDATE = PACKET.parents[1] / 'plan-a3/direction-preallocation-candidate183'
++CANDIDATE = PACKET.parents[1] / 'plan-a3/direction-preallocation-candidate282'
+ ORACLE = PACKET.parents[1] / 'plan-a3/direction-metadata-optionA-candidate'
+ TEST = 'test_a3_prepared_pilot_target.py'
+ ENVS = {'base': '/sw/external/python/anaconda3/bin/python3.9', 'mgnp': '/u/swong2/.conda/envs/mgnp/bin/python'}
+@@ -102,7 +102,7 @@
+ 
+ 
+ def source_identity():
+-    return dict(revision='r6-r2-sharded', runtime_sha256=sha(CANDIDATE/'component_analysis/a3_direction_runtime.py'),
++    return dict(revision='r7-sharded', runtime_sha256=sha(CANDIDATE/'component_analysis/a3_direction_runtime.py'),
+         fixture_sha256=sha(PACKET/'suite'/TEST), partition_sha256=sha(PACKET/'partition.json'),
+         source_pins_sha256=sha(PACKET/'source-pins.json'))
+ 
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/fixture_preflight.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/fixture_preflight.py
+@@ -74,7 +74,7 @@
+     import sys
+     from tests.a3_prepared_integration_cases import PreparedCase, runtime
+     from component_analysis import a3_pipeline
+-    candidate = Path(__file__).resolve().parents[2] / 'plan-a3/direction-preallocation-candidate183'
++    candidate = Path(__file__).resolve().parents[2] / 'plan-a3/direction-preallocation-candidate282'
+     assert Path(sys.modules[PreparedCase.__module__].__file__).resolve() == (candidate / 'tests/a3_prepared_integration_cases.py').resolve()
+     r = runtime(); recorder = StageRecorder(output, r._prepared_process_observation)
+     manifest = recorder.manifest
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/bridges/host.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/bridges/host.py
+@@ -20,7 +20,7 @@
+ import supervisor
+ import transport229 as old
+ 
+-PACKET_REL = Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded')
++PACKET_REL = Path('Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded')
+ 
+ def durable(path, value):
+     with path.open('x') as stream:
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/bridges/transport229.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/bridges/transport229.py
+@@ -27,7 +27,7 @@
+  assert c['status']=='ROOT_BOUND_A3_GREEN_MGNP_TRANSPORT' and type(c['expected_cases']) is int and c['expected_cases']>0
+  files=c['files'];aliases=c['aliases'];assert type(files) is list and files and type(c['expected_file_count']) is int and len(files)==c['expected_file_count'] and type(aliases) is list and len(aliases)==8
+  alias_root=VIRT/'Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3'
+- required={str(alias_root/source/rel) for source in ('direction-preallocation-candidate183','direction-metadata-optionA-candidate') for rel in ('data','docs/research/directions.json','docs/research/held_out.json','outputs/_analyses/specificity-ladder/a1-control-77b6487-m07')}
++ required={str(alias_root/source/rel) for source in ('direction-preallocation-candidate282','direction-metadata-optionA-candidate') for rel in ('data','docs/research/directions.json','docs/research/held_out.json','outputs/_analyses/specificity-ladder/a1-control-77b6487-m07')}
+  assert {x['virtual'] for x in aliases}==required,'candidate and oracle aliases must be complete'
+  for rows in (files,aliases):
+   assert len({x['virtual'] for x in rows})==len(rows) and len({x['physical'] for x in rows})==len(rows)
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/aggregate.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/aggregate.py
+@@ -83,7 +83,7 @@
+     Root must authenticate the complete map before calling this pure function.
+     """
+     validate_partition(expected_partition)
+-    require(expected_source['revision'] == 'r6-r2-sharded', 'wrong packet revision')
++    require(expected_source['revision'] == 'r7-sharded', 'wrong packet revision')
+     observed = {}; jobs = set(); outputs = set()
+     for ref in records:
+         m = read_ref(ref)
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/test_packet.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/test_packet.py
+@@ -46,7 +46,7 @@
+     with pytest.raises((AssertionError,ValueError)):a.validate_partition(p)
+ 
+ def terminal(tmp_path):
+-    a=module('aggregate'); p=contract(); source={'revision':'r6-r2-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
++    a=module('aggregate'); p=contract(); source={'revision':'r7-sharded','runtime_sha256':'runtime','fixture_sha256':'fixture','partition_sha256':a.digest(HERE/'partition.json'),'source_pins_sha256':'pins'}
+     bindings={}; records=[]
+     for env,py in a.ENVS.items():
+         bindings[py]={}
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/partition.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/partition.json
+@@ -1,6 +1,6 @@
+ {
+   "schema": 1,
+-  "revision": "r6-r2-sharded",
++  "revision": "r7-sharded",
+   "full_collection": [
+     "test_a3_prepared_pilot_target.py::test_prepared_writer_matches_untouched_publisher[payload0-{\"a\": -0.0, \"z\": 1.25}\\n]",
+     "test_a3_prepared_pilot_target.py::test_prepared_writer_matches_untouched_publisher[payload1-{\"text\": \"\\u03bb\\u96ea\"}\\n]",
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/proposal.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/proposal.json
+@@ -1,6 +1,6 @@
+ {
+   "status": "UNBOUND_NOT_RUNNABLE",
+-  "revision": "r6-r2-sharded",
++  "revision": "r7-sharded",
+   "allocation_seconds": 4800,
+   "stage_caps_seconds": {
+     "baseline": 610,
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/resource-proposal.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/resource-proposal.json
+@@ -1,6 +1,6 @@
+ {
+   "status": "UNBOUND_NOT_RUNNABLE",
+-  "revision": "r6-r2-sharded",
++  "revision": "r7-sharded",
+   "allocation_seconds": 4800,
+   "stage_caps_seconds": {
+     "baseline": 610,
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/source-pins.json
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r7-sharded/source-pins.json
+@@ -377,7 +377,7 @@
+     "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+     "component_analysis/a3_direction_reporting.py": "01f0e36eb5338c17d8224df609c5bab2fd67ee38f224b4b64683f0b2d01cb04d",
+     "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+-    "component_analysis/a3_direction_runtime.py": "aea07dbf153824f373be70629dd24edc28dd6566cafa5955f43c69fd1119ec90",
++    "component_analysis/a3_direction_runtime.py": "1d6c3886a7634641a8a4ad64135adeef34dcdac7ce6b388e8441df1bf2cea116",
+     "component_analysis/a3_direction_workload.py": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+     "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+     "component_analysis/a3_edge_pipeline.py": "f8212df3f2b3a70b10e884164cc1e0b1781622553c2d95b77413a3fbb7cb20ce",
+@@ -586,7 +586,7 @@
+     "tests/test_a3_mask_pipeline.py": "44d350af636585cae7f9c27081543de453194d957ef66763dcc29c698078ce52",
+     "tests/test_a3_native.py": "eee521191f1b4504d39965bd1ae4fe66d929353a87e0b5ea21d6854dfc6aaee5",
+     "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+-    "tests/test_a3_prepared_pilot_target.py": "ccdecf2545b4bbc5ab9448f2c2114c72c3e2c6d4a0fbce8dcad7fdb76fdf8bf1",
++    "tests/test_a3_prepared_pilot_target.py": "2f89de3edb0ac5d513b98c018c6ab1393179b73d9ee67c64d725a064eaa09fb3",
+     "tests/test_a3_source_validation.py": "f3164a051cf18c5f44e7da13b364e02057426e02b7daccd557947afd54c66241",
+     "tests/test_a3_statistics.py": "dba62abb4324187582b91153d7788346dcebb3187832c3cf8f884f17bfa870ab",
+     "tests/test_algebra.py": "3177e30d30c06ced1cb5313e0aa07e53a7b5b601ff581e2098066ed22b25ff70",
+@@ -1096,32 +1096,32 @@
+     "write_format_control_summary.py": "641aa8a2dcb5f830c0316d88503185272b6738c1dc487a7efedeb46b17d1d6ff"
+   },
+   "packet": {
+-    "aggregate.py": "2c766243c6064a46b267323b3506626c0061a327e3e307ca6d3e7334d540444d",
++    "aggregate.py": "d006594f0d95baebc3cc5570960ea50e3cfe82da01782fc83a729f8f8646f201",
+     "baseline-suite/conftest.py": "d13ffc3bf9ec4d2cbad8ae425c0e116a5d2ce9a7911e1f76dd7c2130758576ce",
+     "baseline-suite/test_a3_prepared_pilot_target.py": "ccdecf2545b4bbc5ab9448f2c2114c72c3e2c6d4a0fbce8dcad7fdb76fdf8bf1",
+     "baseline_red.py": "8451fd6cee8cee442d66f3f7d53ff09f77544723468a965278743a99de4495df",
+-    "bridges/host.py": "2cc1908a13bfe83f86375e4c82684973e2b5f6e9d6cdcda2e47a271d16114e9d",
++    "bridges/host.py": "7f5f6d881d92239d807950104c8025a0b8cbb671621ff445b9763f7c65a56999",
+     "bridges/inner.py": "0268945f1bdf4c79ec1e2dc0e0540c5a4d2932afb619383d34971d0a928b6a93",
+     "bridges/launch.sh": "43ed6e7816db0ec391cf27973fedc12b2bd7a2978364e822b2254a4982a84b20",
+-    "bridges/manifest.json": "46d52e51eefcde1b59147e59750651f44e156607dac1e95a40d814360e64e96c",
+-    "bridges/transport229.py": "83594af1e7b665faf684af15f84b6c42534cf493db31298afb0c38c5c596bee4",
++    "bridges/manifest.json": "9b3188730d6690ddecd7fccdd401b001dd4082762c51a60f10302ae331d6f2f9",
++    "bridges/transport229.py": "6ed7f7503bdb1b08a0d75a9ca767655feb6309a5afa69ec71975abfced2554bb",
+     "closure_preflight.py": "bc6e63f4600280347c695879a1ab41de5044b522b2c544dd25178986ea7419a7",
+-    "copy-manifest.json": "f753f54b238544cfc604ee7d402ebdeb8348a6ed65dd1fc748c126b454a3e236",
++    "copy-manifest.json": "3a405cf1772b17084344e44658b3fda795ff93d90c6a3c5e4b6f6bc6e92e040d",
+     "cpu.sbatch": "78b9f5e3d0c8cef46fe40336f939e222af87fd405abd552e8de1a1ac264ea427",
+-    "fixture_preflight.py": "407e5c0a9bebbefc7065db0058b863d37f5b3cab1e9e81d75498c0071565aea7",
+-    "partition.json": "73aa13bd780837687cc2953fe6f64cd1df60b92056d856b7aad74d0dfb8a5306",
+-    "proposal.json": "4074ef0466c123805dd83909cb6114a10f8df5331f52aca6db4d83aa51c0f9cc",
++    "fixture_preflight.py": "d98cfcf43ad392ec5993b75f113be0b7b29b2b2f07d3cb74917df07acb1b7ee2",
++    "partition.json": "76ee856c6c7cde2d38b2fdea01f8b3c8816a116866aacbf0a536244fa8bdf62d",
++    "proposal.json": "03f77fd414de070e11f4a860eabe8db261c3e749f71d82f8c879e89b7fa482d1",
+     "pure_cgroup_comparability.py": "6fab4a66567c9c3a54be1ddd2e19f7d04cfa24712abe8fbf40d59f70e35d7d87",
+-    "resource-proposal.json": "4074ef0466c123805dd83909cb6114a10f8df5331f52aca6db4d83aa51c0f9cc",
+-    "run_packet.py": "4f7d047d516d34f01baaaa8a7c124439c2e91347ae3fea8b615ca1cfa33f564d",
++    "resource-proposal.json": "03f77fd414de070e11f4a860eabe8db261c3e749f71d82f8c879e89b7fa482d1",
++    "run_packet.py": "2f51c4a14b987a07c5220d36d1d578e05a8eafa30fc48df28356517eb975f1af",
+     "selector.py": "c6d4b401dc4136046d9524af7b028572005ce2ea493465a1bc6d711855c63b5b",
+     "suite/conftest.py": "a39319b5ae932f897c8032ac0e89d6e034491604d9ec3e9dedfcc7ecd8b98415",
+     "suite/test_a3_direction_runtime.py": "8a314262a2c4fb09c9f6ca883264e072d475affde7a4b927a4379b9c276ec112",
+-    "suite/test_a3_prepared_pilot_target.py": "e2a7c5622508974fafafe016e9c3d1d55903302f646f05c5f35630570a1f6e86",
++    "suite/test_a3_prepared_pilot_target.py": "2f89de3edb0ac5d513b98c018c6ab1393179b73d9ee67c64d725a064eaa09fb3",
+     "supervisor.py": "9c4099cbc1214e3111727c978325d855c0949193b0683832c75926818bf226a6",
+     "test-groups.json": "766ded5b4b8f3dc83d4d1685e88edfea08d64a93abb8ee5ce8a6814b6ebc683b",
+     "test_closure_preflight.py": "6eeb9c1fe7d4c4ccc39fbccc7f58b8f71fd0dc5815d3ee323fced2a683826f72",
+-    "test_packet.py": "619b14139cebad5afd6006e98d7ce02b82bcc83a833b0aa92326069aea7511d9",
++    "test_packet.py": "2468a6b4d575d6e8b75d844f3c77d5c5f6b3ed0bb483ee901a6da9da0b350ddf",
+     "test_review272.py": "99c0dd910de6efe13ec9f319ca057d4c388c339e7d198ecafa584eabe455bcf5",
+     "verification-scope.json": "f2dae62f5731ce1a0375713f5e16425c8d8c5e55a66a4fb08023be6f95eab1fe"
+   }

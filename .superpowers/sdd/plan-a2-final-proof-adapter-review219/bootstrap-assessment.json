@@ -1,0 +1,20 @@
+{
+  "existing_pattern": {
+    "dispatch": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/dispatch.sh",
+    "dispatch_sha256": "572320be934c9875395f7c82dda291f480074f5b48dd3bcc579b59ed37144e60",
+    "transfer_receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/binding-support-transfer.json",
+    "transfer_receipt_sha256": "8283a19a63620d97461fb13daa98108f1ab3b9b1a8eff416ed8c14d54a75767f",
+    "actual_submission": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-bridges-assay/h100-g3-20261103/root-H100-R5/submission-50189932.json",
+    "actual_submission_sha256": "abda264508cbbda88edf05fdaee83edfb3cc9ab6eff1ea66e1b96ad9e2e9a411"
+  },
+  "source_219_operational_issue": "Binding and transfer witness include actualjobid, so bindingSHA cannot be known as submitarg before sbatch returns jobid. Current adapter launch requires bindingSHA arg.",
+  "root_ruling": "Use existing allowed root-genuine-proof-r2/job-$SLURM_JOB_ID/execution and same-parent bindings. Do not broaden frozen output guard.",
+  "safe_transport_requirements": [
+    "Numeric actual SLURM_JOB_ID derives exact owned perjob directory; reject missing, occupied output, symlink leaves/ancestors or wrong ownership.",
+    "Root alone seals perjob binding bytes and separate expected lowercase64hex sidecar before release; stage/readback exact bytes and validate actual job/packet/witness/probe/review/output references.",
+    "Dispatcher and reviewed packet bytes pinned; read sealed expected digest, compare current raw binding bytes and pass original binding+expected digest to unchanged launch.",
+    "Reject absent, truncated, default/template, mismatched or self-adopted digest; no waiting/retry or weaker live guards.",
+    "A separate source/fixture review of exact new dispatcher remains before execution. Historical pattern is not acceptance of unseen new wrapper."
+  ],
+  "new_native_authority_kind": false
+}

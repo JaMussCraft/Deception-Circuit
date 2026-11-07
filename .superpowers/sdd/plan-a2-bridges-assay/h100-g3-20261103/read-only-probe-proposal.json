@@ -1,0 +1,43 @@
+{
+  "status": "ROOT_READ_ONLY_PROBE_TEMPLATES_NOT_EXECUTED",
+  "note": "Early probe can reuse old sourceprofile/assets; finalacceptedsource post-wrapper CPUowninggeometry/tokenization/protection probe stillmandatory.",
+  "physical_HF_root": "/ocean/projects/cis260361p/swong2/hf/hub",
+  "virtual_HF_root": "/work/nvme/beto/swong2",
+  "physical_project_new": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment",
+  "project_virtual": "/projects/beto/swong2/Alignment",
+  "image": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif",
+  "image_sha256": "f50c8e39dd5e2ac1c1a4bdfd443351cb970513fdb10a572725eb53d7396f8697",
+  "early_source_profile": "Existing verified6bd profile only for earlycacheprobe; finalsource stillunselected",
+  "container_flags": [
+    "--cleanenv",
+    "--contain",
+    "--no-home",
+    "--writable-tmpfs",
+    "--bind",
+    "/ocean:/ocean:ro",
+    "--bind",
+    "/ocean/projects/cis260361p/swong2/hf/hub:/work/nvme/beto/swong2:ro"
+  ],
+  "environment": {
+    "DC_B2_ALLOC": "cis260361p",
+    "DC_CLUSTER": "bridges2",
+    "HF_HUB_CACHE": "/work/nvme/beto/swong2",
+    "TRANSFORMERS_CACHE": "/work/nvme/beto/swong2",
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "HF_DATASETS_OFFLINE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "CUDA_VISIBLE_DEVICES": ""
+  },
+  "order": [
+    "CheckactualSIFsha/metadata and existingaccount382 access tolegacy361 readonlyassets",
+    "UseREAL newprojectsbind onlyafterdata staging; oldverifiedprojectsbind allowedforEARLYassetprobe only",
+    "Sourceactualexistingbridges2.env andevaluatepackedDC_ACTIVATE, preservingactualSLURM vars andbillingaccount",
+    "Afteractivation set explicitHF_HUB_CACHE andTRANSFORMERS_CACHE virtual/work alias; wrapper maysetHF_HOMEtolegacy/ocean",
+    "Run early-cache-probe.py withactualpackedpython; no model loaded",
+    "After161acceptedsourceexport andfreshG3, fullremoteCPUowning_source+geometry+tokenizer+protected+livegrader guards, beforeanyGPUreservation"
+  ]
+}

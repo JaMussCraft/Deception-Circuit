@@ -1,0 +1,100 @@
+{
+  "kind": "read_only_Astra_decision_audit202",
+  "snapshot_local": "2026-11-06 04:38 PM EST",
+  "new_scientific_runs": false,
+  "source_edits": false,
+  "scheduler_mutations": false,
+  "source_files": {
+    "original_science": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/START.md",
+      "sha256": "9f07c8240e95096314809b596218c18771d202c43dbc7a5c656d70d2c7af4236"
+    },
+    "accepted_science_plan": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/plan-a3.md",
+      "sha256": "8b6e306872f3716118e0b761efc95f835f7623aee7ef292d7cf47cd900d24347"
+    },
+    "state": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/RESUME.md",
+      "sha256": "424dfa22b83eec3f4b214b6278885e2d3234849358b25341a039105b7ed6b1e9"
+    },
+    "worklog": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/WORKLOG.md",
+      "sha256": "1f7a50aafcbcc9649b7ebddc7ae7a236eb3dfbd097072a3361c12dd3c322ef3f"
+    },
+    "runtime": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/component_analysis/a3_direction_runtime.py",
+      "sha256": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc"
+    },
+    "workload": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/component_analysis/a3_direction_workload.py",
+      "sha256": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9"
+    },
+    "edge_runtime": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/component_analysis/a3_edge_pipeline.py",
+      "sha256": "acc0b7953af131bc65e328a38e8464f900775470ec00acf413984a4f2778f020"
+    },
+    "implementation_plan": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-implementation183-r2/plan.md",
+      "sha256": "daf91f3b9a1542f5268aa0adf983dd4a4fd808d9af9442535f74cc444df4fe13"
+    },
+    "edge_updated_review": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/142-real-input-readiness-handback.md",
+      "sha256": "d233f9616da5bcbfd4ed9862a7e93ea3f0d72477a4f1ba661f194dad652d9605"
+    },
+    "edge_staging_review": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/117-edge-pilot-readiness-handback.md",
+      "sha256": "685fe385d7cf548ab928b1233f3e27ef5ca96cc9bca8ae0a7359bdf601bee5d8"
+    },
+    "base_oracle": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-plan/genuine-oracle-executions/original-base-r3-01/COMPLETE_ORACLE.json",
+      "sha256": "463591fc08f04a8275042a68e9c884b22c264eac5bf11bd87679a17a5594973a"
+    },
+    "mgnp_comparison_review": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate-result-review171/actual-mgnp-comparison-verdict.json",
+      "sha256": "5937f7578223803bc803ae19e6e0dcc6c36c1467fe3ba84350498281a6943fec"
+    }
+  },
+  "live_queue": {
+    "23613149": {
+      "state": "PENDING",
+      "partition": "cpu,cpu-interactive",
+      "reason": "None"
+    },
+    "23613360": {
+      "state": "PENDING",
+      "partition": "cpu",
+      "reason": "None"
+    }
+  },
+  "usage": {
+    "checked_at": "2026-11-06T21:38:31.632262+00:00",
+    "used_percent": 15,
+    "remaining_percent": 85,
+    "pause_at": 80,
+    "should_pause": false,
+    "reset_utc": "2026-11-13T16:18:29+00:00"
+  },
+  "oracle_observations": {
+    "full_publisher_stream_bytes": 11421127399,
+    "full_publisher_stream_sha256": "c738a185b9a79ef8873113e63aefa197a820f0a5c117159db055de6f70e0a6c9",
+    "build_seconds": 2628.6614440809935,
+    "stream_seconds": 986.9338401540008
+  },
+  "inventory_counts": {
+    "raw_keys": 246486,
+    "shards": 81904,
+    "capture_shards": 4256,
+    "requirements": 618117,
+    "captures": 45042
+  },
+  "declared_output_bytes": 5916288259710,
+  "declared_publication_metadata_bytes": 5881781407862,
+  "metadata_fraction_of_declared_output": 0.9941674830006184,
+  "storage_caveat": "Conservative source-derived envelope, not measured bytes or a scientific lower bound.",
+  "scope_limits": [
+    "No comprehensive re-audit of historical runs",
+    "No new timings or native numerical validation",
+    "No remote Bridges check; deployment/availability assessment uses supplied current context and local records",
+    "No git, RS mutation, jobs, subagents, source changes, or source publication"
+  ]
+}

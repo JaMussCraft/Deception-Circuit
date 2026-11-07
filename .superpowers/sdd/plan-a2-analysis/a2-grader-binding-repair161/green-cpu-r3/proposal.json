@@ -1,0 +1,34 @@
+{
+  "kind": "A2graderbinding161_GREEN_CPU_r3_durable_progress",
+  "candidate": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-candidate161",
+  "baseline": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "source_count": 511,
+  "tests": [
+    "tests/test_a2_pipeline.py",
+    "tests/test_a2_mask_comparison.py"
+  ],
+  "cpus": 4,
+  "memory_GiB": 8,
+  "minutes": 13,
+  "gpus": 0,
+  "constraint": "projects",
+  "command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-repair161/green-cpu-r3/green_cpu.sh"
+  ],
+  "resource_basis": "Actual previous180s per-interpreter watchdog expired after substantial fullsuiteprogress. Approx138of159 at180s extrapolates about208s;360s per interpreter gives fixture variability and startup buffer.13min allocation covers two360s bounds plus shutdown. Same exact fullsuite/source; no fixture or test changes.",
+  "changed_files": {
+    "component_analysis/a2_pipeline.py": "45ba2b7d551164d75ed6bdd3fd5c7f171087b6f60753691e7fb6831f9e56aa51",
+    "tests/test_a2_pipeline.py": "bc8d2419cf0f217d8373f5879461f126a9549012ccdc93981600d55a65cd4be5"
+  },
+  "no_gpu_or_model": true,
+  "input_fixture_count": 1,
+  "prior_failure": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-repair161/green-cpu/result-23482237-mgnp.json",
+  "per_interpreter_timeout_seconds": 360,
+  "prior_timeout": {
+    "job_id": "23482347",
+    "exit": "124:0",
+    "elapsed_seconds": 185,
+    "observed_progress": "root observed approx138of159 testdots at181jobseconds; no assertion failure observed; mgnp incomplete and base not started"
+  }
+}

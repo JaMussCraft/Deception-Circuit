@@ -1,0 +1,56 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r5/suite/test_a3_prepared_pilot_target.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/fixture-correction265/test_a3_prepared_pilot_target.py
+@@ -512,7 +512,8 @@
+     r = runtime(); validate = r._validate_prepared_receiver_resources
+     from tests.a3_prepared_integration_cases import environment_identity
+     c = integration_case(tmp_path, monkeypatch).anchor()
+-    record = copy.deepcopy(c.resource_record)
++    # Attack plain data: deepcopy intentionally preserves production frozen references.
++    record = json.loads(json.dumps(c.resource_record, allow_nan=False))
+     record.update(retained_metadata_bytes_bound=20, extra_transient_bytes_bound=30)
+     inputs = dict(references=dict(target=c.preparation_binding['target_reference'],
+         preparation=c.preparation_binding['preparation_reference']), source_identity=c.resource_record['source_identity'],
+@@ -616,7 +617,7 @@
+ def test_prepared_final_barrier_after_all_costly_work(tmp_path, monkeypatch, seam, damage, request):
+     r = runtime(); r._PreparedPilotTarget
+     request.getfixturevalue('fake')
+-    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load(); writer_calls = []; phase = {'final': False, 'mutated': False}
++    c = integration_case(tmp_path, monkeypatch).anchor(); handle = c.load(); writer_calls = []; phase = {'final': False, 'mutated': False, 'final_live_guard_calls': 0}
+     def mutate():
+         if phase['mutated']: return
+         phase['mutated'] = True
+@@ -628,7 +629,7 @@
+             st = path.stat(); raw = path.read_bytes(); path.write_bytes(raw)
+             os.utime(path, ns=(st.st_atime_ns, st.st_mtime_ns))
+     original_union = r._measure_complete_guard_union; original_before = r._PilotReconciliationPass.before_publication
+-    original_barrier = r._PreparedPilotTarget.final_publication_barrier
++    original_barrier = r._PreparedPilotTarget.final_publication_barrier; original_live_guard = r.live_guard
+     def union(*args, **kwargs):
+         result = original_union(*args, **kwargs)
+         if seam == 'guard-union': mutate()
+@@ -641,17 +642,21 @@
+         phase['final'] = True
+         try: return original_barrier(instance, *args, **kwargs)
+         finally: phase['final'] = False
+-    def guard():
+-        result = c.guard()
+-        if seam == 'final-live-guard' and phase['final']: mutate()
++    def live_guard(*args, **kwargs):
++        result = original_live_guard(*args, **kwargs)
++        if seam == 'final-live-guard' and phase['final']:
++            phase['final_live_guard_calls'] += 1
++            mutate()
+         return result
++    monkeypatch.setattr(r, 'live_guard', live_guard)
+     monkeypatch.setattr(r, '_measure_complete_guard_union', union)
+     monkeypatch.setattr(r._PilotReconciliationPass, 'before_publication', before)
+     monkeypatch.setattr(r._PreparedPilotTarget, 'final_publication_barrier', barrier)
+     monkeypatch.setattr(r, '_publish_measured_pilot_receipt', lambda *args: writer_calls.append(args))
+     with pytest.raises(ValueError):
+         r.run_pilot(object(), c.design, c.protocol, c.pilot_inventory, root=c.root, args=c.args,
+-            guard=guard, startup_seconds=0, prepared_target=handle)
++            guard=c.guard, startup_seconds=0, prepared_target=handle)
++    if seam == 'final-live-guard': assert phase['final_live_guard_calls'] == 1
+     assert phase['mutated'] and writer_calls == []
+ 
+ 

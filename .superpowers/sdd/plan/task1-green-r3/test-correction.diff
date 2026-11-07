@@ -1,0 +1,15 @@
+--- green-r2/tests/test_a3_prepared_pilot_target.py
++++ green-r3/tests/test_a3_prepared_pilot_target.py
+@@ -326,7 +326,11 @@
+     value = inventory(native, design, protocol, 'prefit')
+     target, preparation, tr, pr, policy = object_case(tmp_path, payload=value)
+     frozen, _, _, witness, _, _ = unpack(read(tr, pr, policy))
+-    assert frozen == value == r.read_object(target)
++    native_target = native / 'inventory' / 'prefit'
++    # Native tuples become JSON arrays in the unchanged ordinary publisher.
++    assert frozen == r.read_object(target) == r.read_object(native_target)
++    assert r.workload.digest(frozen) == r.workload.digest(value)
++    assert (target / 'payload.json').read_bytes() == (native_target / 'payload.json').read_bytes()
+     assert frozen['inventory_sha256'] == value['inventory_sha256']
+     assert len(frozen['expected_keys']) == len(value['expected_keys']) > 0
+     r._check_file_witness(witness)

@@ -1,0 +1,49 @@
+{
+  "observed_unix": 1794012464.4072502,
+  "accounting": {
+    "argv": [
+      "sacct",
+      "-j",
+      "50311864",
+      "--format=JobID,State%32,ExitCode,Elapsed,Start,End",
+      "-P"
+    ],
+    "exit_code": 0,
+    "stdout": "JobID|State|ExitCode|Elapsed|Start|End\n50311864|COMPLETED|0:0|00:00:05|2026-11-06T19:35:08|2026-11-06T19:35:13\n50311864.batch|COMPLETED|0:0|00:00:05|2026-11-06T19:35:08|2026-11-06T19:35:13\n50311864.extern|COMPLETED|0:0|00:00:05|2026-11-06T19:35:08|2026-11-06T19:35:13\n",
+    "stderr": ""
+  },
+  "files": {
+    "submission-result.json": {
+      "sha256": "7cc98e19af934b132cad801756353887cc7dffddda11b74b0cd6a03bc27aac10",
+      "bytes": 1377
+    },
+    "job-50311864.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "submission-intent.json": {
+      "sha256": "69b188e21231744da751afe7ab1c1c16c60f9c26310087126fe885e2328a075a",
+      "bytes": 1238
+    },
+    "execution/probe-result.json": {
+      "sha256": "eff5f3096335d320a5cd11b745c682d6588d04ba90d20f7a21a29b9d4e5fdf2c",
+      "bytes": 178
+    },
+    "execution/container-cgroup.json": {
+      "sha256": "f59231af8075e1cb3b701901e8d92be2e67ed416ac75bccf71f93e4be30ba8f7",
+      "bytes": 1103
+    },
+    "execution/allocation.json": {
+      "sha256": "cf5ad1be8751b11de4412a51d64ed971a35ea7f529c11b1aecaa358396258745",
+      "bytes": 4894
+    },
+    "execution/host-cgroup.json": {
+      "sha256": "d6fe49460ae002c07b43deefecc99a82f34d1a658729c463b592a1ab2614bf5b",
+      "bytes": 985
+    },
+    "execution/command.json": {
+      "sha256": "ee1c2f1dce8772daaab4d6d90a61ce0ceb38e19bff9981902723564984ecfd87",
+      "bytes": 3791
+    }
+  }
+}

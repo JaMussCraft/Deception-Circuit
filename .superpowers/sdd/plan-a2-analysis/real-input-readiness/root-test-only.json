@@ -1,0 +1,22 @@
+{
+  "command": [
+    "sbatch",
+    "--test-only",
+    "--export=ALL",
+    "--account=beto-delta-cpu",
+    "--partition=cpu",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=4",
+    "--mem=32G",
+    "--time=00:15:00",
+    "--job-name=lad-a2-compare-freeze",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/real-input-readiness/cpu-job.sh"
+  ],
+  "stdout": "",
+  "stderr": "sbatch: Job 23459498 to start at 2026-11-02T21:19:21 a using 4 processors on nodes cn096 in partition cpu\n",
+  "exit_code": 0
+}

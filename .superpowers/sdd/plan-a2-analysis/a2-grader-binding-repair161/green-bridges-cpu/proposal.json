@@ -1,0 +1,29 @@
+{
+  "kind": "PROVISIONAL_A2_BINDING161_BRIDGES_MGNP_ONLY_GREEN",
+  "status": "root_staging_and_submission_required",
+  "scientific_acceptance": false,
+  "delta_both_interpreters_still_required": true,
+  "account": "cis260361p",
+  "qos": "rm",
+  "partition": "RM-shared",
+  "cpus": 5,
+  "memory_GiB": 8,
+  "minutes": 8,
+  "gpus": 0,
+  "candidate_virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-candidate161",
+  "physical_alignment": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment",
+  "physical_packet": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/deployment/a2-binding161-provisional-green",
+  "source_manifest_sha256": "33805f49e9357b53db846b24728689b1ecc8ff7e9999fbc87233b138293a6b72",
+  "image": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif",
+  "image_sha256": "f50c8e39dd5e2ac1c1a4bdfd443351cb970513fdb10a572725eb53d7396f8697",
+  "interpreter": "/ocean/projects/cis260361p/swong2/envs/mgnp/bin/python",
+  "tests": [
+    "tests/test_a2_pipeline.py",
+    "tests/test_a2_mask_comparison.py"
+  ],
+  "command": [
+    "bash",
+    "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/deployment/a2-binding161-provisional-green/green_bridges_cpu.sh"
+  ],
+  "resource_basis": "Same fixed two-module candidate as queued Delta23482237. Provisional mgnp-only feedback; no base interpreter substitution. FiveCPU required by RM-shared8GiB/corelimit.180s pytest watchdog plus image hash/containerstartup under8min."
+}

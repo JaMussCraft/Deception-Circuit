@@ -1,0 +1,87 @@
+{
+  "status": "read_only_static_dependency_inference_not_admission",
+  "source_manifest": {
+    "component_analysis/a3_direction_pipeline.py": "96678db186078ab37cad108e2d1e71ffdccf1fb3dd157c35cdc57a91b2ebd4a0",
+    "component_analysis/a3_direction_runner.py": "89a62335665595533204006c3eca28d14ca9c42eb600879c235e9c6370739429",
+    "component_analysis/a3_direction_runtime.py": "b66c2d8cd26c36f321b5079758209214746b0e4eec16a6c801742086d729c0cc",
+    "component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9",
+    "component_analysis/a3_directions.py": "ed882d4e12a396e03e73671e588beba5b1a8c90ab9d31e7ee73d4194430b4a86",
+    "component_analysis/a3_pipeline.py": "310eb53427ad4ac32522dfd0d6cd3b33e4ec887af1776579845f8953bdbe83f5",
+    "scripts/jobs/specificity_a3.sh": "936dfb7f8b9c2d267d52f1e199ed431275e6527cbfc3a105a22e3812289a9b96",
+    "tests/test_a3_direction_runner.py": "3ea945d5b23b4eef7d56139758c7075ea1b56ac612f1923590b7978628ca0120",
+    "tests/test_a3_direction_runtime.py": "5a41e89b0b2bd5fd59553f5f5a63260638e3547a63c31a615d84da08f796fb6a",
+    "tests/test_a3_direction_workload.py": "91eb6f874e180c5ffb362daba231631b7bea21c224446580efccfe20a9007300",
+    "tests/test_a3_directions.py": "cd8471b1524ad7b8f1b7c87f9eb5fec5724b3ab2980027ef7aadfea3fc3bb1c1",
+    "tests/test_a3_pipeline.py": "bbb3efdba075cc14c2997cc11ae44bab268bdea56459c0574d6bfc21b62f4a18",
+    "tests/a3_direction_native_scenario.py": "9b5061ab9618222b23230917f446abcaa73747f3d216f69c77b9218feec6297b"
+  },
+  "call_graph_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/native-continuation-plan/selected-aggregate-calibration-proposal/source-call-graph.json",
+  "initial_prefit_route": [
+    "scripts/jobs/specificity_a3.sh",
+    "a3_pipeline.main",
+    "a3_direction_pipeline.main",
+    "a3_direction_runtime.main/parser",
+    "dispatch(stage=pilot,pilot_part=prefit)",
+    "_read_stage_inventory/_validate_inventory(prefit)",
+    "live_guard/actualallocation/modelmetadata",
+    "load_model/geometry",
+    "run_pilot(part=prefit)",
+    "build_inventory(fit-select) metadata target only",
+    "_pilot_invocation/packing proof orserial proof",
+    "_PilotReconciliationPass/captures/positivecontrols/serialization/fullguardunion",
+    "_pilot_origin/_publish_measured_pilot_receipt"
+  ],
+  "selected_route_extra": [
+    "completed frozen selected bundle and actual axes",
+    "selected-pilot inventory exact selected numeric scope",
+    "build_inventory(remaining) target metadata",
+    "selected numeric backing witness"
+  ],
+  "not_called_by_pilot_branch": [
+    "run_scoring",
+    "_admitted_candidate_index",
+    "_completed_pilot_index",
+    "assessment_preflight",
+    "read_runtime_rows",
+    "summarize_calibration",
+    "summarize_runtime"
+  ],
+  "not_consumed_artifacts": [
+    "completed calibration runtime shards",
+    "calibration-summary",
+    "completed assessment runtime shards",
+    "final summary"
+  ],
+  "metadata_target_is_still_used": true,
+  "target_inventory_validation_and_serialization_are_used_paths": true,
+  "timing_source_split": "validation",
+  "timing_split_enforcement": "a3_direction_runtime._batch_for_timing requires allanalysis_split validation andcalls source_batches validation",
+  "prefit_native_evidence": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/unit-f-cpu-evidence/native-round3-b66c2d8/process-evidence/prefit-aggregate-0-32-resume-2346898/payload.json",
+    "sha256": "59995ecdb18e3aa6d2324ec33b61712039b86efdec770c85dd0bfa8b43bb1819",
+    "completed_cases": 9,
+    "original_case_forwards_replayed": 1863,
+    "new_actual_reconciliation_forwards": 153,
+    "wall_seconds": 98.80185985198477
+  },
+  "selected_native_evidence": {
+    "authenticated_case_count": 63,
+    "aggregate_executed": false,
+    "full_scoring_calibration_executed": false
+  },
+  "recommendation": {
+    "prefit": "A scoped independent readiness review is justified without waiting for unused calibration/assessment/summary stages; independently verify full existing prefit native producer evidence and all actual source/authority/resource/cost/protection prerequisites.",
+    "selected": "The same unused downstream stages are not hard dependencies; the new full selected aggregation/reconciliation path remains directly relevant to reviewing selected-pilot software. Actual production selected axes and completed fit/selection lineage remain prerequisites.",
+    "decision_owner": "root/reviewer only; no admission granted"
+  },
+  "remaining_production_constraints": {
+    "direction_M1_total_GPU_hours": 0.5,
+    "all_M1_GPU_hours": 2,
+    "production_source_closed": true,
+    "current_input_registry_protection_required": true,
+    "actualSlurmGPU_and_model_metadata_required": true,
+    "original_reservation_and_finish_reserve_required": true,
+    "injected_evidence_cannot_authorize_production": true
+  },
+  "fresh_index_note": "Each _completed_pilot_index creates new local packed/serial/numeric dictionaries even in the same process. Original run_phase also reconstructs the tiny model perphase; do not claim avoided completed-source authentication/index startup from keeping one interpreter alive."
+}

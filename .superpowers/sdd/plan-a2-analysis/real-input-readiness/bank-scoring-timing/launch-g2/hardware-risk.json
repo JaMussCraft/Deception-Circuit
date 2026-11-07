@@ -1,0 +1,19 @@
+{
+  "selected_family": "H200",
+  "root_instruction": "PreferH200; preserve BF16/SDPA/batch8/all science; same actual physical device and runtime for bank and score",
+  "A100_required_by_contract": false,
+  "contract_evidence": {
+    "bank_contract": "a2_pipeline.py:621-685 binds model geometry/config/keys/source/numeric environment, no fixed GPU name",
+    "score": "a2_pipeline.py:824-841 compares bank actual dtype/device family/gpu_name to current model",
+    "loader": "ladder_pipeline.py:274-279 uses originalBF16 CUDA loader; hooks.py SDPA fixed"
+  },
+  "A100_reference_only": true,
+  "new_union_memory_measured": false,
+  "risks": [
+    "all400H IDs/both streams and up to145keys+7wholeMLPs exceed prior partial-bank breadth",
+    "retained fp32 vector bytes do not bound capture/logit/model temporary peaks",
+    "H200 name/total/free/UUID must be inspected inside actual allocation; sinfo type label is not physical-device evidence",
+    "25min bounded exploratory maximum may finish bank only; no shortened score/automaticretry"
+  ],
+  "checked_utc": "2026-11-03T13:04:21.146955+00:00"
+}

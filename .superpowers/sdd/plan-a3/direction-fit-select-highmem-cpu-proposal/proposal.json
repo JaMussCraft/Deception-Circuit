@@ -1,0 +1,31 @@
+{
+  "status": "PROPOSAL_ONLY_REQUIRES_ROOT_RESOURCE_REVIEW_NOT_AUTOMATIC_RETRY",
+  "source_commit": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "prior_actual_OOM_evidence": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-prefit-remaining-cpu-r163-r2-execution-review/run_manifest.json",
+  "root_resources_requested": {
+    "CPUs": 4,
+    "memory_GiB": 192,
+    "Slurm_minutes": 45,
+    "child_cap_seconds": 2520,
+    "kill_grace_seconds": 15,
+    "GPUs": 0
+  },
+  "memory_basis": {
+    "prior_finite_limit_bytes": 34359738368,
+    "prior_peak_wait4_bytes": 34244575232,
+    "prior_OOM_events": 1,
+    "prior_elapsed_seconds": 2137,
+    "requested_multiple_of_failed_limit": 6,
+    "not_a_measured_upper_bound": true,
+    "allocation_available_node_memory_MiB": 257617,
+    "reason": "32GiB is a demonstrated insufficient lower bound.192GiB gives sixfold room for the full retained object and transient source/JSON structures within one known251GiB-class CPU node; it remains a bounded exploration, not proof of sufficiency."
+  },
+  "time_basis": "Reuse same45min finite allocation: prior35.6min included severe near-limit stall/CPU-system pressure; no complete build runtime exists. No fit guarantee or extension.",
+  "scope": "ONLY still-missing original fit-select inventory creation, fresh output. Reuse/hash-check canonical and completedprefit before/after. No dryrun/finalvalidation bundled, so completedcreation is not lost behind larger downstream rebuild.",
+  "later_required": "Original prefit dryrun plus complete original validation remain necessary in a separate reviewed CPU phase after genuine inventory counts/size/cgrouppeak are available. Do not skip independent reconstruction or controls.",
+  "telemetry": "Every5s capture each actual cgroupancestor memory.current/peak/max/events/pressure + host PSI. DriverRSS is supplementary only. Preserve actual allocation/endtime, source/inputpins, wait4CPU/RSS, childtermination and terminal cgroups.",
+  "no_source_changes": true,
+  "no_canonical_or_prefit_rebuild": true,
+  "no_GPU_admission": true,
+  "no_automatic_retry": true
+}

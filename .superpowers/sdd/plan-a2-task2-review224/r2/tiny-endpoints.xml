@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="0.832" timestamp="2026-11-06T20:29:47.006092-06:00" hostname="dt-login04.delta.ncsa.illinois.edu"><testcase classname="test_full_score_cpu" name="test_review224_actual_Task1_marker_is_accepted_without_renaming[1140.0-1125.0]" time="0.273"><failure message="ValueError: actual GPU job identity">test_full_score_cpu.py:530: in test_review224_actual_Task1_marker_is_accepted_without_renaming
+    assert need(m,'validate_request')(c,r,waiting,now=1010.)['actual_future_GPU_job_id'] == gpu_c['actual_job_id']
+../cpu/supervisor.py:83: in validate_request
+    require(re.fullmatch('[0-9]+',r['actual_future_GPU_job_id']) is not None,'actual GPU job identity')
+../cpu/supervisor.py:28: in require
+    if not ok: raise ValueError(message)
+E   ValueError: actual GPU job identity</failure></testcase><testcase classname="test_full_score_cpu" name="test_review224_actual_422_manifest_preserves_all_eleven_aliases[None]" time="0.060" /><testcase classname="test_full_score_cpu" name="test_review224_actual_Task2_COMPLETE_satisfies_actual_Task1_consumer[None]" time="0.294" /></testsuite></testsuites>

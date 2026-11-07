@@ -249,9 +249,8 @@ def fit_ridge_probe(train_coordinates, labels):
     return dict(center=center,scale=scale,coefficient=coef,intercept=float(y.mean()),regularization=1.)
 
 
-def probe_balanced_accuracy(probe, coordinates, labels):
+def probe_predictions(probe, coordinates):
     x = _tensor(coordinates,'probe coordinates',ndim=2)
-    y = _labels(labels,len(x))
     _require(isinstance(probe,dict) and {'center','scale','coefficient','intercept','regularization'} <= set(probe), 'incomplete probe fields')
     center = _tensor(probe['center'], 'probe center', ndim=1)
     scale = _tensor(probe['scale'], 'probe scale', ndim=1)
@@ -264,4 +263,11 @@ def probe_balanced_accuracy(probe, coordinates, labels):
     standardized = _tensor((x-center)/scale, 'probe evaluation standardized design', ndim=2)
     scores = _tensor(standardized@coefficient+intercept, 'probe evaluation scores', ndim=1)
     predicted = torch.where(scores>=0,1.,-1.)
+    return predicted
+
+
+def probe_balanced_accuracy(probe, coordinates, labels):
+    x = _tensor(coordinates,'probe coordinates',ndim=2)
+    y = _labels(labels,len(x))
+    predicted = probe_predictions(probe,x)
     return float(torch.stack([(predicted[y==c]==c).float().mean() for c in (-1.,1.)]).mean())

@@ -1,0 +1,32 @@
+test_exact_job_component (test_regressions.OriginalSemantics) ... FAIL
+test_no_bytecode_option (test_regressions.OriginalSemantics) ... FAIL
+test_traversal_rejected (test_regressions.OriginalSemantics) ... FAIL
+
+======================================================================
+FAIL: test_exact_job_component (test_regressions.OriginalSemantics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/test_regressions.py", line 6, in test_exact_job_component
+    job='123';path='/sys/fs/cgroup/slurm/job_1234/step_batch';self.assertFalse(bool(job and job in path))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_no_bytecode_option (test_regressions.OriginalSemantics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/test_regressions.py", line 10, in test_no_bytecode_option
+    self.assertIn('python3 -B', (OLD/'launch.sh').read_text())
+AssertionError: 'python3 -B' not found in '#!/bin/bash\nset -euo pipefail\n: "${SLURM_JOB_ID:?actual Bridges CPU allocation required}"\nP=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight\nexec python3 "$P/host_probe.py" --output "$1" --manifest-sha256 "$2"\n'
+
+======================================================================
+FAIL: test_traversal_rejected (test_regressions.OriginalSemantics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/test_regressions.py", line 8, in test_traversal_rejected
+    root=Path('/allowed/root');path=root/'../../outside';self.assertFalse(path.is_relative_to(root))
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.004s
+
+FAILED (failures=3)

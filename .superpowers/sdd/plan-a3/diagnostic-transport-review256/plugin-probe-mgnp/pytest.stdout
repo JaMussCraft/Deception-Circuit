@@ -1,0 +1,22 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- /u/swong2/.conda/envs/mgnp/bin/python
+rootdir: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/diagnostic-transport-review256/plugin-probe-mgnp/suite
+collecting ... collected 3 items
+
+test_mini.py::test_selected_fail FAILED                                  [ 33%]
+
+=================================== FAILURES ===================================
+______________________________ test_selected_fail ______________________________
+
+lifecycle = None
+
+    def test_selected_fail(lifecycle):
+>    assert False,"selected_failure"
+E    AssertionError: selected_failure
+E    assert False
+
+test_mini.py:16: AssertionError
+=========================== short test summary info ============================
+FAILED test_mini.py::test_selected_fail - AssertionError: selected_failure
+assert False
+============================== 1 failed in 0.10s ===============================

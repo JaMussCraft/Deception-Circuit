@@ -1,0 +1,58 @@
+--- frozen321/test_full_score_integration.py
++++ correction327/test_full_score_integration.py
+@@ -507,8 +507,23 @@
+     manifest=j.m.read(Path(j.producer.g['main_root'])/'score/run_manifest.json')
+     assert manifest['kind']=='a2_score' and manifest['execution_commit']==j.m.SOURCE and manifest['execution']['synthetic_fixture']
+     assert manifest['counts']==dict(rows=59652,expected=59652,positive_controls=3396)
+-    with pytest.raises((ValueError,FileExistsError)):controller.run_full_score(j.producer.g,r)
+-    with pytest.raises(FileExistsError):j.producer.publish()
++    # A completed score must reject before any retry can rewrite evidence.
++    # Real bank/input guards precede the duplicate-publication claim guard.
++    retained_roots=(j.producer.work,j.cpu,Path(j.producer.g['main_root']),Path(j.producer.g['evidence_root']))
++    def retry_state():
++        paths={path for root in retained_roots for path in root.rglob('*') if path.is_file()}
++        paths.add(Path(r['_release_path']))
++        return {str(path):(path.stat().st_size,j.m.sha(path)) for path in paths}
++    retained=retry_state();pending=Path(r['_release_path']+'.pending')
++    assert not pending.exists() and not pending.is_symlink()
++    with pytest.raises(ValueError,match='^score already exists or is symlink$'):
++        controller.run_full_score(j.producer.g,r)
++    with pytest.raises(ValueError,match='^score already exists or is symlink$'):
++        j.producer.publish()
++    assert retry_state()==retained
++    assert not pending.exists() and not pending.is_symlink()
++    assert (j.cpu/'COMPLETE.json').read_bytes()==before
++    assert j.events.count('stage')==1 and not j.p._TASK4_MODEL_CALLS
+     assert len(calls)==1 and j.events.count('publish')==1
+     # A native, hash-consistent artifact still cannot change the support mask
+     # or control domain after the full CLI boundary. No new CLI is permitted.
+@@ -543,7 +558,28 @@
+     with pytest.raises((ValueError,AssertionError,KeyError)):j.producer.publish()
+     assert 'stage' in j.events  # intended mutation boundary must actually run
+     assert not calls and not j.p._TASK4_MODEL_CALLS and 'publish' not in j.events
+-    with pytest.raises(FileExistsError):j.producer.publish()
++    claim=j.producer.work/'publish-once.claim';assert claim.is_file()
++    record=j.m.read(j.producer.work/'trigger-record.json')
++    retained_roots=(j.producer.work,j.cpu,Path(j.producer.g['main_root']),Path(j.producer.g['evidence_root']))
++    def retry_state():
++        paths={path for root in retained_roots for path in root.rglob('*') if path.is_file()}
++        paths.update((Path(record['request']),Path(record['marker'])))
++        return {str(path):(path.stat().st_size,j.m.sha(path)) for path in paths}
++    retained=retry_state();remote_before={path:j.m.sha_bytes(raw) for path,raw in j.remote.items()}
++    final=Path(j.producer.waiting_paths()[1])
++    absent=(final,Path(str(final)+'.pending'),Path(j.producer.g['main_root'])/'score')
++    assert all(not path.exists() and not path.is_symlink() for path in absent)
++    if fault=='catalogue':
++        # The retained damaged input is re-authenticated before claim creation.
++        with pytest.raises(ValueError) as rejected:j.producer.publish()
++        assert str(rejected.value)=='ordinary input changed: '+j.producer.g['minimum_registry_paths'][0]
++    else:
++        with pytest.raises(FileExistsError) as rejected:j.producer.publish()
++        assert rejected.value.filename==str(claim)
++    assert retry_state()==retained
++    assert {path:j.m.sha_bytes(raw) for path,raw in j.remote.items()}==remote_before
++    assert all(not path.exists() and not path.is_symlink() for path in absent)
++    assert j.events.count('stage')==1 and not calls and not j.p._TASK4_MODEL_CALLS and 'publish' not in j.events
+ 
+ 
+ @pytest.mark.parametrize('fault',['postactivation','catalogue','bank','release','existing-score','null-resource','config','WAITING','expired','old-authority','short-allocation'])

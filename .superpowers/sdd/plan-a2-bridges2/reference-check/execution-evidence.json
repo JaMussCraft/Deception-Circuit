@@ -1,0 +1,102 @@
+{
+  "status": "read-only reference and raw/canonical provenance reconciliation complete; remote/job/drift release separate",
+  "scope": "existing saved H200 SDR D/I timing20 seed42 artifacts only",
+  "commands": [
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 .superpowers/sdd/plan-a2-bridges2/reference-check/extract_reference_schema.py",
+      "exit_code": 0,
+      "observed_assertions": [
+        "all10 native artifact hashes match receipts",
+        "all6 recorded source hashes match",
+        "native dataset file hashes match",
+        "both arms baseline/node_eval952-row order and aggregates reconcile",
+        "both arms0/10/20 validation187-row order and aggregates reconcile",
+        "complete binary mask counts reconcile"
+      ]
+    },
+    {
+      "command": "research-session lint .superpowers/sdd/plan-a2-bridges2/reference-check/comparison-plan.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py .superpowers/sdd/plan-a2-bridges2/reference-check/comparison-plan.md --strict --json",
+      "exit_code": 0,
+      "output": "number-check.json"
+    },
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 /u/swong2/.conda/envs/mgnp/bin/python .superpowers/sdd/plan-a2-bridges2/reference-check/reconcile_provenance.py",
+      "exit_code": 0,
+      "output": "provenance-reconciliation.json"
+    },
+    {
+      "command": "research-session lint .superpowers/sdd/plan-a2-bridges2/reference-check/provenance-clarification.md",
+      "exit_code": 0
+    },
+    {
+      "command": "/sw/external/python/anaconda3/bin/python3.9 scripts/check_report_numbers.py .superpowers/sdd/plan-a2-bridges2/reference-check/provenance-clarification.md --strict --json",
+      "exit_code": 0,
+      "output": "provenance-number-check.json"
+    }
+  ],
+  "end_input_hashes_rechecked": true,
+  "no_source_or_harness_edits": true,
+  "no_model_import_or_weights_or_forwards": true,
+  "no_GPU_or_jobs_or_git_or_RS_mutations_or_notebooks_or_API_or_subagents": true,
+  "all_owned_processes_terminal": true,
+  "artifacts": {
+    "provenance-clarification.md": {
+      "bytes": 5044,
+      "sha256": "969e1172bea86413ac3a7405787d37d0187eba3ba67be6188646f867897786a7"
+    },
+    "number-check.json": {
+      "bytes": 2754,
+      "sha256": "dbf624249683744e5f1d2948688227a1ef42a7fa87a127dcfa5ea257f10983e6"
+    },
+    "provenance-reconciliation.json": {
+      "bytes": 34781,
+      "sha256": "d84525bb8af5ea70221de00cb4cd976ed2431cb5047c84e9d18b006eb0458b6f"
+    },
+    "predeclared-comparison.json": {
+      "bytes": 5755,
+      "sha256": "82e6d53617d4cb276b3596edf22327c7a6f47e54b3c1592b85127d706d97afc9"
+    },
+    "reconcile_provenance.py": {
+      "bytes": 7656,
+      "sha256": "7eb232223ec4546bc595cc07ae6b3de47739422d2ae8577cbe0993e25772b95f"
+    },
+    "comparison-plan.md": {
+      "bytes": 7032,
+      "sha256": "b07ead94d8616648ab94d102953738ba34c9d41666e03a4bd87f5d24e5271337"
+    },
+    "extract_reference_schema.py": {
+      "bytes": 7178,
+      "sha256": "d303409be841fa549c164eb30c9f1f64f80f87c9544f7dc4c3fc4a56a675c6da"
+    },
+    "provenance-number-check.json": {
+      "bytes": 1038,
+      "sha256": "990df1686cfcbcbd4a5f8e4dbe6f4d1aefa994abac3bf598dd5ba75472300af2"
+    },
+    "execution-evidence-before-provenance-clarification.json": {
+      "bytes": 2145,
+      "sha256": "a43a6ced999c27a3a1f6aaca7d6ff2a65bacb500a4eb5c3e2386705e0aec1be2"
+    },
+    "predeclared-comparison-before-provenance-clarification.json": {
+      "bytes": 5244,
+      "sha256": "61e971fa57f6ee9a8fd5303aff9928c35f38d2bb0e4e737342a6125469c46418"
+    },
+    "reference-schema.json": {
+      "bytes": 68937,
+      "sha256": "09969c13cb6349c3198842d598d78a199d95c50d08ef4834b9c4b968095a3c3a"
+    }
+  },
+  "clarification": {
+    "raw_vs_canonical_hashes_reproduced": true,
+    "same_exact_transfer_input_files": true,
+    "archived_default_differs_only_output_root": true,
+    "frozen_train_script_location_is_operational": true,
+    "all_scientific_argv2_unchanged": true,
+    "saved_SDR_rows_labels_order_proofs_equal": true,
+    "legacy_runtime_token_ID_arrays_unavailable_and_not_fabricated": true,
+    "numeric_predeclaration_unchanged": true
+  }
+}

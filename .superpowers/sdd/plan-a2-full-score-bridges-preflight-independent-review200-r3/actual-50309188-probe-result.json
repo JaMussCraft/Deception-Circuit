@@ -1,0 +1,10 @@
+{
+  "complete": true,
+  "host_exit": 0,
+  "container_exit": 1,
+  "host_stderr": "",
+  "container_stderr": "Traceback (most recent call last):\n  File \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/cgroup_probe.py\", line 44, in <module>\n    if __name__=='__main__':sys.exit(main())\n                                     ^^^^^^\n  File \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/cgroup_probe.py\", line 43, in main\n    out=collect(os.environ.get('SLURM_JOB_ID',''),Path('/proc/self/cgroup').read_text(),mountinfo=Path('/proc/self/mountinfo').read_text());print(json.dumps(out,indent=2,allow_nan=False));return 0 if out['required_194_counter_visible'] else 2\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/cgroup_probe.py\", line 27, in collect\n    elif 'memory' in f[1].split(','):kind='v1';base=controller_path(kind,f[2],mountinfo,cgroup_root);names=('memory.usage_in_bytes','memory.max_usage_in_bytes','memory.failcnt','memory.oom_control');kind='v1'\n                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/preflight-r2/cgroup_probe.py\", line 18, in controller_path\n    assert candidates,'actual cgroup memory mount unavailable'\n           ^^^^^^^^^^\nAssertionError: actual cgroup memory mount unavailable\n",
+  "no_graph": true,
+  "no_model": true,
+  "proof_admitted": false
+}

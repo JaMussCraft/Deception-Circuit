@@ -1,0 +1,219 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/tests/test_a3_direction_workload.py	2026-11-03 08:37:07.000000000 -0600
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-metadata-optionA-candidate/tests/test_a3_direction_workload.py	2026-11-03 16:58:51.000000000 -0600
+@@ -792,3 +792,216 @@
+     l.update(entries=[old,new,dict(id='edge',phase='M1',subphase='edges',state='completed',reserved_gpu_hours=.75)],
+         expected_entry_ids=['r-031','r-new','edge'],contingency_gpu_hours=5.25,original_admissions=[a])
+     assert w.project_cost(receipts(inv),inv,l)['execution_authorized'] is False
++
++
++# Option A: unchanged frozen source is the independent metadata oracle.
++# These are CPU-only equivalence/work-count tests, never model admission.
++def _option_a_original():
++    import importlib.util
++    import hashlib
++    from pathlib import Path
++    path = Path('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_workload.py')
++    assert hashlib.sha256(path.read_bytes()).hexdigest() == '1b0f6110a39b5d50342b95fe7ee2d6b643fce20feb2ae4448403c1bc8c52d1b3'
++    spec = importlib.util.spec_from_file_location('option_a_original_workload_oracle', path)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++def _option_a_dump(value):
++    import json
++    return (json.dumps(value, sort_keys=True, allow_nan=False) + '\n').encode('utf-8')
++
++
++def _option_a_input(stage, padding=False):
++    d, p, selected = fixture()
++    p['workload']['pad_tail_batches'] = padding
++    if stage in ('remaining', 'selected-pilot'):
++        p['workload']['axis_tile_size'] = 32
++        selected['identity'] = w.inventory_identity(d, p)
++    return d, p, selected if stage in ('remaining', 'selected-pilot') else None
++
++
++@pytest.mark.parametrize('stage', ['prefit', 'fit-select', 'selected-pilot', 'remaining'])
++@pytest.mark.parametrize('padding', [False, True])
++def test_option_a_whole_output_matches_original(stage, padding):
++    d, p, selected = _option_a_input(stage, padding)
++    original = _option_a_original().build_inventory(d, p, stage=stage, selected=selected)
++    actual = w.build_inventory(d, p, stage=stage, selected=selected)
++    assert _option_a_dump(actual) == _option_a_dump(original)
++    assert actual['inventory_sha256'] == original['inventory_sha256']
++    assert actual['storage_requirements'] == original['storage_requirements']
++    assert actual['forward_counts'] == original['forward_counts']
++    assert type(actual['expected_keys'][0]) is type(original['expected_keys'][0])
++    assert type(actual['requirements'][0]['timing_inputs']) is list
++
++
++def test_option_a_never_copies_target_only_rows_for_lengths(monkeypatch):
++    d, p, _ = fixture()
++    target_only = {id(row) for rows in d['access_rows'].values() for row in rows if row['split'] == 'train'}
++    deepcopy = copy.deepcopy
++    seen = []
++    depth = [0]
++    def observe(value, *args, **kwargs):
++        if depth[0] == 0 and id(value) in target_only:
++            seen.append(value['instance_id'])
++        depth[0] += 1
++        try:
++            return deepcopy(value, *args, **kwargs)
++        finally:
++            depth[0] -= 1
++    monkeypatch.setattr(w.copy, 'deepcopy', observe)
++    result = w.build_inventory(d, p, stage='fit-select')
++    assert result['capture_shards']
++    assert seen == [], 'target-only source rows were deep-copied solely for discarded lengths'
++
++
++def test_option_a_source_rows_scanned_at_most_three_times_per_group(monkeypatch):
++    from collections import Counter
++    d, p, _ = fixture()
++    scans = Counter()
++    original = w._source_rows
++    def observe(design, task, split):
++        scans[(task, split)] += 1
++        return original(design, task, split)
++    monkeypatch.setattr(w, '_source_rows', observe)
++    result = w.build_inventory(d, p, stage='fit-select')
++    assert result['expected_keys']
++    assert max(scans.values()) <= 3, dict(scans)
++
++
++def test_option_a_sender_constant_encoded_and_bounded_once(monkeypatch):
++    d, p, _ = fixture()
++    dumps = w.json.dumps
++    host_bound = w._host_bound
++    counts = dict(wire=0, host=0)
++    def senders(value):
++        return isinstance(value, list) and len(value) > 10 and all(isinstance(x, list) and len(x) == 3 and x[0] in ('head', 'mlp') for x in value)
++    def observe_dump(value, *args, **kwargs):
++        if senders(value):
++            counts['wire'] += 1
++        return dumps(value, *args, **kwargs)
++    def observe_host(value, *args, **kwargs):
++        if senders(value):
++            counts['host'] += 1
++        return host_bound(value, *args, **kwargs)
++    monkeypatch.setattr(w.json, 'dumps', observe_dump)
++    monkeypatch.setattr(w, '_host_bound', observe_host)
++    result = w.build_inventory(d, p, stage='fit-select')
++    assert result['storage_requirements']['components']['positive_evidence'] > 0
++    assert counts == dict(wire=1, host=1), counts
++
++
++def test_option_a_retained_timing_records_are_independent():
++    d, p, _ = fixture()
++    result = w.build_inventory(d, p, stage='fit-select')
++    records = []
++    for req in result['requirements']:
++        for row in req['timing_inputs']:
++            if row['source_task'] == 'far_v2' and row['condition'] == 'D' and row['stream'] == 'clean':
++                records.append(row['record'])
++    first = records[0]
++    other = next(row for row in records[1:] if row['instance_id'] == first['instance_id'])
++    assert first is not other
++    assert first['streams']['clean']['tokens'] is not other['streams']['clean']['tokens']
++    first['streams']['clean']['tokens'].append(99)
++    assert other['streams']['clean']['tokens'] == [1, 2, 3]
++    assert all(row['streams']['clean']['tokens'] == [1, 2, 3] for row in d['access_rows']['far_v2'])
++    assert all(row['streams']['clean']['tokens'] == [1, 2, 3] for row in result['frozen_inputs']['design']['access_rows']['far_v2'])
++
++
++def test_option_a_target_lengths_preserve_padding_and_deduplication():
++    d, p, _ = fixture()
++    p['workload']['microbatch_size'] = 3
++    p['workload']['pad_tail_batches'] = True
++    for widths in p['workload']['widths'].values():
++        for split in widths:
++            widths[split] = 6
++    for row in d['access_rows']['far_v2']:
++        if row['split'] == 'validation' and row['instance_id'].endswith('v1'):
++            for stream in row['streams'].values():
++                stream['tokens'] = [1, 2, 3, 4, 5]
++                stream['readout'] = 4
++    result = w.build_inventory(d, p, stage='fit-select')
++    req = next(q for q in result['requirements'] if q['operation'] == 'patched' and q['profile']['source_task'] == 'far_v2')
++    assert req['target_unmasked_lengths'] == [3, 5, 3]
++    positive = next(q for q in result['requirements'] if q['operation'] == 'positive_control' and q['profile']['source_task'] == 'far_v2')
++    assert positive['target_unmasked_lengths'] == [3]
++    empty = [q for q in result['requirements'] if not q['target_keys']]
++    assert empty and all(q['target_unmasked_lengths'] == [] for q in empty)
++
++
++@pytest.mark.parametrize('fault', ['missing_source', 'duplicate_source', 'readout', 'width', 'utility_width'])
++def test_option_a_invalid_sources_match_original_errors(fault):
++    d, p, _ = fixture()
++    if fault == 'missing_source':
++        d['access_rows']['far_v2'].pop(0)
++    elif fault == 'duplicate_source':
++        d['access_rows']['far_v2'].append(copy.deepcopy(d['access_rows']['far_v2'][0]))
++    elif fault == 'readout':
++        d['access_rows']['far_v2'][0]['streams']['clean']['readout'] = 0
++    elif fault == 'width':
++        p['workload']['widths']['far_v2']['validation'] = 1
++    else:
++        p['workload']['widths']['ioi']['validation'] = 1
++    original = _option_a_original()
++    with pytest.raises(ValueError) as expected:
++        original.build_inventory(d, p, stage='fit-select')
++    with pytest.raises(type(expected.value)) as actual:
++        w.build_inventory(d, p, stage='fit-select')
++    assert str(actual.value) == str(expected.value)
++
++
++def test_option_a_changed_input_between_calls_not_cached():
++    d, p, _ = fixture()
++    for widths in p['workload']['widths'].values():
++        for split in widths:
++            widths[split] = 6
++    first = w.build_inventory(d, p, stage='fit-select')
++    changed = copy.deepcopy(d)
++    row = next(x for x in changed['access_rows']['far_v2'] if x['split'] == 'validation')
++    row['streams']['clean']['tokens'] = [1, 2, 3, 4]
++    row['streams']['clean']['readout'] = 3
++    second = w.build_inventory(changed, p, stage='fit-select')
++    original = _option_a_original().build_inventory(changed, p, stage='fit-select')
++    assert first['inventory_sha256'] != second['inventory_sha256']
++    assert _option_a_dump(second) == _option_a_dump(original)
++
++
++@pytest.mark.parametrize('payload', [
++    {'unicode': 'é漢🙂', 'float': [1.0, -0.0, 1e-16, 1e30, 1.7976931348623157e308]},
++    {'nested': {'b': [True, False, None], 'a': (1, 'x\\ny', '\\ud800')}},
++    {'empty': [], 'map': {}, 'text': 'quote"slash\\'},
++])
++def test_option_a_publisher_stream_defaults_match_untouched_writer(tmp_path, payload):
++    import hashlib
++    import json
++    from pathlib import Path
++    from component_analysis import a3_direction_runtime as runtime
++    baseline = Path('/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-861f84a3938a/runtime/component_analysis/a3_direction_runtime.py')
++    assert hashlib.sha256(Path(runtime.__file__).read_bytes()).hexdigest() == hashlib.sha256(baseline.read_bytes()).hexdigest()
++    runtime.publish_object(tmp_path/'original', payload)
++    expected = (tmp_path/'original/payload.json').read_bytes()
++    class Sink:
++        def __init__(self): self.hash = hashlib.sha256(); self.bytes = 0
++        def write(self, text):
++            raw = text.encode('utf-8'); self.hash.update(raw); self.bytes += len(raw); return len(text)
++    sink = Sink()
++    json.dump(payload, sink, sort_keys=True, allow_nan=False)
++    sink.write('\n')
++    assert sink.bytes == len(expected)
++    assert sink.hash.hexdigest() == hashlib.sha256(expected).hexdigest()
++    assert expected.endswith(b'\n')
++    assert b'\\u00e9' in expected if 'unicode' in payload else True
++
++
++def test_option_a_publisher_stream_rejects_nonfinite_without_complete(tmp_path):
++    import json
++    from component_analysis import a3_direction_runtime as runtime
++    with pytest.raises(ValueError):
++        runtime.publish_object(tmp_path/'original', {'value': math.inf})
++    assert not (tmp_path/'original').exists()
++    class Sink:
++        def write(self, text): return len(text)
++    with pytest.raises(ValueError):
++        json.dump({'value': math.inf}, Sink(), sort_keys=True, allow_nan=False)

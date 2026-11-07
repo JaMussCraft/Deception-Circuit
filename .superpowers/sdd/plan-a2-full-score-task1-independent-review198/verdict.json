@@ -1,0 +1,53 @@
+{
+  "status": "handed-back",
+  "verdict": "REVISE_TWO_NARROW_FINAL_ENTRY_GAPS_STATIC_REVIEW",
+  "findings": [
+    {
+      "id": "R198-A",
+      "site": "candidate/gpu/common.py entry_release",
+      "severity": "blocking final immutable-entry ordering",
+      "problem": "Release/config/WAITING/catalogue hashes run before verify_existing_bank (whole bank read/decode/canonical hash) and actual allocation. Later _lease only checks the acquired dict clock; release/WAITING/catalogue changes during those costly checks are not detected before CONSUMED/Popen. Required immutable final check is after costly external work.",
+      "minimal_correction": "Keep bank/native/costly work before the last identity barrier. After it, recheck acquired immutable release SHA and config/WAITING/catalogue identities, fresh actual allocation/deadline eligibility and clock immediately before single entry. Never adopt current bytes. No continuous/internal-loader freshness claim or scientific change required.",
+      "required_regression": "Mutate acquired release file, WAITING or catalogue during bank validation and during actual-allocation observation; final entry rejects with zero CLI process and no successful consume. Existing mutation-before-entry test is insufficient. At least one integrated runner fixture must use the real entry guard rather than replace it with a success seam."
+    },
+    {
+      "id": "R198-B",
+      "site": "candidate/gpu/common.py entry_release consume write; candidate/gpu/controller.py run_full_score final remaining calculation",
+      "severity": "blocking reviewed minimum-entry-floor enforcement",
+      "problem": "entry_release enforces remaining_work>=minimum_entry then writes CONSUMED. run_full_score recomputes min(context deadline,entry deadline,child cap) afterward but only requires remaining>0. Slow consume/evidence filesystem work can lower remaining below the reviewed minimum while still positive and lease fresh, yet Popen proceeds.",
+      "minimal_correction": "After entry evidence work, use a fresh final clock and enforce the reviewed minimum_entry_seconds on the actual effective remaining deadline immediately before Popen, while retaining child cap/fixed/current/context minima, finite release and no extension. A consumed-but-rejected attempt stays failed/once-only; never renew or retry.",
+      "required_regression": "Controlled consume/evidence write advances time from above to below minimum_entry while leaving positive remaining and unexpired release. Real runner must make zero Popen calls. Also positive case above floor and current deadline shortened by final allocation."
+    }
+  ],
+  "GREEN_job": "23613976",
+  "actual_GREEN_observed": false,
+  "implementation_accepted": false,
+  "resource_or_GPU_admitted": false,
+  "author_handback_read": false,
+  "new_tests_run": false,
+  "independent_checks": [
+    "Raw59 pinned members verified, unchanged82-case test SHA, R5 diff SHAa842eb20c71b7b7588b67e00e6c516220d0546cc631d56f75ec7cbe832c00838.",
+    "Read all eight GPU members and82-case fixtures; Python3.6 grammar for five Python members and shell syntax checked. Actual Python3.6 execution not claimed; APIs inspected (strptime, Path.relative_to, universal_newlines; no is_relative_to/fromisoformat).",
+    "Original native shell execs exact original a2_pipeline; no limit/bank/pilot/summarize command.",
+    "Accepted module-level fixture seams are internal only; production run signature accepts config/release, no guard-success callback/provider."
+  ],
+  "scoped_sound": [
+    "Closed config rejects null resource tuple/unreviewed booleans/old timing flags; template remains unbound. No4.75h duration default.",
+    "Exact bank payload/file/manifest/G3 pins and original UUID provenance separate from actual new GPU UUID. Fresh numeric_environment/device/name/dtype and original loaded geometry guards preserved.",
+    "Source511+4 and input422 literal/role closure, original cache algorithm, four catalogues, resource/capacity/admission/native budget full lineage paths present.",
+    "Actual typed H100 allocation parser and min(initial,current,fixed) deadline, process-group TERM/KILL/reap and no retry.",
+    "MAIN parent RW with every existing leaf RO supports original native sibling temporary+rename; protected inventory/native manifest/full keys/control/support audit present. Actual namespace deployment remains a later gate."
+  ],
+  "coverage_notes": [
+    "Existing command runner tests replace preflight/entry/audit at internal seams; they do not demonstrate genuine full preflight/CPU/composite/native audit integration. Task2/3 and final integration tests must cover those real consumers before whole-packet acceptance.",
+    "Do not edit a source-pinned candidate while GREEN runs. Preserve actual GREEN/failed revisions, then produce distinct corrected packet with new attributable RED/GREEN evidence."
+  ],
+  "remaining_gates": [
+    "Actual pinned dual-environment GREEN plus corrected guard regression acceptance",
+    "Task2/3 producer/CPU proof compatibility and whole-packet integration review",
+    "Genuine host/schema/hash/resource proof and actual capacity/resource binding",
+    "reader-safe native ledger transition/new actual full_score config/job/current proof/cache/protection/usage once-only release",
+    "independent normal full-result acceptance"
+  ],
+  "no_mutations": "No candidate/plan/source/test edits, jobs/RS/git/remote actions or subagents."
+}

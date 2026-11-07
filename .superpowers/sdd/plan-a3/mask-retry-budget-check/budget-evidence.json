@@ -1,0 +1,55 @@
+{
+  "kind": "prospective_read_only_mask_retry_budget_check",
+  "checked_utc": "2026-11-02T23:42:43.259868+00:00",
+  "source_commit": "f5a5687ec12091f0d148b38b301598e9c7cb98cd",
+  "current_api_verdict": "NO valid contingency-funded mask M1 retry route after original share exhausted",
+  "caps": {
+    "A3": 40,
+    "M1_total": 2,
+    "M1_masks": 0.75,
+    "contingency": 6
+  },
+  "actual_r031": {
+    "account": "bimc-delta-gpu",
+    "actual_seconds": null,
+    "cluster": "delta",
+    "gpus": 1,
+    "id": "r-031",
+    "job_id": "23444798",
+    "manifest_hash": null,
+    "output_dir": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-independent-pilots-74efb4d04819/mask-pilot-1",
+    "partition": "gpuH200x8",
+    "requested_minutes": 45.0,
+    "reserved_gpu_hours": 0.75,
+    "source_commit": "74efb4d0481968a1d0138eb1a79b97f302fd3c3b",
+    "status": "PENDING"
+  },
+  "ledger_sha256": "56f680b6151d8bab4bac88a12bb1f9e9482a3330a74b16fca87bf616f166cbf6",
+  "actual_runtime_note": "Root reports zero runtime; canonical RS actual_seconds is null. Both retain original reserved charge.",
+  "synthetic_arithmetic_example_only": {
+    "additional_gpu_hours": 0.25,
+    "no_reservation_proposed_or_authorized": true,
+    "cases": {
+      "M1": {
+        "global_budget_pass": false,
+        "error": "A3 M1 masks ceiling exceeded"
+      },
+      "contingency": {
+        "global_budget_pass": true,
+        "result": {
+          "M1": 0.75,
+          "all": 1.0,
+          "contingency": 0.25
+        }
+      }
+    },
+    "contingency_entry_M1_inventory_phase_predicate_pass": false
+  },
+  "source_hashes": {
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_direction_runtime.py": "0401c7a2750cf66ef5508d2dbbaed2f9bcea5f83918d6503e6a8f6b809a44867",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_mask_pipeline.py": "98c6b4addef010944aabc547b939585679072fbe931feb64b2b4548d9de9172a",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_mask_workload.py": "889f2359e024d6846dcad1623fd28583a3f87b27b1e5314f689fdc6df4d92828",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-f5a5687ec120/runtime/component_analysis/a3_direction_workload.py": "3e43aaf2b4cacb99df87593ae377c8fdf3eb7b223b258ed8873853841404d8f9"
+  },
+  "no_jobs_RS_source_or_budget_changes": true
+}

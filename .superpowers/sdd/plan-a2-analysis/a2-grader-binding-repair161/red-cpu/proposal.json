@@ -1,0 +1,19 @@
+{
+  "kind": "A2graderbinding161_focused_RED_CPU",
+  "candidate": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-candidate161",
+  "baseline": "861f84a3938a5e22fa329af0c469b2dd812fe68a",
+  "source_count": 511,
+  "expected_tests": 5,
+  "selection": "test_a2_catalogue_unrelated_live_change_allowed or test_a2_catalogue_existing_stage_read_requires_no_rewrite or test_a2_catalogue_freeze_has_new_binding_and_legacy_is_rejected",
+  "cpus": 4,
+  "memory_GiB": 8,
+  "minutes": 3,
+  "gpus": 0,
+  "constraint": "projects",
+  "command": [
+    "bash",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-analysis/a2-grader-binding-repair161/red-cpu/red_cpu.sh"
+  ],
+  "resource_basis": "Onlyfive syntheticcontract tests, actualoriginalgrader over10small temporarycopiedfiles; no model/tokenizer/realdata. Torchimport dominates;75sperenv and3minallocationbuffer.",
+  "production_edit_started": false
+}

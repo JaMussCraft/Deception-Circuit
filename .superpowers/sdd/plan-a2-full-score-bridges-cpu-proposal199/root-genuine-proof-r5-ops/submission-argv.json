@@ -1,0 +1,18 @@
+[
+  "sbatch",
+  "--parsable",
+  "--account=cis260361p",
+  "--partition=RM-shared",
+  "--qos=rm",
+  "--nodes=1",
+  "--ntasks=1",
+  "--cpus-per-task=26",
+  "--mem=48G",
+  "--time=00:45:00",
+  "--no-requeue",
+  "--export=ALL,CUDA_VISIBLE_DEVICES=",
+  "--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime",
+  "--job-name=lad-A2-proof-r5",
+  "--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-genuine-proof-r2/job-%j.log",
+  "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199/root-proof-dispatch237/dispatch.sh"
+]

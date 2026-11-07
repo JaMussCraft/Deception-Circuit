@@ -1,0 +1,64 @@
+[
+  {
+    "module": "component_analysis/a3_direction_runtime.py",
+    "interface": "prepare_pilot_target(args, design, protocol, *, selected=None) -> preparation_reference",
+    "role": "CPU-only producer behind one new existing-prepare action: prepare --action pilot-target --pilot-part prefit|selected. No model argument or loader. Canonical paths derived from work_dir/part; no arbitrary target-provider callback.",
+    "steps": [
+      "Run existing live_guard(design,protocol,args) without an execution inventory before and after work; actual CPU provenance is external and grants no model authority.",
+      "Build EXACT original target: prefit -> build_inventory(..., stage=fit-select, fits=None, selected=None); selected -> build_inventory(..., stage=remaining, fits=None, selected=actual complete selected metadata). Never prune initial targets or invent a selection.",
+      "Call unchanged workload._validate_inventory on the complete in-memory value, retaining the independent reconstruction and full hash/coverage checks ON CPU. Measure its separate time/peak; it is not assumed cheap.",
+      "Publish the unchanged target value using the existing common.publish/JSON format/artifacts._finish contract at work_dir/pilot-target-inventory/part. Only a complete normal producer with postguards publishes the small preparation descriptor at work_dir/pilot-target-preparation/part. Existing target/certificate conflicts fail; no automatic resume/re-sign/retry.",
+      "Bind the exact bytes emitted from the validated value, not merely a current self-signed file: a small on-write UTF-8 hash/count wrapper must emit exactly json.dump(sort_keys=True,allow_nan=False) defaults plus LF. Compare the later target object reference against that emitted hash/count before certifying. This does not change workload.digest, the JSON format, metadata bounds or the builder; fixture differential tests cover the writer. Record all extra CPU hashing time."
+    ]
+  },
+  {
+    "module": "component_analysis/a3_direction_runtime.py",
+    "interface": "load_prepared_pilot_target(args, design, protocol, pilot_inventory, *, selected=None) -> _PreparedPilotTarget",
+    "role": "Private data-authentication Module, called by dispatch BEFORE model loading. In production it derives expected preparation/target references from the freshly validated root admission via the process-local _AuthorityContext; not from a caller boolean or unanchored CLI hash.",
+    "steps": [
+      "Keep existing _read_stage_inventory and its pilot-inventory reconstruction unchanged, then run original live_guard(..., pilot_inventory) for actual ledger/reservation/allocation/budget checks before reading a large artifact.",
+      "Require the existing a3_root_pilot_admission_v1 body, immutably anchored in native ledger mapping, to bind pilot_target_preparation_reference for the exact part and exact target object reference. No new execution-admission kind or CPU-granted permission.",
+      "Before the large read, require a separately root-admission-bound receiver-cost/resource record for these exact artifact/source/environment bytes. Charge its conservative transient/retained metadata RAM in addition to the existing pilot/model/proof obligations; claimed capacity must still be backed by the actual allocation contract. After parse/freeze, reject if observed retained/transient accounting exceeds that bound before model load. Do not change full-target/M2 storage requirements or treat a producer peak as a reader bound.",
+      "Use the explicitly specified same-buffer receiver sequence in receiver-and-pass-counts.json. Validate exact children/regular leaf files and both root-pinned completion-marker byte images, then hash/parse exactly one target payload buffer. Do not compose object_reference+read_object+another reader silently; each additional full read must be counted.",
+      "Check identity/commit/code hashes, exact design/protocol hashes, stage and part mapping, injected status, planned geometry/dtype/backend/tiling/finish reserve, complete expected counts/bounds and selected full backing reference when applicable against the root-bound CPU descriptor and current frozen inputs.",
+      "Freeze the parsed JSON once with existing workload._freeze_json; mint a private sealed PID-bound nonserializable data handle. It contains an immutable value/reference and preparation provenance, no cached ledger result, lease, allocation or execution_authorized=True.",
+      "After authenticated read/parse/freeze returns, dispatch repeats the original fresh model_guard and actual remaining-lease checks immediately before invoking the original model loader. A slow data load cannot inherit the earlier ledger/allocation/protection result. The existing post-load geometry equality and model_guard remain as well.",
+      "At entry capture a process-local phase-only _FileWitness over the resolved descriptor and target artifact roots, plus the approved lexical namespace/alias fingerprint. Match its payload/marker hashes to the authenticated ENTRY references. This witness is checked only at the final publication barrier; it is not added to existing per-operation numeric witness forests."
+    ]
+  },
+  {
+    "module": "component_analysis/a3_direction_runtime.py",
+    "interface": "run_pilot(model, design, protocol, inventory, *, root, args, guard, startup_seconds, selected=None, prepared_target=None)",
+    "role": "Consume a loader-minted _PreparedPilotTarget in production; remove only the full-target build and late full-target serialization. Missing/stale/unbound data fails BEFORE model load; no production fallback to an unbudgeted builder.",
+    "steps": [
+      "dispatch keeps original model loader and actual post-load hooks.geometry equality, original model_guard and runtime/kernel/numerical checks. It passes the sealed target only after those checks. No model_loader/clock/geometry injection.",
+      "All original invocations, serial/packed/dummy/nonzero/positive/replay/control forwards, selected-axis loads, numeric witnesses, reconciliation coverage, serialization measurements and deadlines remain. The target value is the same frozen graph consumed by _PilotReconciliationPass; its existing _freeze_json is idempotent on an already frozen value.",
+      "A test-only injected reference route may call the old builder for differential tests; production design.injected=False cannot use it or pass arbitrary dicts. New native prefit aggregation must exercise the prepared route, not only that reference route.",
+      "The target already exists at the original canonical pilot-target-inventory/part path. _pilot_origin records the sealed authenticated ENTRY target/preparation references without adopting a newly computed current reference. Keep their original content/source/part meanings and audit them in downstream intake.",
+      "After _measure_complete_guard_union AND reconciliation.before_publication, call prepared_target.final_publication_barrier(reconciliation, receipt) immediately before _publish_measured_pilot_receipt. Full backing/namespace/phase-identity checks compare against ENTRY; then repeat fresh live guard and refresh the effective deadline, perform a cheap identity/namespace seal check for changes during that guard, and recheck deadline before invoking the existing writer. No expensive operation is placed after this barrier except the original bounded receipt publication."
+    ]
+  },
+  {
+    "module": "component_analysis/a3_direction_runtime.py",
+    "interface": "_pilot_origin / _completed_pilot_source / _authenticated_pilot_receipts",
+    "role": "Bind and audit preparation provenance without granting CPU authority.",
+    "steps": [
+      "Origin records the root-admission-bound preparation reference and original target reference; later intake checks the same binding.",
+      "Keep current independent CPU target reconstruction and original pilot-source/numeric authentication in later admission intake. This design does not remove _authenticated_pilot_receipts reconstruction or widen completed-source kinds.",
+      "Keep _AuthorityContext, _FileWitness and actual source/protection/ledger/allocation/lease functions process-local and fresh. Do not serialize them in a CPU descriptor."
+    ]
+  },
+  {
+    "module": "component_analysis/a3_direction_runtime.py",
+    "interface": "_PreparedPilotTarget.final_publication_barrier(reconciliation, receipt) -> None",
+    "role": "Final phase-only transport check, AFTER all costly union measurement and original before_publication work; no new live authority.",
+    "steps": [
+      "Require same PID, same sealed handle/context/part and EXACT same frozen target graph and requirement identities as reconciliation.inventory; require reconciliation is finished.",
+      "Recheck allowed lexical paths, exact approved resolution/alias policy and entry-local namespace identities. _check_file_witness over resolved target+descriptor roots performs fresh full hashes against entry identities; root/leaf byte-identical replacement during the phase rejects. Never update the stored expected refs/witness to current.",
+      "Require receipt.origin target/preparation references still equal authenticated ENTRY references; no adopt-current repair.",
+      "Call the original fresh live guard through reconciliation._live_guard() so source/protection/ledger/budget/allocation checks and effective min(initial,current) deadline are refreshed AFTER full transport scans. Existing original before_publication calls are retained, not moved away.",
+      "Recheck phase namespace/root/leaf stat seal for replacement/write while the live guard ran; this is a race seal AFTER fresh full-content proof, not a stat-as-content substitute. Recheck reconciliation.check_deadline immediately before the original _publish_measured_pilot_receipt.",
+      "Record barrier I/O/time/resource overhead in the actual receipt/cost evidence and include new metadata in the existing inert byte envelope; no zero-cost assumption or unbounded final metadata addition. The last-barrier contract is not a claim of continuous filesystem immutability during the following original receipt write."
+    ]
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,hashlib,time,os,shutil\nfrom pathlib import Path\nb=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199'\"'\"');sys.path.insert(0,str(b/'\"'\"'proof-adapter-r3'\"'\"'));import host_supervisor as h\nsif=h.sha(h.IMAGE);assert sif==h.IMAGE_SHA\npy=h.sha(h.PY);assert py=='\"'\"'5c8e75cf8a297c6bd47595539e4696efb2d2662a9e3afb9741541d155ca9e5fd'\"'\"'\nassert Path(h.HUB).is_dir();free=shutil.disk_usage(str(b)).free\nprint(json.dumps({'\"'\"'sif'\"'\"':h.IMAGE,'\"'\"'sif_sha256'\"'\"':sif,'\"'\"'packed_python'\"'\"':h.PY,'\"'\"'packed_python_sha256'\"'\"':py,'\"'\"'HF_hub'\"'\"':h.HUB,'\"'\"'HF_hub_exists'\"'\"':True,'\"'\"'available_bytes'\"'\"':free,'\"'\"'observed_unix'\"'\"':time.time(),'\"'\"'numeric_environment_verified_here'\"'\"':False,'\"'\"'numeric_environment_native_guard_required'\"'\"':True}))\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"sif\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif\", \"sif_sha256\": \"f50c8e39dd5e2ac1c1a4bdfd443351cb970513fdb10a572725eb53d7396f8697\", \"packed_python\": \"/ocean/projects/cis260361p/swong2/envs/mgnp/bin/python\", \"packed_python_sha256\": \"5c8e75cf8a297c6bd47595539e4696efb2d2662a9e3afb9741541d155ca9e5fd\", \"HF_hub\": \"/ocean/projects/cis260361p/swong2/hf/hub\", \"HF_hub_exists\": true, \"available_bytes\": 1036974768128, \"observed_unix\": 1794016659.0263224, \"numeric_environment_verified_here\": false, \"numeric_environment_native_guard_required\": true}\n",
+  "stderr": "",
+  "observed_unix": 1794016659.0519729
+}

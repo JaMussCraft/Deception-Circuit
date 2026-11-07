@@ -1,0 +1,158 @@
+{
+  "status": "PROSPECTIVE_N5_UNAPPROVED_NO_EXECUTION",
+  "approved": false,
+  "source_commit": "UNBOUND_FUTURE_APPROVED_FREEZE",
+  "prior_source": "40fe57289405fd53a3fce02e5d4e47a0ebf78b64",
+  "r031_charge_retained": 0.75,
+  "replacement_reservations_max": 1,
+  "replacement_gpu_hours_max": 0.75,
+  "replacement_minutes_max": 45,
+  "gpu_type": "H200",
+  "gpus": 1,
+  "cpus": 4,
+  "memory_bytes": 68719476736,
+  "declared_host_allowance_bytes": 60129542144,
+  "finish_reserve_seconds": 300,
+  "minimum_shard_seconds": 60,
+  "native_soft_stop_seconds_before_actual_allocation_end": 360,
+  "native_hard_stop_seconds_before_actual_allocation_end": 300,
+  "chunk_size": 4,
+  "dtype": "bfloat16",
+  "backend": "eager",
+  "model_tokenizer_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+  "arms": [
+    "constrained",
+    "unconstrained"
+  ],
+  "pilot_updates_per_arm": 1,
+  "future_scientific_updates_unchanged": 200,
+  "timing_only": true,
+  "may_select_checkpoint": false,
+  "mechanism_assessment_validation_ids_per_task": 100,
+  "full_validation_ids_by_task": {
+    "far_v2": 177,
+    "sdr_v2": 187,
+    "ser_v2": 167
+  },
+  "IOI_validation_ids": 100,
+  "MMLU_validation_ids": 32,
+  "expected_pilot_keys": 31191,
+  "expected_full_target_keys": 3437966,
+  "source_refreshes_successful_main": 1187,
+  "mask_reservation_calls": 1186,
+  "full_authority_validations": 1187,
+  "actual_scheduler_allocation_reads": 2374,
+  "prior_CPU_preparation_observations": {
+    "canonical": {
+      "source_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/evidence/canonical-command.json",
+      "sha256": "6c326c5610e6fb0423d2558750d3b7bac6a012bab30bf1b4c24e7d326e3d2bb4",
+      "elapsed_seconds": 242.43406520504504,
+      "exit_code": 0,
+      "models_loaded": false,
+      "execution_authorized": false
+    },
+    "mask": {
+      "source_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/evidence/mask-command.json",
+      "sha256": "00d6787f3a847340e1a6bc253c0bdac114af2d3d4273e60e155d4bc46b282d15",
+      "elapsed_seconds": 22.455088827060536,
+      "exit_code": 0,
+      "models_loaded": false,
+      "execution_authorized": false
+    },
+    "mask-inventory-pilot": {
+      "source_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/evidence/mask-inventory-pilot-command.json",
+      "sha256": "7bb4937d9a902b88c69acdb02d797f4894bf151c8fe8f986164e54154026e287",
+      "elapsed_seconds": 35.020506753004156,
+      "exit_code": 0,
+      "models_loaded": false,
+      "execution_authorized": false
+    },
+    "mask-inventory-full": {
+      "source_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/evidence/mask-inventory-full-command.json",
+      "sha256": "bf07ea1f8623683f04cbc2d92d35c554117ad7a2c8e9b1f20ab1450123586705",
+      "elapsed_seconds": 58.15121874306351,
+      "exit_code": 0,
+      "models_loaded": false,
+      "execution_authorized": false
+    },
+    "validate": {
+      "source_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/evidence/validate-command.json",
+      "sha256": "ee0209a6438b3b02b5a161c36ccc151f964ea6af32e5c227e2c3ac0fd22e8e7e",
+      "elapsed_seconds": 95.75146990804933,
+      "exit_code": 0,
+      "models_loaded": false,
+      "execution_authorized": false
+    },
+    "mask-dry-run": {
+      "source_file": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-pilots-40fe57289405/evidence/mask-dry-run-command.json",
+      "sha256": "acc428383075a5f33cffe9a7554ecdbdc85fc3693dded3c8ebd60e906081bd0e",
+      "elapsed_seconds": 4.182394645991735,
+      "exit_code": 0,
+      "models_loaded": false,
+      "execution_authorized": false
+    }
+  },
+  "driver_phase_order": [
+    "source initialization and live protection",
+    "complete target read+validate+expected-rebuild",
+    "pilot inventory/authority proof and live admission before weights",
+    "one native model load",
+    "initial guarded target proof and base hash",
+    "constrained full validation targets/update/validation-replay-positive/parity/checkpoint/restore-export-randomserialization",
+    "unconstrained identical protocol",
+    "three full-validation H banks with both streams",
+    "three complete first100validation crossed mechanism and IOI/MMLU utility/control adapters",
+    "atomic full pilot receipt and disposable model discard"
+  ],
+  "policy_patch_locations": {
+    "component_analysis/a3_direction_runtime.py": [
+      "validate_global_budgets: M1total, maskshare, protectedcontingency floor, one-new-entry constraint and legacyanchor invariants",
+      "validate_reservation: independent all-M1total bound, approved single admission/reservation anchor binding"
+    ],
+    "component_analysis/a3_direction_workload.py": [
+      "_ledger: protectedcontingency floor",
+      "project_cost: independent overallM1<=2 predicate becomes approved limit; own direction.5 unchanged"
+    ],
+    "component_analysis/a3_mask_pipeline.py": [
+      "mask_reservation: revised M1share in contextmint and validation; no scientific path changes"
+    ],
+    "component_analysis/a3_mask_workload.py": [
+      "project_cost: revised maskM1share and allM1limit; completed authentic pilot intake unchanged"
+    ]
+  },
+  "scope_limits": [
+    "No budget/source/authority changes before approval",
+    "No fit claim, no new GPU diagnostic or refactor",
+    "No shortening model/control/validation work; timeout yields failure, never partial completed receipt",
+    "No automatic retry/extension or r031 refund/source retarget",
+    "No M5 admission from N5"
+  ],
+  "structured_future_argv": [
+    "bash",
+    "C_RETRY_RUNTIME/scripts/jobs/specificity_a3_mask.sh",
+    "--stage",
+    "pilot",
+    "--design",
+    "O_RETRY/canonical/design.json",
+    "--commit",
+    "C_RETRY_FULL_SHA",
+    "--work-dir",
+    "O_RETRY/mask-pilot-1",
+    "--prepared",
+    "O_RETRY/mask/prepared",
+    "--inventory",
+    "O_RETRY/mask/inventory-pilot",
+    "--target-inventory",
+    "O_RETRY/mask/inventory-full",
+    "--ledger-snapshot",
+    "A_RETRY/mapping",
+    "--reservation",
+    "A_RETRY/reservation",
+    "--admission",
+    "A_RETRY/admission",
+    "--chunk-size",
+    "4",
+    "--registry",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json"
+  ]
+}

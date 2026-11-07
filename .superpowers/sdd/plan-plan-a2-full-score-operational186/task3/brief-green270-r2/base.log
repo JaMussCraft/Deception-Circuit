@@ -1,0 +1,85 @@
+F......FFFFF.                                                            [100%]
+=================================== FAILURES ===================================
+_ test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift[None] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:220: in test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift
+    assert producer.publish()['published'] is True
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:521: in publish
+    authenticate_cutover(self.b,self.g,normalized)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:134: in authenticate_cutover
+    validate_cutover(value,now=finalized)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:121: in validate_cutover
+    need(type(value) is dict and 0<=decimal(now)-decimal(value['observed_unix'])<=15,'fresh root cutover attestation required')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:58: in decimal
+    need(type(value) in (int,float,str),'invalid numeric type')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: invalid numeric type
+__ test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[None] __
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:71: in test_sealed_cutover_later_reuse_requires_same_authorized_native_pair
+    assert authenticate(b,g,normalized)['finalized_unix']==1001.
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:134: in authenticate_cutover
+    validate_cutover(value,now=finalized)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:121: in validate_cutover
+    need(type(value) is dict and 0<=decimal(now)-decimal(value['observed_unix'])<=15,'fresh root cutover attestation required')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:58: in decimal
+    need(type(value) in (int,float,str),'invalid numeric type')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: invalid numeric type
+_ test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[modified-proof] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:71: in test_sealed_cutover_later_reuse_requires_same_authorized_native_pair
+    assert authenticate(b,g,normalized)['finalized_unix']==1001.
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:134: in authenticate_cutover
+    validate_cutover(value,now=finalized)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:121: in validate_cutover
+    need(type(value) is dict and 0<=decimal(now)-decimal(value['observed_unix'])<=15,'fresh root cutover attestation required')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:58: in decimal
+    need(type(value) in (int,float,str),'invalid numeric type')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: invalid numeric type
+_ test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[changed-lineage] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:71: in test_sealed_cutover_later_reuse_requires_same_authorized_native_pair
+    assert authenticate(b,g,normalized)['finalized_unix']==1001.
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:134: in authenticate_cutover
+    validate_cutover(value,now=finalized)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:121: in validate_cutover
+    need(type(value) is dict and 0<=decimal(now)-decimal(value['observed_unix'])<=15,'fresh root cutover attestation required')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:58: in decimal
+    need(type(value) in (int,float,str),'invalid numeric type')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: invalid numeric type
+_ test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[new-transition] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:71: in test_sealed_cutover_later_reuse_requires_same_authorized_native_pair
+    assert authenticate(b,g,normalized)['finalized_unix']==1001.
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:134: in authenticate_cutover
+    validate_cutover(value,now=finalized)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:121: in validate_cutover
+    need(type(value) is dict and 0<=decimal(now)-decimal(value['observed_unix'])<=15,'fresh root cutover attestation required')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:58: in decimal
+    need(type(value) in (int,float,str),'invalid numeric type')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: invalid numeric type
+_ test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[future-finalization] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:71: in test_sealed_cutover_later_reuse_requires_same_authorized_native_pair
+    assert authenticate(b,g,normalized)['finalized_unix']==1001.
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:134: in authenticate_cutover
+    validate_cutover(value,now=finalized)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:121: in validate_cutover
+    need(type(value) is dict and 0<=decimal(now)-decimal(value['observed_unix'])<=15,'fresh root cutover attestation required')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:58: in decimal
+    need(type(value) in (int,float,str),'invalid numeric type')
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: invalid numeric type
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/brief-green270-r2/base.xml -
+=========================== short test summary info ============================
+FAILED ../../../../dev::test_full_fake_transport_keeps_CPU_immutable_and_fails_closed_on_transfer_drift[None]
+FAILED ../../../../dev::test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[None]
+FAILED ../../../../dev::test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[modified-proof]
+FAILED ../../../../dev::test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[changed-lineage]
+FAILED ../../../../dev::test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[new-transition]
+FAILED ../../../../dev::test_sealed_cutover_later_reuse_requires_same_authorized_native_pair[future-finalization]
+6 failed, 7 passed in 16.53s

@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "stdout": "recorded job 50319334 on bridges2 (PENDING). Waiter, run in the background:\ntimeout 60m sh -c 'until ssh -o BatchMode=yes bridges2 sacct -j 50319334 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'\n",
+  "stderr": ""
+}

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import subprocess,json,pathlib,hashlib,time,os\nbase=pathlib.Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/root-tool-discovery/strace-smoke'\"'\"');base.mkdir(parents=True,mode=0o700,exist_ok=False)\np=pathlib.Path('\"'\"'/usr/bin/strace'\"'\"');ldd=subprocess.run(['\"'\"'ldd'\"'\"',str(p)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=10)\na=['\"'\"'apptainer'\"'\"','\"'\"'exec'\"'\"','\"'\"'--cleanenv'\"'\"','\"'\"'--contain'\"'\"','\"'\"'--no-home'\"'\"','\"'\"'--writable-tmpfs'\"'\"','\"'\"'--pwd'\"'\"','\"'\"'/'\"'\"','\"'\"'--bind'\"'\"',str(p)+'\"'\"':/opt/fixture-tools/strace:ro'\"'\"','\"'\"'--bind'\"'\"',str(base)+'\"'\"':/probe:rw'\"'\"','\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif'\"'\"','\"'\"'/opt/fixture-tools/strace'\"'\"','\"'\"'-f'\"'\"','\"'\"'-qq'\"'\"','\"'\"'-e'\"'\"','\"'\"'trace=%file'\"'\"','\"'\"'-o'\"'\"','\"'\"'/probe/trace.log'\"'\"','\"'\"'/usr/bin/true'\"'\"'];r=subprocess.run(a,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=20);trace=base/'\"'\"'trace.log'\"'\"'\nx={'\"'\"'tool_only'\"'\"':True,'\"'\"'runtime_slice_compatibility_claimed'\"'\"':False,'\"'\"'source_sha256'\"'\"':hashlib.sha256(p.read_bytes()).hexdigest(),'\"'\"'host_ldd'\"'\"':{'\"'\"'exit_code'\"'\"':ldd.returncode,'\"'\"'stdout'\"'\"':ldd.stdout,'\"'\"'stderr'\"'\"':ldd.stderr},'\"'\"'container_tool'\"'\"':{'\"'\"'argv'\"'\"':a,'\"'\"'exit_code'\"'\"':r.returncode,'\"'\"'stdout'\"'\"':r.stdout,'\"'\"'stderr'\"'\"':r.stderr},'\"'\"'trace'\"'\"':trace.read_text() if trace.exists() else None,'\"'\"'observed_unix'\"'\"':time.time()};print(json.dumps(x))\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"tool_only\": true, \"runtime_slice_compatibility_claimed\": false, \"source_sha256\": \"74da1646530b24a5a46375311f1b35c46527fb40535ec1a4ada1f59d0c61dc44\", \"host_ldd\": {\"exit_code\": 0, \"stdout\": \"\\tlinux-vdso.so.1 (0x00007ffcca1d5000)\\n\\tlibrt.so.1 => /lib64/librt.so.1 (0x00007f05d707d000)\\n\\tlibdw.so.1 => /lib64/libdw.so.1 (0x00007f05d6dda000)\\n\\tlibselinux.so.1 => /lib64/libselinux.so.1 (0x00007f05d6baf000)\\n\\tlibc.so.6 => /lib64/libc.so.6 (0x00007f05d67d9000)\\n\\tlibpthread.so.0 => /lib64/libpthread.so.0 (0x00007f05d65b9000)\\n\\tlibelf.so.1 => /lib64/libelf.so.1 (0x00007f05d639f000)\\n\\tlibdl.so.2 => /lib64/libdl.so.2 (0x00007f05d619b000)\\n\\tlibz.so.1 => /lib64/libz.so.1 (0x00007f05d5f83000)\\n\\tlibzstd.so.1 => /lib64/libzstd.so.1 (0x00007f05d5cdf000)\\n\\tliblzma.so.5 => /lib64/liblzma.so.5 (0x00007f05d5ab8000)\\n\\tlibbz2.so.1 => /lib64/libbz2.so.1 (0x00007f05d58a7000)\\n\\t/lib64/ld-linux-x86-64.so.2 (0x00007f05d76a3000)\\n\\tlibpcre2-8.so.0 => /lib64/libpcre2-8.so.0 (0x00007f05d5623000)\\n\", \"stderr\": \"\"}, \"container_tool\": {\"argv\": [\"apptainer\", \"exec\", \"--cleanenv\", \"--contain\", \"--no-home\", \"--writable-tmpfs\", \"--pwd\", \"/\", \"--bind\", \"/usr/bin/strace:/opt/fixture-tools/strace:ro\", \"--bind\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-exact-fixture-bridges250/root-tool-discovery/strace-smoke:/probe:rw\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif\", \"/opt/fixture-tools/strace\", \"-f\", \"-qq\", \"-e\", \"trace=%file\", \"-o\", \"/probe/trace.log\", \"/usr/bin/true\"], \"exit_code\": 127, \"stdout\": \"\", \"stderr\": \"/opt/fixture-tools/strace: error while loading shared libraries: libdw.so.1: cannot open shared object file: No such file or directory\\n\"}, \"trace\": null, \"observed_unix\": 1794031086.2051811}\n",
+  "stderr": "",
+  "observed_unix": 1794031086.2295685
+}

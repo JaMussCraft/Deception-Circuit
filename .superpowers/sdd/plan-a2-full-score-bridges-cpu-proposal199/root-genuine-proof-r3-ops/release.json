@@ -1,0 +1,21 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,hashlib,subprocess,os,time\nfrom pathlib import Path\nb=Path('\"'\"'/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-bridges-cpu-proposal199'\"'\"');job='\"'\"'50313499'\"'\"';j=b/'\"'\"'root-genuine-proof-r2'\"'\"'/('\"'\"'job-'\"'\"'+job);ops=b/'\"'\"'root-genuine-proof-r3-ops'\"'\"'\nheld=subprocess.check_output(['\"'\"'scontrol'\"'\"','\"'\"'show'\"'\"','\"'\"'job'\"'\"',job,'\"'\"'-o'\"'\"'],universal_newlines=True,timeout=15);assert '\"'\"'JobState=PENDING'\"'\"' in held and '\"'\"'Reason=JobHeldUser'\"'\"' in held and '\"'\"'RunTime=00:00:00'\"'\"' in held\nsys.path.insert(0,str(b/'\"'\"'proof-adapter-r3'\"'\"'));import host_supervisor as h\nos.environ['\"'\"'SLURM_JOB_ID'\"'\"']=job;binding=h.load_bindings(str(j/'\"'\"'bindings.json'\"'\"'),'\"'\"'18bb4495bd6e044d0acb071a3c4eadb189756d2d86245e24f793d6643764486c'\"'\"');h.check_packet(b/'\"'\"'proof-adapter-r3'\"'\"',binding['\"'\"'adapter_manifest_sha256'\"'\"'])\nassert (j/'\"'\"'bindings.sha256'\"'\"').read_text()=='\"'\"'18bb4495bd6e044d0acb071a3c4eadb189756d2d86245e24f793d6643764486c\n'\"'\"'\nassert h.sha(j/'\"'\"'spooled-batch.sh'\"'\"')=='\"'\"'8abf86b1295addd5cd8b41f13176199fb0fcf753cf6f1c40c044a073fa05e6aa'\"'\"' and not(j/'\"'\"'execution'\"'\"').exists()\na=json.loads((j/'\"'\"'transfer-attestation.json'\"'\"').read_text())\nfor n,row in a['\"'\"'current_catalogues'\"'\"'].items():assert h.sha(row['\"'\"'physical'\"'\"'])==row['\"'\"'sha256'\"'\"'] and Path(row['\"'\"'physical'\"'\"']).stat().st_size==row['\"'\"'bytes'\"'\"']\nwith(ops/'\"'\"'release-intent.json'\"'\"').open('\"'\"'x'\"'\"') as f:json.dump({'\"'\"'job_id'\"'\"':job,'\"'\"'held_state'\"'\"':held,'\"'\"'observed_unix'\"'\"':time.time(),'\"'\"'accepted_review_sha256'\"'\"':'\"'\"'f72f9a52bb4ca9dc48f70c04defd303b97f1051c362c857fb839f93b26784b45'\"'\"'},f,indent=2)\nr=subprocess.run(['\"'\"'scontrol'\"'\"','\"'\"'release'\"'\"',job],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=15)\nafter=subprocess.check_output(['\"'\"'scontrol'\"'\"','\"'\"'show'\"'\"','\"'\"'job'\"'\"',job,'\"'\"'-o'\"'\"'],universal_newlines=True,timeout=15)\nx={'\"'\"'job_id'\"'\"':job,'\"'\"'exit_code'\"'\"':r.returncode,'\"'\"'stdout'\"'\"':r.stdout,'\"'\"'stderr'\"'\"':r.stderr,'\"'\"'after'\"'\"':after,'\"'\"'observed_unix'\"'\"':time.time()}\nwith(ops/'\"'\"'release-result.json'\"'\"').open('\"'\"'x'\"'\"') as f:json.dump(x,f,indent=2)\nprint(json.dumps(x));sys.exit(r.returncode)\n'"
+  ],
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "  File \"<string>\", line 7\n    assert (j/'bindings.sha256').read_text()=='18bb4495bd6e044d0acb071a3c4eadb189756d2d86245e24f793d6643764486c\n                                                                                                              ^\nSyntaxError: EOL while scanning string literal\n",
+  "observed_unix": 1794017196.4356582
+}
