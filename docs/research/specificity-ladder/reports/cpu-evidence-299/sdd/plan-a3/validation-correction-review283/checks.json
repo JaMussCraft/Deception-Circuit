@@ -1,0 +1,91 @@
+{
+  "scope": "independent AST/hash and extracted boundary only; no native imports",
+  "files": [
+    {
+      "changed": [
+        "_completed_pilot_source"
+      ],
+      "assertions": 0,
+      "decorators_unchanged": true,
+      "hashes_match": true
+    },
+    {
+      "changed": [
+        "test_prepared_costs_and_envelope_are_charged"
+      ],
+      "assertions": 114,
+      "decorators_unchanged": true,
+      "hashes_match": true
+    }
+  ],
+  "probes": [
+    {
+      "python": "/sw/external/python/anaconda3/bin/python3.9",
+      "mode": "red",
+      "exit": 1,
+      "result": {
+        "scope": "NON_NATIVE_EXTRACTED_REFERENCE_BOUNDARY_ONLY",
+        "failures": [
+          "absent: leaked KeyError",
+          "null: leaked TypeError",
+          "scalar: leaked TypeError",
+          "list: leaked TypeError",
+          "no-path: leaked KeyError",
+          "null-path: reached reference I/O",
+          "integer-path: reached reference I/O",
+          "list-path: reached reference I/O",
+          "empty-path: reached reference I/O"
+        ],
+        "malformed_cases": 9,
+        "valid_path_cases": 2,
+        "unequal_reference_cases": 2
+      }
+    },
+    {
+      "python": "/sw/external/python/anaconda3/bin/python3.9",
+      "mode": "green",
+      "exit": 0,
+      "result": {
+        "scope": "NON_NATIVE_EXTRACTED_REFERENCE_BOUNDARY_ONLY",
+        "failures": [],
+        "malformed_cases": 9,
+        "valid_path_cases": 2,
+        "unequal_reference_cases": 2
+      }
+    },
+    {
+      "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "mode": "red",
+      "exit": 1,
+      "result": {
+        "scope": "NON_NATIVE_EXTRACTED_REFERENCE_BOUNDARY_ONLY",
+        "failures": [
+          "absent: leaked KeyError",
+          "null: leaked TypeError",
+          "scalar: leaked TypeError",
+          "list: leaked TypeError",
+          "no-path: leaked KeyError",
+          "null-path: reached reference I/O",
+          "integer-path: reached reference I/O",
+          "list-path: reached reference I/O",
+          "empty-path: reached reference I/O"
+        ],
+        "malformed_cases": 9,
+        "valid_path_cases": 2,
+        "unequal_reference_cases": 2
+      }
+    },
+    {
+      "python": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "mode": "green",
+      "exit": 0,
+      "result": {
+        "scope": "NON_NATIVE_EXTRACTED_REFERENCE_BOUNDARY_ONLY",
+        "failures": [],
+        "malformed_cases": 9,
+        "valid_path_cases": 2,
+        "unequal_reference_cases": 2
+      }
+    }
+  ]
+}

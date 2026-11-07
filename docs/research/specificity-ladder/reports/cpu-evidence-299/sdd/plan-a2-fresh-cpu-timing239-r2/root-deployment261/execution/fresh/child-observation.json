@@ -1,0 +1,236 @@
+{
+  "kind": "A2_DATA_TIMING_DIAGNOSTIC_V1",
+  "diagnostic_only": true,
+  "operational_admission": false,
+  "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+  "actual_CPU_job_id": "23624978",
+  "native_observations": {
+    "numeric_environment": {
+      "torch": "2.11.0+cu128",
+      "transformers": "5.13.0",
+      "nnsight": "0.7.0",
+      "numpy": "2.5.1",
+      "python": [
+        3,
+        12,
+        13
+      ],
+      "cuda_runtime": "12.8",
+      "matmul_precision": "highest",
+      "cpu_threads": 1,
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": true,
+      "deterministic_algorithms": false
+    },
+    "bank_execution_provenance": {
+      "bank_compute_seconds": 109.02882971707731,
+      "bank_stage_seconds": 664.8189254421741,
+      "cluster": "bridges2",
+      "cluster_source": "SLURM_CLUSTER_NAME",
+      "device": "cuda:0",
+      "dtype": "torch.bfloat16",
+      "gpu_name": "NVIDIA H100 80GB HBM3",
+      "memory_scope": "bank compute after model load; includes resident model",
+      "model_load_seconds": 555.7060698261485,
+      "peak_allocated_memory_bytes": 16194887168,
+      "peak_reserved_memory_bytes": 16240345088,
+      "slurm_job_id": "50189932",
+      "stage_time_scope": "model load plus bank compute; excludes artifact publication"
+    },
+    "model_loaded": false,
+    "freeze_executed": false,
+    "GPU_admitted": false
+  },
+  "counts": {
+    "rows": 59652,
+    "positive_controls": 3396,
+    "support_reason_mask_sha256": "73002c8b74d13947aeb9bf1f6e09d50544b549ea51ab00a50b9510bd6404ffd8",
+    "reconstructed_rows": 59652,
+    "reconstructed_controls": 3396
+  },
+  "source_before": {
+    "groups": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+    "bank": "a8afbd51a994a6346d1bb8c832b68cab0ea42c83a195c22a29aae4016723e00b",
+    "bank_manifest": "3fdff794cb9bba609ee3d181af24c02b1734796270c07985c020345b238b360f",
+    "source": "25ae1e447cb238e686cb605fc79fcd50ad14a9989014d8213b6cbe890289b337",
+    "input_manifest": "ff11c97d3fc0d279cf4d4f5c9c545ad8e8783778d75d45ef6f87fe8373e4aaad",
+    "aliases": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/data": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/directions.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/held_out.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/docs/research/held_out.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/docs/research/directions.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/outputs": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/docs/research/held_out.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "/projects/beto/swong2/Alignment/.scratch/mechanism-datasets": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_studies/mechanism-datasets/scratch",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/data": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/logs": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs"
+    },
+    "catalogues": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json": "508092548c76deef7dc3339cec990d1a62cbd455ac0117e8ada215755a591ada",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0"
+    }
+  },
+  "source_after": {
+    "groups": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+    "bank": "a8afbd51a994a6346d1bb8c832b68cab0ea42c83a195c22a29aae4016723e00b",
+    "bank_manifest": "3fdff794cb9bba609ee3d181af24c02b1734796270c07985c020345b238b360f",
+    "source": "25ae1e447cb238e686cb605fc79fcd50ad14a9989014d8213b6cbe890289b337",
+    "input_manifest": "ff11c97d3fc0d279cf4d4f5c9c545ad8e8783778d75d45ef6f87fe8373e4aaad",
+    "aliases": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/data": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/directions.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/held_out.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/docs/research/held_out.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-source-cost-runtime-40fe57289405/runtime/docs/research/directions.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/outputs": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/docs/research/held_out.json": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "/projects/beto/swong2/Alignment/.scratch/mechanism-datasets": "/projects/beto/swong2/Alignment/Deception-Circuit/outputs/_studies/mechanism-datasets/scratch",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/data": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-runtime-6bd8bf5/runtime/logs": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/logs"
+    },
+    "catalogues": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json": "508092548c76deef7dc3339cec990d1a62cbd455ac0117e8ada215755a591ada",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0"
+    }
+  },
+  "module_origins": {
+    "component_analysis": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/__init__.py",
+    "scripts.twin_training": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/scripts/twin_training.py",
+    "scripts.twin_training_projection": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/scripts/twin_training_projection.py",
+    "component_analysis.a2_mask_comparison": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/a2_mask_comparison.py",
+    "component_analysis.sampling": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/sampling.py",
+    "component_analysis.ladder_design": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/ladder_design.py",
+    "dataset": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/dataset/__init__.py",
+    "dataset.deception_common": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/dataset/deception_common.py",
+    "dataset.matched_honest": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/dataset/matched_honest.py",
+    "dataset.build_user_inversion_v2": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/dataset/build_user_inversion_v2.py",
+    "dataset.user_inversion_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/dataset/user_inversion_pipeline.py",
+    "component_analysis.ladder_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/ladder_pipeline.py",
+    "component_analysis.a2_pipeline": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/a2_pipeline.py",
+    "evaluation": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/evaluation/__init__.py",
+    "evaluation.grader_hash": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/evaluation/grader_hash.py",
+    "component_analysis.ladder_tasks": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/ladder_tasks.py",
+    "component_analysis.hooks": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/hooks.py",
+    "component_analysis.specificity_ladder": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/specificity_ladder.py"
+  },
+  "packet_manifest_sha256": "c43d084973d38dbb2367b269879f23cc2d42383784f65d9abde937d4232573e6",
+  "current_catalogue_witness_sha256": "ea94bb74793addbd88ed07bc968cb1e75660dcef160446e4db9d2c6e637c0dc9",
+  "catalogue_capture_files": [
+    {
+      "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json",
+      "sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "bytes": 32,
+      "captured_bytes_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/execution/fresh/catalogue-0.json"
+    },
+    {
+      "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
+      "sha256": "508092548c76deef7dc3339cec990d1a62cbd455ac0117e8ada215755a591ada",
+      "bytes": 24115,
+      "captured_bytes_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/execution/fresh/catalogue-1.json"
+    },
+    {
+      "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json",
+      "sha256": "801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e",
+      "bytes": 32,
+      "captured_bytes_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/execution/fresh/catalogue-2.json"
+    },
+    {
+      "virtual_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json",
+      "sha256": "f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0",
+      "bytes": 21212,
+      "captured_bytes_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/root-deployment261/execution/fresh/catalogue-3.json"
+    }
+  ],
+  "assessment_effects_inspected": false,
+  "pid": 3652266,
+  "parent_pid": 3649282,
+  "diagnostic_stage": "fresh",
+  "started_unix": 1794042805.984851,
+  "finished_unix": 1794042992.8617713,
+  "wall_seconds": 186.8769222520059,
+  "user_seconds": 163.823845,
+  "system_seconds": 7.615732,
+  "peak_RSS_bytes": 1955831808,
+  "process_before": {
+    "pid": 3652266,
+    "captured_unix": 1794042808.3523972,
+    "host": "cn099.delta.ncsa.illinois.edu",
+    "status": "Name:\tpython\nUmask:\t0077\nState:\tR (running)\nTgid:\t3652266\nNgid:\t0\nPid:\t3652266\nPPid:\t3649282\nTracerPid:\t0\nUid:\t78031\t78031\t78031\t78031\nGid:\t202\t202\t202\t202\nFDSize:\t64\nGroups:\t202 2286 3444 19691 20974 22175 22717 \nNStgid:\t3652266\nNSpid:\t3652266\nNSpgid:\t3652266\nNSsid:\t3652266\nVmPeak:\t  260888 kB\nVmSize:\t  260888 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   20480 kB\nVmRSS:\t   20480 kB\nRssAnon:\t   10240 kB\nRssFile:\t    8192 kB\nRssShmem:\t    2048 kB\nVmData:\t   26404 kB\nVmStk:\t     160 kB\nVmExe:\t    2372 kB\nVmLib:\t    6080 kB\nVmPTE:\t     112 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t0/1030119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\t00000000,00000000,00000000,00000981\nCpus_allowed_list:\t0,7-8,11\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,000000ff\nMems_allowed_list:\t0-7\nvoluntary_ctxt_switches:\t1475\nnonvoluntary_ctxt_switches:\t2\n",
+    "cgroup": "0::/system.slice/slurmstepd.scope/job_23624978/step_batch/user/task_0\n",
+    "process_usage": {
+      "user_seconds": 0.084341,
+      "system_seconds": 0.140431,
+      "peak_RSS_bytes": 78790656
+    },
+    "cgroup_observations": [
+      {
+        "scope": "process",
+        "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23624978/step_batch/user/task_0",
+        "files": {
+          "memory.current": "1495863296",
+          "memory.peak": "2842611712",
+          "memory.max": "max",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+        },
+        "available": true
+      },
+      {
+        "scope": "job",
+        "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23624978",
+        "files": {
+          "memory.current": "1503580160",
+          "memory.peak": "2850590720",
+          "memory.max": "34359738368",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+        },
+        "available": true
+      }
+    ]
+  },
+  "process_after": {
+    "pid": 3652266,
+    "captured_unix": 1794042992.8617792,
+    "host": "cn099.delta.ncsa.illinois.edu",
+    "status": "Name:\tpython\nUmask:\t0077\nState:\tR (running)\nTgid:\t3652266\nNgid:\t0\nPid:\t3652266\nPPid:\t3649282\nTracerPid:\t0\nUid:\t78031\t78031\t78031\t78031\nGid:\t202\t202\t202\t202\nFDSize:\t64\nGroups:\t202 2286 3444 19691 20974 22175 22717 \nNStgid:\t3652266\nNSpid:\t3652266\nNSpgid:\t3652266\nNSsid:\t3652266\nVmPeak:\t 8113576 kB\nVmSize:\t 7540176 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t 1909992 kB\nVmRSS:\t 1342860 kB\nRssAnon:\t  987452 kB\nRssFile:\t  350288 kB\nRssShmem:\t    5120 kB\nVmData:\t 2556400 kB\nVmStk:\t     160 kB\nVmExe:\t    2372 kB\nVmLib:\t 2769936 kB\nVmPTE:\t    3952 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t7\nSigQ:\t0/1030119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000100000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\t00000000,00000000,00000000,00000981\nCpus_allowed_list:\t0,7-8,11\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,000000ff\nMems_allowed_list:\t0-7\nvoluntary_ctxt_switches:\t53262\nnonvoluntary_ctxt_switches:\t1353\n",
+    "cgroup": "0::/system.slice/slurmstepd.scope/job_23624978/step_batch/user/task_0\n",
+    "process_usage": {
+      "user_seconds": 163.867629,
+      "system_seconds": 7.631272,
+      "peak_RSS_bytes": 1955831808
+    },
+    "cgroup_observations": [
+      {
+        "scope": "process",
+        "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23624978/step_batch/user/task_0",
+        "files": {
+          "memory.current": "2500202496",
+          "memory.peak": "3084079104",
+          "memory.max": "max",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+        },
+        "available": true
+      },
+      {
+        "scope": "job",
+        "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23624978",
+        "files": {
+          "memory.current": "2508099584",
+          "memory.peak": "3092062208",
+          "memory.max": "34359738368",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+        },
+        "available": true
+      }
+    ]
+  },
+  "data_parameters_sha256": "def7de444885d33d5baa7db1c0fe222ad38fbea623a4e961836f0eadcc7545f8",
+  "numeric_interpreter": "/u/swong2/.conda/envs/mgnp/bin/python",
+  "deadline_unix": 1794043043.5200186
+}

@@ -1,0 +1,21 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import json,sys,time,hashlib\nfrom pathlib import Path\nx=json.load(sys.stdin);result={}\nfor n,r in x.items():\n p=Path(r['\"'\"'physical'\"'\"']);assert p.is_file() and not p.is_symlink();b=p.read_bytes();assert len(b)==r['\"'\"'bytes'\"'\"'] and hashlib.sha256(b).hexdigest()==r['\"'\"'sha256'\"'\"'],str(p)\n result[n]=dict(cluster='\"'\"'bridges2'\"'\"',path=str(p),bytes=len(b),sha256=hashlib.sha256(b).hexdigest(),observed_unix=time.time())\nprint(json.dumps(result))\n'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/held_out.json\": {\"cluster\": \"bridges2\", \"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/held_out.json\", \"bytes\": 32, \"sha256\": \"801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e\", \"observed_unix\": 1794032349.202514}, \"/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json\": {\"cluster\": \"bridges2\", \"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/docs/research/directions.json\", \"bytes\": 24115, \"sha256\": \"508092548c76deef7dc3339cec990d1a62cbd455ac0117e8ada215755a591ada\", \"observed_unix\": 1794032349.2152224}, \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json\": {\"cluster\": \"bridges2\", \"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json\", \"bytes\": 32, \"sha256\": \"801b24e37c3315a8e58aa2ad5007f7831822fc2636d1e61837ad3652c370425e\", \"observed_unix\": 1794032349.2654579}, \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json\": {\"cluster\": \"bridges2\", \"path\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json\", \"bytes\": 21212, \"sha256\": \"f8c7dbb92f2edc509c7bb8e94624a5c8adabddd103a8c48db1cc59bd69a3c6b0\", \"observed_unix\": 1794032349.274556}}\n",
+  "stderr": "",
+  "observed_unix": 1794032349.2903965
+}

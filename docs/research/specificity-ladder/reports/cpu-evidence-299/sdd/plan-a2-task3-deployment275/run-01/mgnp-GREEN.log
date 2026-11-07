@@ -1,0 +1,54 @@
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 56%]
+........................................................................ [ 75%]
+.............................................................FFFFF...... [ 94%]
+...................                                                      [100%]
+=================================== FAILURES ===================================
+______ test_original_native_normalizer_preserves_full_mapping_chain[None] ______
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_file_sha256'
+__ test_original_native_normalizer_preserves_full_mapping_chain[old-snapshot] __
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_file_sha256'
+___ test_original_native_normalizer_preserves_full_mapping_chain[old-charge] ___
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_file_sha256'
+_ test_original_native_normalizer_preserves_full_mapping_chain[original-admission] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_file_sha256'
+_ test_original_native_normalizer_preserves_full_mapping_chain[missing-successor] _
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/tests/test_full_score_root_integration.py:298: in test_original_native_normalizer_preserves_full_mapping_chain
+    captured,normalized,budget=m.collect_native_closure(g)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../plan-plan-a2-full-score-operational186/task3/green270-r3/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:298: in collect_native_closure
+    identity=dict(purpose='A2 original source50e full scoring',source_commit=SOURCE,groups_sha256=g['groups_file_sha256'],main_root=g['main_root'])
+                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'groups_file_sha256'
+=========================== short test summary info ============================
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[None]
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[old-snapshot]
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[old-charge]
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[original-admission]
+FAILED ../../../../../../../../../../../../dev::test_original_native_normalizer_preserves_full_mapping_chain[missing-successor]
+5 failed, 374 passed in 81.34s (0:01:21)

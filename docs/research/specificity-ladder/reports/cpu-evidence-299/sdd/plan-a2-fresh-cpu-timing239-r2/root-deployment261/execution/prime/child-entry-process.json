@@ -1,0 +1,31 @@
+{
+  "pid": 3649297,
+  "captured_unix": 1794042582.8106244,
+  "host": "cn099.delta.ncsa.illinois.edu",
+  "status": "Name:\tpython\nUmask:\t0077\nState:\tD (disk sleep)\nTgid:\t3649297\nNgid:\t0\nPid:\t3649297\nPPid:\t3649282\nTracerPid:\t0\nUid:\t78031\t78031\t78031\t78031\nGid:\t202\t202\t202\t202\nFDSize:\t64\nGroups:\t202 2286 3444 19691 20974 22175 22717 \nNStgid:\t3649297\nNSpid:\t3649297\nNSpgid:\t3649297\nNSsid:\t3649297\nVmPeak:\t    7148 kB\nVmSize:\t    7148 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t       0 kB\nVmRSS:\t       0 kB\nRssAnon:\t       0 kB\nRssFile:\t       0 kB\nRssShmem:\t       0 kB\nVmData:\t    1960 kB\nVmStk:\t     160 kB\nVmExe:\t    2372 kB\nVmLib:\t     164 kB\nVmPTE:\t      44 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t0/1030119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000000000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\t00000000,00000000,00000000,00000981\nCpus_allowed_list:\t0,7-8,11\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,000000ff\nMems_allowed_list:\t0-7\nvoluntary_ctxt_switches:\t13\nnonvoluntary_ctxt_switches:\t0\n",
+  "cgroup": "0::/system.slice/slurmstepd.scope/job_23624978/step_batch/user/task_0\n",
+  "cgroup_observations": [
+    {
+      "scope": "process",
+      "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23624978/step_batch/user/task_0",
+      "files": {
+        "memory.current": "31674368",
+        "memory.peak": "32837632",
+        "memory.max": "max",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+      },
+      "available": true
+    },
+    {
+      "scope": "job",
+      "path": "/sys/fs/cgroup/system.slice/slurmstepd.scope/job_23624978",
+      "files": {
+        "memory.current": "39534592",
+        "memory.peak": "40697856",
+        "memory.max": "34359738368",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+      },
+      "available": true
+    }
+  ]
+}

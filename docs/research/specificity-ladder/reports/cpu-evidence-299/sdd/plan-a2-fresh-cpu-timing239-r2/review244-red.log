@@ -1,0 +1,46 @@
+FFFF.F.                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_review244_final_authentication_or_current_end_expiry_prevents_Popen[fresh-1250.0-1900.0] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:136: in test_review244_final_authentication_or_current_end_expiry_prevents_Popen
+    with pytest.raises(TimeoutError):m.run_stage(c,ref,stage,tmp_path,2000.,v,s)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/runner.py:200: in run_stage
+    child=subprocess.Popen(command,cwd=RUNTIME,env=env,stdout=stream,stderr=subprocess.STDOUT,start_new_session=True)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:114: in popen
+    raise AssertionError('Popen reached after final bound expired')
+E   AssertionError: Popen reached after final bound expired
+_ test_review244_final_authentication_or_current_end_expiry_prevents_Popen[prime-1490.0-1900.0] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:136: in test_review244_final_authentication_or_current_end_expiry_prevents_Popen
+    with pytest.raises(TimeoutError):m.run_stage(c,ref,stage,tmp_path,2000.,v,s)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/runner.py:200: in run_stage
+    child=subprocess.Popen(command,cwd=RUNTIME,env=env,stdout=stream,stderr=subprocess.STDOUT,start_new_session=True)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:114: in popen
+    raise AssertionError('Popen reached after final bound expired')
+E   AssertionError: Popen reached after final bound expired
+_ test_review244_final_authentication_or_current_end_expiry_prevents_Popen[fresh-1240.0-1900.0] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:136: in test_review244_final_authentication_or_current_end_expiry_prevents_Popen
+    with pytest.raises(TimeoutError):m.run_stage(c,ref,stage,tmp_path,2000.,v,s)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/runner.py:200: in run_stage
+    child=subprocess.Popen(command,cwd=RUNTIME,env=env,stdout=stream,stderr=subprocess.STDOUT,start_new_session=True)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:114: in popen
+    raise AssertionError('Popen reached after final bound expired')
+E   AssertionError: Popen reached after final bound expired
+_ test_review244_final_authentication_or_current_end_expiry_prevents_Popen[fresh-1010.0-1050.0] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:136: in test_review244_final_authentication_or_current_end_expiry_prevents_Popen
+    with pytest.raises(TimeoutError):m.run_stage(c,ref,stage,tmp_path,2000.,v,s)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/runner.py:200: in run_stage
+    child=subprocess.Popen(command,cwd=RUNTIME,env=env,stdout=stream,stderr=subprocess.STDOUT,start_new_session=True)
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:114: in popen
+    raise AssertionError('Popen reached after final bound expired')
+E   AssertionError: Popen reached after final bound expired
+_ test_review244_valid_normal_child_starts_once_with_nonincreasing_bound[1160.0-1100.0] _
+Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py:145: in test_review244_valid_normal_child_starts_once_with_nonincreasing_bound
+    assert result['deadline_unix']==want
+E   assert 1240.0 == 1100.0
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/review244-red.xml -
+=========================== short test summary info ============================
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py::test_review244_final_authentication_or_current_end_expiry_prevents_Popen[fresh-1250.0-1900.0]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py::test_review244_final_authentication_or_current_end_expiry_prevents_Popen[prime-1490.0-1900.0]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py::test_review244_final_authentication_or_current_end_expiry_prevents_Popen[fresh-1240.0-1900.0]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py::test_review244_final_authentication_or_current_end_expiry_prevents_Popen[fresh-1010.0-1050.0]
+FAILED Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/test_timing239.py::test_review244_valid_normal_child_starts_once_with_nonincreasing_bound[1160.0-1100.0]
+5 failed, 2 passed, 19 deselected in 0.31s

@@ -1,0 +1,29 @@
+# Task 4 unbound resource-runner review279
+
+Status: handed-back. CHANGES REQUIRED before measurement binding. Scoped spec and code-quality verdicts require two narrow recording corrections; no native or measurement admission.
+
+## What changed
+
+Created only reviewer-owned snapshots, checks, logs and [verdict](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-review279/verdict.json). Review binds manifest `05010654ef2e177932055238bd2072a02f06b32be56059436b9296df368fa1ee` and runner `c6b45b57b00677eb8d4fc0c4bd5f4001ed6ce9d150685a4ce6faaa21fce215e8`. Immutable packet247 requirements were read and their references rehashed. Native runtime aea07 and workload765b remain unchanged; no active-job source, scheduler, remote or publication change occurred.
+
+## How verified
+
+**B1, medium: missing observed step breakdown and failure counters.** [receiver](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/runner.py:151) times entry/final separately but copies actual profiler counters only after both. Its native_observed field contains native returned bookkeeping, not independent observed entry counters. It cannot check the required observed entry-two/final-one split. If entry or final raises, the failure record omits live partial counters and observer provenance. Preserve counter snapshots/deltas and status at both step boundaries, check each expected step separately and retain partial counters on errors; keep declared native counts distinct. A synthetic three-entry/zero-final arrangement passes total-three verification, and a failure after an observed read/hash loses those counts. These demonstrate recording gaps, not a defect in the unchanged native two-plus-one algorithm.
+
+**B2, medium: character counts are called bytes.** [PhaseObserver](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/runner.py:211) adds Path.write_text's returned character count to file_write_bytes. A UTF8 write of λ雪 records two while the file has five bytes. Separate text-character units or measure actual encoded bytes; retain honest Path.write_bytes counts and existing inclusive scope. No generic profiling framework is needed.
+
+The remaining source preserves preparation boundaries. Imports/dry-runs are stdlib-only; unbound CLI and missing/relative shell-supervisor inputs refuse execution. Producer primitives preserve exact objects/selectedNone and operational startup delegates native main. Receiver retains the exact result through one final witness, drops it and runs GC before same-process repeat, and never mints a handle. Lifetime RSS/cgroup scope, observer overhead, absent filesystem-cache claim and non-bound observations are explicit. Contract authority/resource/job fields remain NULL.
+
+## Execution evidence
+
+All ten supplied synthetic/API tests pass in each supported interpreter. They use stand-in functions and tiny temporary files, import no native project modules and do not validate production algorithms or genuine launch provenance. Three independent synthetic counter/unit reproductions pass in each environment; those passing tests establish the gaps above. [Synthetic runs](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-review279/run_manifest.json), [focused reproductions](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-review279/counter-three-run-manifest.json).
+
+Actual shell dry-runs pass with each interpreter, and missing/relative launch inputs fail before supervisor execution. The supplied import trap covers direct CLI dry-run/unbound paths. [Launch checks](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-review279/launch-checks.json). Read attributable original five RED failures, two added boundary failures and three operational failures, followed by ten GREEN passes per interpreter; no errors/skips were reported. Exact manifest/file/contract/native hashes were verified without native imports. [Pins](/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-review279/pins-and-scope.json). Latest usage is forty-four percent, cap eighty and cadence forty.
+
+## What is NOT done
+
+No code completion, final source/export publication, actual source/job/target/resource/admission/receiver binding, native import/validation, measurement, resource-bound acceptance, model or GPU use. The old11GB stream was a hash sink, not a saved target artifact. Lower-reader profiling does not cover authentic production handle overhead or replace the production final scope/live/deadline barrier. No API or synthetic record is accepted as genuine native evidence.
+
+## Open questions
+
+Create a distinct minimal runner correction for B1/B2 with targeted RED/GREEN evidence; leave native code and active jobs frozen. Root later binds exact native origins/publication, authentic prepare/pilot-target/prefit argv with selectedNone and unchanged main/dispatch/guards, actual existing supervisor/interpreter/resources/storage and emitted target/preparation references. Root must start a genuinely new executable once before receiver access; matching a distinct immediate parent PID alone is only relational evidence. Use the operational receiver wrapper, never raw API/NullSyntheticObserver outputs as genuine launch evidence. Original dual-interpreter/source closure, complete numerical/resource/paired-M1 feasibility, nine prefit cases plus aggregate/reconciliation, GPU and actual selection dependencies remain separate gates.

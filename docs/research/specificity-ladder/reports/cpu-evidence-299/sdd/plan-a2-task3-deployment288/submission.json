@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "sbatch",
+    "--parsable",
+    "--hold",
+    "--account=beto-delta-cpu",
+    "--partition=cpu-interactive",
+    "--constraint=projects",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=2",
+    "--mem=8G",
+    "--time=00:07:00",
+    "--no-requeue",
+    "--export=ALL,CUDA_VISIBLE_DEVICES=",
+    "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+    "--job-name=lad-A2-task3-green",
+    "--output=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task3-deployment288/slurm-%j.log",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/run_cpu.sh",
+    "--output",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task3-deployment288/run-01"
+  ],
+  "exit_code": 0,
+  "stdout": "23635594\n",
+  "stderr": "",
+  "observed_unix": 1794044588.6017761
+}

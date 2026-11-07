@@ -1,0 +1,223 @@
+{
+  "kind": "local_synthetic_correction_only",
+  "baseline_commit": "538109e809285b6ddc45d42df8786270a65f7b12",
+  "source_commit": null,
+  "native_imports": false,
+  "scientific_execution": false,
+  "execution_authorized": false,
+  "original_test_prefix_unchanged": true,
+  "expected_collected_methods": 13,
+  "exception_subcases": 2,
+  "runs": [
+    {
+      "name": "base",
+      "origin": {
+        "executable": "/sw/external/python/anaconda3/bin/python3.9",
+        "version": "3.9.18 (main, Sep 11 2023, 13:41:44) \n[GCC 11.2.0]",
+        "pytest_version": "8.3.3",
+        "pytest_origin": "/u/swong2/.local/lib/python3.9/site-packages/pytest/__init__.py"
+      },
+      "command": [
+        "/sw/external/python/anaconda3/bin/python3.9",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2",
+        "--import-mode=importlib",
+        "--basetemp=/tmp/packet278-r2-base-final-green",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/test_runner.py"
+      ],
+      "cwd": "/tmp",
+      "exit_code": 0,
+      "expected_collected_methods": 13,
+      "output": ".............                                                            [100%]\n13 passed in 0.45s\n"
+    },
+    {
+      "name": "mgnp",
+      "origin": {
+        "executable": "/u/swong2/.conda/envs/mgnp/bin/python",
+        "version": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]",
+        "pytest_version": "9.1.1",
+        "pytest_origin": "/u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/pytest/__init__.py"
+      },
+      "command": [
+        "/u/swong2/.conda/envs/mgnp/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2",
+        "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2",
+        "--import-mode=importlib",
+        "--basetemp=/tmp/packet278-r2-mgnp-final-green",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/test_runner.py"
+      ],
+      "cwd": "/tmp",
+      "exit_code": 0,
+      "expected_collected_methods": 13,
+      "output": ".............                                                          [100%]\n13 passed, 2 subtests passed in 0.52s\n"
+    },
+    {
+      "name": "relocated-dryrun-base",
+      "command": [
+        "bash",
+        "/tmp/packet278-r2-relocated-du041gqj/spool-script",
+        "--dry-run"
+      ],
+      "interpreter": "/sw/external/python/anaconda3/bin/python3.9",
+      "cwd": "/tmp/packet278-r2-relocated-du041gqj",
+      "exit_code": 0,
+      "output": "{\"actual_job\": null, \"execution_authorized\": false, \"model_loaded\": false, \"native_imports\": false, \"resources\": null, \"source_commit\": null, \"source_publication\": null, \"status\": \"UNBOUND_PREPARATION_ONLY\"}\n",
+      "native_imports": false,
+      "absolute_adapter": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/runner.py"
+    },
+    {
+      "name": "relocated-dryrun-mgnp",
+      "command": [
+        "bash",
+        "/tmp/packet278-r2-relocated-du041gqj/spool-script",
+        "--dry-run"
+      ],
+      "interpreter": "/u/swong2/.conda/envs/mgnp/bin/python",
+      "cwd": "/tmp/packet278-r2-relocated-du041gqj",
+      "exit_code": 0,
+      "output": "{\"actual_job\": null, \"execution_authorized\": false, \"model_loaded\": false, \"native_imports\": false, \"resources\": null, \"source_commit\": null, \"source_publication\": null, \"status\": \"UNBOUND_PREPARATION_ONLY\"}\n",
+      "native_imports": false,
+      "absolute_adapter": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/runner.py"
+    }
+  ],
+  "preserved_red_runner": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/runner-red.py",
+    "sha256": "c6b45b57b00677eb8d4fc0c4bd5f4001ed6ce9d150685a4ce6faaa21fce215e8",
+    "bytes": 14500
+  },
+  "original_packet": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278/run_manifest.json",
+    "sha256": "05010654ef2e177932055238bd2072a02f06b32be56059436b9296df368fa1ee",
+    "bytes": 11498
+  },
+  "review": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-review279/verdict.json",
+    "sha256": "787a2a47b1e95da7dfca5ccd5dfa58bf4022e991f4f9a8d9e2b596550fd6e9f9",
+    "bytes": 4443
+  },
+  "review_reproductions": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-review279/counter_recording_checks.py",
+    "sha256": "d08440bcad369ba3afdd4e26d725f2708f928af319f6b02089d7dabf1ff999da",
+    "bytes": 2844
+  },
+  "red_results": [
+    {
+      "name": "base",
+      "exit_code": 1,
+      "collected_methods": 13,
+      "original_methods_passed": 10,
+      "new_methods_failed": 3,
+      "display_summary": "3 failed, 10 passed in 0.43s",
+      "log": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/red-base.log",
+        "sha256": "f9ea8701d9cba934204d4845f881963c01b4b258a748f213b6218ca61444cd1d",
+        "bytes": 8310
+      }
+    },
+    {
+      "name": "mgnp",
+      "exit_code": 1,
+      "collected_methods": 13,
+      "original_methods_passed": 10,
+      "new_methods_failed": 3,
+      "display_summary": "4 failed, 11 passed in 0.54s",
+      "subtest_explanation": "Enabled normal-environment plugin reports two exception subcases separately; same13 collected methods.",
+      "log": {
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/red-mgnp.log",
+        "sha256": "33ae2e92347121a18037785a8d5f9b809af3a5b48eafa6777973fa437ddaf1d0",
+        "bytes": 15597
+      }
+    }
+  ],
+  "source_context": [
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_runtime.py",
+      "sha256": "aea07dbf153824f373be70629dd24edc28dd6566cafa5955f43c69fd1119ec90",
+      "bytes": 264309
+    },
+    {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate183/component_analysis/a3_direction_workload.py",
+      "sha256": "765b22a006ab519186a168bf455f4084915457d4ffce88881e76bf31b71a37cb",
+      "bytes": 101780
+    }
+  ],
+  "files": {
+    "green-mgnp.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/green-mgnp.log",
+      "sha256": "b3f03db8d581710d5cabb820e8e0f10490181b7ed6d035ec518168723522d6a6",
+      "bytes": 116
+    },
+    "collection-base.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/collection-base.log",
+      "sha256": "f18932ad0120d550f7d56c4022a0a48a6e8d309bad863845d66f84d3eed7ad6f",
+      "bytes": 1306
+    },
+    "runner.py": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/runner.py",
+      "sha256": "6e32385c82e83c9e362377f20813fa50c9754560878ac76f749c1646c0bef962",
+      "bytes": 17532
+    },
+    "red-collection-provenance.json": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/red-collection-provenance.json",
+      "sha256": "6a5fa46785cd70f25e14b0ce58f776eb0b45e81eafb163b2214a08cf223a4a0c",
+      "bytes": 4205
+    },
+    "contracts.json": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/contracts.json",
+      "sha256": "bbe834920839bfc3be50777aafeb3cbc669cd46342725063c20248dec8d0ec6a",
+      "bytes": 4227
+    },
+    "red-mgnp.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/red-mgnp.log",
+      "sha256": "33ae2e92347121a18037785a8d5f9b809af3a5b48eafa6777973fa437ddaf1d0",
+      "bytes": 15597
+    },
+    "test_runner.py": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/test_runner.py",
+      "sha256": "0d27b099da7687292b83714d855ad7db433b91aedca2e1eb86eeb83a0e52455a",
+      "bytes": 13659
+    },
+    "launch.sh": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/launch.sh",
+      "sha256": "8325d7bb834f65976867ab7771afc1cb50ad014738cd348d37afc8ebca63b8e6",
+      "bytes": 811
+    },
+    "runner-red.py": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/runner-red.py",
+      "sha256": "c6b45b57b00677eb8d4fc0c4bd5f4001ed6ce9d150685a4ce6faaa21fce215e8",
+      "bytes": 14500
+    },
+    "README.md": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/README.md",
+      "sha256": "a11f678fb328b788e98e8ebe4f68253b30a9acf656b5931369dc1d6bc72ebf02",
+      "bytes": 7899
+    },
+    "collection-mgnp.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/collection-mgnp.log",
+      "sha256": "f18932ad0120d550f7d56c4022a0a48a6e8d309bad863845d66f84d3eed7ad6f",
+      "bytes": 1306
+    },
+    "red-base.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/red-base.log",
+      "sha256": "f9ea8701d9cba934204d4845f881963c01b4b258a748f213b6218ca61444cd1d",
+      "bytes": 8310
+    },
+    "green-base.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/green-base.log",
+      "sha256": "a1d9ed8ac4edfe4f8763057aaded95fb5b7deacd372b5ee8db2a26d5903a0fcd",
+      "bytes": 99
+    }
+  }
+}

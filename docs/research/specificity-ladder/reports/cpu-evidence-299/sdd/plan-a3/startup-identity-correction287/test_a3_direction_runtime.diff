@@ -1,0 +1,40 @@
+--- /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/suite/test_a3_direction_runtime.py
++++ /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/startup-identity-correction287/tests/test_a3_direction_runtime.py
+@@ -1393,7 +1393,9 @@
+ 
+ def test_completed_index_startup_is_measured_conditionally_and_charged_per_job(tmp_path,fake,monkeypatch):
+     from types import SimpleNamespace
++    import os
+     from tests.test_a3_direction_workload import ledger
++    expected_job_id=os.environ.get('SLURM_JOB_ID','injected-cpu');expected_pid=os.getpid()
+     r,d,p=_fake_pilot_inputs(1);inv=r.workload.build_inventory(d,p,stage='prefit')
+     receipt=r.run_pilot(object(),d,p,inv,root=tmp_path,args=SimpleNamespace(pilot_part='prefit',selected=None),guard=lambda:None,startup_seconds=0)
+     target=r.read_object(tmp_path/'pilot-target-inventory'/'prefit');path=tmp_path/'pilot'/'prefit'
+@@ -1408,8 +1410,10 @@
+     assert 'publication_seconds' not in record and cost['publication_seconds']>0
+     assert cost['seconds']>=record['construction']['seconds']+cost['publication_seconds']
+     assert r._object_payload_size(reference)<=r.workload.STARTUP_REFERENCE_BYTES
+-    assert r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')==record
+-    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu',expected_pid=record['process']['pid']+1)
++    assert record['process']['job_id']==expected_job_id and record['process']['pid']==expected_pid
++    assert r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id,expected_pid=expected_pid)==record
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id,expected_pid=expected_pid+1)
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id+':wrong-job',expected_pid=expected_pid)
+     budget=ledger(target);budget['storage_capacities']['host_ram']['available_bytes']=10**12
+     plain=r.workload.project_cost(receipts,target,budget)
+     proposal=r.workload.project_cost(receipts,target,budget,runtime_cost=cost)
+@@ -1453,12 +1457,12 @@
+         dependency_bytes=cost['dependency_bytes_per_refresh'],retained_bytes=cost['retained_bytes'],peak_host_bytes=cost['peak_host_bytes'],
+         conditional=cost['conditional'],source_reference_count=len(cost['pilot_references']),cpu_model=cost['host_profile']['cpu_model'])))
+     marker=Path(reference['path'])/'COMPLETE.json';original_marker=marker.read_bytes();marker.unlink()
+-    with pytest.raises((ValueError,FileNotFoundError)):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')
++    with pytest.raises((ValueError,FileNotFoundError)):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id)
+     with pytest.raises((ValueError,FileNotFoundError)):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
+     marker.write_bytes(original_marker)
+     payload=Path(reference['path'])/'payload.json';payload.write_bytes(payload.read_bytes()+b' ')
+     with pytest.raises(ValueError):index.refresh_dependencies()
+-    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id='injected-cpu')
++    with pytest.raises(ValueError):r._validate_startup_record(reference,d,p,expected_job_id=expected_job_id)
+     with pytest.raises(ValueError):r.read_runtime_rows(d,p,one,tmp_path/'runtime-shards')
+ 
+ 

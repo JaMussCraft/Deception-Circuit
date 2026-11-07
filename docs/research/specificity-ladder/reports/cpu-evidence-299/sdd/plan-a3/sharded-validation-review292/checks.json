@@ -1,0 +1,136 @@
+{
+  "actual_bindings_null": true,
+  "aliases_literal_verified": 8,
+  "candidate_declared_files_including_linked_registry_content": 364,
+  "candidate_links": [
+    "data",
+    "docs/research/directions.json",
+    "docs/research/held_out.json",
+    "outputs/_analyses/specificity-ladder/a1-control-77b6487-m07"
+  ],
+  "candidate_only_changes_from_r6_r2": [
+    "component_analysis/a3_direction_runtime.py",
+    "tests/test_a3_direction_runtime.py",
+    "tests/test_a3_prepared_pilot_target.py"
+  ],
+  "candidate_regular_files": 362,
+  "composition": {
+    "component_analysis/a3_direction_runtime.py": "1d6c3886a7634641a8a4ad64135adeef34dcdac7ce6b388e8441df1bf2cea116",
+    "tests/test_a3_direction_runtime.py": "760cfe9c9aef14b0ab3a0b41eaba526b2aa64376334be1bea5a710978f9c6f23",
+    "tests/test_a3_prepared_pilot_target.py": "2f89de3edb0ac5d513b98c018c6ab1393179b73d9ee67c64d725a064eaa09fb3"
+  },
+  "explicit_file_list_rows_verified": 786,
+  "host_grammar36": true,
+  "inventory_files_hashed": 1133,
+  "mechanical_only_files": [
+    "aggregate.py",
+    "run_packet.py",
+    "fixture_preflight.py",
+    "bridges/host.py",
+    "bridges/transport229.py",
+    "test_packet.py"
+  ],
+  "no_self_hash_cycle": true,
+  "partition_sha256": "88f74d6348e24d828c34b4c9901e988a8c6564eb2ed60e614fe0c1a1e71ddc29",
+  "partition_unchanged_except_revision": true,
+  "prior_terminal_shards": [
+    {
+      "cases": 112,
+      "failures": [
+        "test_prepared_costs_and_envelope_are_charged",
+        "test_prepared_migrated_intake_and_legacy_rejection[missing-preparation]"
+      ],
+      "job": "50319105",
+      "native_acceptance": false,
+      "passed": 110,
+      "source_allocation_final_checks": true
+    },
+    {
+      "cases": 111,
+      "failures": [
+        "test_prepared_migrated_intake_and_legacy_rejection[legacy-no-preparation]",
+        "test_completed_index_startup_is_measured_conditionally_and_charged_per_job"
+      ],
+      "job": "50319108",
+      "native_acceptance": false,
+      "passed": 109,
+      "source_allocation_final_checks": true
+    }
+  ],
+  "raw_pure_evidence": [
+    {
+      "environment": "base",
+      "exit_code": 0,
+      "kind": "green",
+      "receipt_sha256": "b466940be46baa952a0703cd4f2c03d527c287ffcda0d639b7663e25f26b6877"
+    },
+    {
+      "environment": "base",
+      "exit_code": 0,
+      "kind": "packaging",
+      "receipt_sha256": "e39957c3e945a66e9df93b23a2cd621ee3538cde10fab7847df34fac9279fefa"
+    },
+    {
+      "environment": "base",
+      "exit_code": 0,
+      "kind": "observer",
+      "receipt_sha256": "803fa0218cd74e4ead816329a3e94e3f1f180343bf43d373294edec02be7c56e"
+    },
+    {
+      "environment": "base",
+      "exit_code": 0,
+      "kind": "relocated",
+      "receipt_sha256": "12cfc0a8f0890441ca9026a58639e36586985c447bd93505956c40455ce18a76"
+    },
+    {
+      "environment": "mgnp",
+      "exit_code": 0,
+      "kind": "green",
+      "receipt_sha256": "1e7cbd5878a905bf27468c2538149fd3aaf5a0a4552bce9b1e45bf1012e3b11a"
+    },
+    {
+      "environment": "mgnp",
+      "exit_code": 0,
+      "kind": "packaging",
+      "receipt_sha256": "d3aba7fabc996b0c42ac3b69a04322b789abfada1ca944e32914bf7516319098"
+    },
+    {
+      "environment": "mgnp",
+      "exit_code": 0,
+      "kind": "observer",
+      "receipt_sha256": "8db1506b61613f5283b9d0b44083e118c93968a757cf14fb6f771eca6852068e"
+    },
+    {
+      "environment": "mgnp",
+      "exit_code": 0,
+      "kind": "relocated",
+      "receipt_sha256": "4d295f184e75c1d20cffbc5616775d1964991cb63a886a1f19a5b07ae5d00060"
+    }
+  ],
+  "scope": "stdlib hash/AST/metadata only;no nativeimports/fullsuite/scheduleractions",
+  "separate_control": [
+    {
+      "bytes": 360853,
+      "sha256": "e7f83fdef0b56aff85f621c871b3bc1cb60ef0d9f39a2c58baf6f01e94d310ab",
+      "virtual": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded/transport-inventory.json"
+    }
+  ],
+  "source_group_entries_hashed": 1118,
+  "source_pins_sha256": "36de6e5608f1a2350992b8b31aa5d4544b3a2825aa72b1d850bbb330449734e4",
+  "unchanged_files": [
+    "selector.py",
+    "supervisor.py",
+    "test_review272.py",
+    "baseline_red.py",
+    "suite/conftest.py",
+    "baseline-suite/conftest.py",
+    "baseline-suite/test_a3_prepared_pilot_target.py",
+    "bridges/inner.py",
+    "bridges/launch.sh",
+    "closure_preflight.py",
+    "verification-scope.json",
+    "test-groups.json",
+    "expected-bindings.template.json",
+    "cpu.sbatch"
+  ]
+}
