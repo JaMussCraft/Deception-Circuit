@@ -5,9 +5,9 @@
 |---|---|
 | State | Running |
 | Directions | 1. Control ladder: Complete and independently audited; tested sets fail specificity. · 2. Matched masks: All eighteen complete and source-audited; functional scoring preparation continues. · 3. Below-head tests: Mask timing failed at its bound; direction preparation and edge readiness continue. |
-| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Fri 6 Nov 2026, 11:57 pm EST |
-| Orchestrator auto-compactions | 16, counted by the compaction hook |
-| Weekly usage, all models | account reads 32%; +47 points this session |
+| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Sat 7 Nov 2026, 1:19 am EST |
+| Orchestrator auto-compactions | 17, counted by the compaction hook |
+| Weekly usage, all models | account reads 35%; +50 points this session |
 | Weekly usage, Fable | no Fable reading |
 | Review checkpoints | 2 of 2 acknowledged; next at +120 session points; cadence 40 points; cap pause at 80% |
 | GPU budget | 20.0 of 125 GPU-h actual (34.4 reserved); at most 99 jobs at once; clusters: Delta, Bridges-2 |
@@ -15,7 +15,7 @@
 | Open needs from you | 0 |
 | Transcripts (for audits) | not recorded yet |
 
-**Right now.** The full-scoring CPU resource proof is complete and independently accepted. Below-head integration validation is running on Bridges, with its intended baseline passed; required Delta checks remain queued. The fresh-process timing diagnostic has passed source review. A small exact-interpreter transport is being designed for fixture-only checks while existing jobs remain intact. Actual validation, timing and numerical results still precede model admission.
+**Right now.** The full-scoring CPU resource proof is complete and independently accepted. Below-head integration reached its test limit after six assertion failures; a focused unchanged-source diagnostic is being packaged. Required Delta checks remain queued. An exact-interpreter compatibility probe is being implemented for fixture-only tests on Bridges. Actual validation, handoff timing and numerical results still precede model admission.
 
 **Terms.** None yet.
 
@@ -347,3 +347,8 @@ Strength is one of: preliminary, reviewed by an independent agent, or final.
 **11:39 pm EST · Process incident P31.** Root added a scheduler-supported preemptible partition without checking the short regression observer allocation guard. Effect: The unchanged observer would reject that partition even though Slurm accepted the request. Neither affected job started there. Fix: Remove preemptible eligibility from the restored unstarted regression and preserve the original guard. Check both scheduler support and application allocation contracts before placement changes.
 **11:47 pm EST · Corrected full CPU resource proof completed normally.** The corrected CPU proof completed normally, including the final host source, allocation and memory checks. All expected schema rows and control-pair keys are recorded, and the completion evidence is preserved for independent audit. These are full-workload resource and serialization measurements, not numerical control passes or model effects. Fresh handoff timing and full-scoring implementation remain separate gates.
 **11:57 pm EST · Hand-back: Full CPU resource proof accepted independently.** Independent audit accepted the complete CPU proof, including every expected row and control-pair key, final guards, memory and serialized-output bounds. The proposed five-and-a-half-hour scoring request remains conditionally supported by measured costs and its stated allowance. This closes the normal CPU proof requirement. It does not establish the short handoff deadline, numerical controls or permission to load a model.
+
+### Saturday 7 November 2026
+**12:36 am EST · Metadata integration reached its test limit with assertion failures.** The intended baseline and original reference preflight completed normally. The implementation suite then reached its fixed time limit after reporting six failures; it produced no complete test report. Preserve the run without accepting partial passes. A focused unchanged-source diagnostic will record those failure traces and the possible slow case, while the independent fixture transport work proceeds.
+**1:14 am EST · Resumed after compaction #7.**
+**1:19 am EST · Full-score CPU task accepted; implementation and timing advanced.**

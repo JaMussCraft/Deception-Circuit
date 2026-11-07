@@ -1996,8 +1996,8 @@
         "NODE_FAIL"
       ],
       "job_id": "50316975",
-      "last_progress_at": "2026-11-06T23:27:59-05:00",
-      "status": "RUNNING",
+      "last_progress_at": "2026-11-07T00:22:10-05:00",
+      "status": "FAILED",
       "submitted_at": "2026-11-06T23:20:59-05:00",
       "waiter": "timeout 60m sh -c 'until ssh -o BatchMode=yes bridges2 sacct -j 50316975 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     },
@@ -2012,13 +2012,45 @@
         "NODE_FAIL"
       ],
       "job_id": "23623058",
-      "last_progress_at": "2026-11-06T23:36:45-05:00",
-      "status": "PENDING",
+      "last_progress_at": "2026-11-07T01:15:33-05:00",
+      "status": "COMPLETED",
       "submitted_at": "2026-11-06T23:36:45-05:00",
       "waiter": "timeout 60m sh -c 'until sacct -j 23623058 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23624978",
+      "last_progress_at": "2026-11-07T01:18:39-05:00",
+      "status": "PENDING",
+      "submitted_at": "2026-11-07T01:18:39-05:00",
+      "waiter": "timeout 30m sh -c 'until sacct -j 23624978 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23625160",
+      "last_progress_at": "2026-11-07T01:28:22-05:00",
+      "status": "PENDING",
+      "submitted_at": "2026-11-07T01:28:22-05:00",
+      "waiter": "timeout 30m sh -c 'until sacct -j 23625160 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     }
   ],
-  "last_worklog_entry_at": "2026-11-06T23:57:26-05:00",
+  "last_worklog_entry_at": "2026-11-07T01:19:29-05:00",
   "schema": 1,
   "session_state": "running",
   "sessions": {
@@ -2637,6 +2669,36 @@
           "agent_type": "explorer",
           "started_at": "2026-11-06T23:49:36-05:00",
           "stop_blocks": 1
+        },
+        "01a1b472-449c-7130-b762-98bd42779369": {
+          "agent_type": "default",
+          "started_at": "2026-11-07T00:19:11-05:00",
+          "stop_blocks": 1
+        },
+        "01a1b480-b113-7bb3-b009-06377022a046": {
+          "agent_type": "worker",
+          "started_at": "2026-11-07T00:34:56-05:00",
+          "stop_blocks": 1
+        },
+        "01a1b480-fe28-7bc1-8a81-224795042ccf": {
+          "agent_type": "worker",
+          "started_at": "2026-11-07T00:35:16-05:00",
+          "stop_blocks": 1
+        },
+        "01a1b48f-6063-7053-85c2-618ab8b11023": {
+          "agent_type": "default",
+          "started_at": "2026-11-07T00:50:59-05:00",
+          "stop_blocks": 0
+        },
+        "01a1b4a6-b57b-7fe2-90fb-e567b84e9559": {
+          "agent_type": "worker",
+          "started_at": "2026-11-07T01:16:29-05:00",
+          "stop_blocks": 0
+        },
+        "01a1b4a8-4ba7-7163-a3e6-32f7aff82d50": {
+          "agent_type": "worker",
+          "started_at": "2026-11-07T01:18:12-05:00",
+          "stop_blocks": 1
         }
       },
       "checkpoints": [
@@ -2689,9 +2751,14 @@
           "at": "2026-11-06T23:01:36-05:00",
           "n": 6,
           "trigger": null
+        },
+        {
+          "at": "2026-11-07T01:14:08-05:00",
+          "n": 7,
+          "trigger": null
         }
       ],
-      "compactions": 6,
+      "compactions": 7,
       "cwd": "/projects/beto/swong2/Alignment",
       "orchestrator_model": "gpt-6-astra",
       "session_id": "01a1a2f4-dbc1-7551-bf86-d1d0f99ad6e2",
@@ -2717,8 +2784,8 @@
           "fable": null,
           "five_hour": null,
           "fresh": true,
-          "read_at": "2026-11-06T23:56:45-05:00",
-          "seven_day": 32
+          "read_at": "2026-11-07T01:21:42-05:00",
+          "seven_day": 36
         },
         "metric": "codex weekly",
         "next_checkpoint": 3,
@@ -2732,11 +2799,11 @@
           },
           {
             "baseline": 0,
-            "last": 32,
+            "last": 36,
             "resets_at": 1794586709
           }
         ],
-        "session_points": 48,
+        "session_points": 52,
         "stale_ok_until": null
       }
     }
