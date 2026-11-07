@@ -1,6 +1,6 @@
 # Resume: neuron-partition
 
-Last rewritten: Wed 4 Nov 2026, 1:00 pm EST by claude-5201d56c, after the four pre-registered follow-ups and their reviews.
+Last rewritten: Sat 7 Nov 2026, 9:50 am EST by claude-5201d56c, during wrap-up (merge on hold).
 
 ## Status
 
@@ -41,16 +41,15 @@ completed).
 
 ## Next action
 
-1. Done 4 Nov 2026, 1:00 pm EST: reviews 07 and 08 folded into R20 and R21; F9 and F10 reviewed; report 13
-   final.
-2. The user decides what follows (options in report 13 section 5): a SER ladder at smaller sizes, an all-forms
-   SER run, a FAR ladder above 750, or wrap-up. New runs need a new pre-registered ruling.
-3. Done 4 Nov 2026, 1:05 pm EST: the clone's `logs/` entries for jobs 50182995, 50183187, 50183194, 50212883 and
-   50213549 are copied to `outputs/_analyses/neuron-partition/bridges2_logs/` in the worktree (they move to the
-   primary checkout with the other outputs at wrap-up). The ablation outputs were fetched by the runners when each
-   job finished.
-4. Wrap-up when the user says so: merge the branch into main, delete branch and worktree, keep the worktree's
-   untracked outputs under the primary checkout, copy the Bridges-2 outputs and logs to Delta.
+Wrap-up began Sat 7 Nov 2026 at the user's request. Done so far: `README.md` written; rows F-np-001 to F-np-010
+added to `docs/research/FINDINGS.md` (findings-check clean); the worktree's `outputs/_analyses/neuron-partition/`
+(2.2 GB) and its Slurm logs copied into the primary checkout at the same paths and verified by checksum; the
+Bridges-2 ablation outputs verified identical to the Delta copies by summary hashes. On hold because another agent
+is merging onto main: (1) `research-session release neuron-partition --status paused`, `render` and
+`ledger-rollup`, and the commit of the tool-owned records in the primary checkout; (2) fast-forward merge of this
+branch into main and push; (3) delete the branch locally and on origin and remove the worktree; (4) final worklog
+entry and state Closed. The user says when main is free. Release status `paused` is proposed because the options
+below are open; the user may choose `done`.
 
 ## Do not
 
