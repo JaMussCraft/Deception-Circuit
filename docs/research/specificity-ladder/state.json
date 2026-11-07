@@ -1980,8 +1980,8 @@
         "NODE_FAIL"
       ],
       "job_id": "23622800",
-      "last_progress_at": "2026-11-06T23:20:09-05:00",
-      "status": "PENDING",
+      "last_progress_at": "2026-11-07T03:29:36-05:00",
+      "status": "CANCELLED",
       "submitted_at": "2026-11-06T23:20:09-05:00",
       "waiter": "timeout 60m sh -c 'until sacct -j 23622800 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     },
@@ -2044,8 +2044,8 @@
         "NODE_FAIL"
       ],
       "job_id": "23625160",
-      "last_progress_at": "2026-11-07T01:28:22-05:00",
-      "status": "PENDING",
+      "last_progress_at": "2026-11-07T03:29:36-05:00",
+      "status": "CANCELLED",
       "submitted_at": "2026-11-07T01:28:22-05:00",
       "waiter": "timeout 30m sh -c 'until sacct -j 23625160 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     },
@@ -2064,9 +2064,89 @@
       "status": "COMPLETED",
       "submitted_at": "2026-11-07T01:34:08-05:00",
       "waiter": "timeout 40m sh -c 'until ssh -o BatchMode=yes bridges2 sacct -j 50318613 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "bridges2",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "50319105",
+      "last_progress_at": "2026-11-07T03:29:17-05:00",
+      "status": "RUNNING",
+      "submitted_at": "2026-11-07T03:17:05-05:00",
+      "waiter": "timeout 60m sh -c 'until ssh -o BatchMode=yes bridges2 sacct -j 50319105 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "bridges2",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "50319108",
+      "last_progress_at": "2026-11-07T03:29:18-05:00",
+      "status": "RUNNING",
+      "submitted_at": "2026-11-07T03:18:09-05:00",
+      "waiter": "timeout 60m sh -c 'until ssh -o BatchMode=yes bridges2 sacct -j 50319108 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23631878",
+      "last_progress_at": "2026-11-07T03:19:36-05:00",
+      "status": "PENDING",
+      "submitted_at": "2026-11-07T03:19:36-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23631878 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23631880",
+      "last_progress_at": "2026-11-07T03:20:00-05:00",
+      "status": "PENDING",
+      "submitted_at": "2026-11-07T03:20:00-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23631880 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
+    },
+    {
+      "cluster": "delta",
+      "expected_terminal": [
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED",
+        "TIMEOUT",
+        "OUT_OF_MEMORY",
+        "NODE_FAIL"
+      ],
+      "job_id": "23632112",
+      "last_progress_at": "2026-11-07T03:23:21-05:00",
+      "status": "PENDING",
+      "submitted_at": "2026-11-07T03:23:21-05:00",
+      "waiter": "timeout 60m sh -c 'until sacct -j 23632112 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'"
     }
   ],
-  "last_worklog_entry_at": "2026-11-07T02:44:24-05:00",
+  "last_worklog_entry_at": "2026-11-07T03:29:36-05:00",
   "schema": 1,
   "session_state": "running",
   "sessions": {
@@ -2735,6 +2815,16 @@
           "agent_type": "worker",
           "started_at": "2026-11-07T02:06:34-05:00",
           "stop_blocks": 1
+        },
+        "01a1b515-a426-7c50-9fc6-bc093a1c7e17": {
+          "agent_type": "default",
+          "started_at": "2026-11-07T03:17:38-05:00",
+          "stop_blocks": 0
+        },
+        "01a1b522-8081-76e0-9663-533d5446d3d2": {
+          "agent_type": "explorer",
+          "started_at": "2026-11-07T03:31:41-05:00",
+          "stop_blocks": 1
         }
       },
       "checkpoints": [
@@ -2792,9 +2882,14 @@
           "at": "2026-11-07T01:14:08-05:00",
           "n": 7,
           "trigger": null
+        },
+        {
+          "at": "2026-11-07T03:14:03-05:00",
+          "n": 8,
+          "trigger": null
         }
       ],
-      "compactions": 7,
+      "compactions": 8,
       "cwd": "/projects/beto/swong2/Alignment",
       "orchestrator_model": "gpt-6-astra",
       "session_id": "01a1a2f4-dbc1-7551-bf86-d1d0f99ad6e2",
@@ -2820,8 +2915,8 @@
           "fable": null,
           "five_hour": null,
           "fresh": true,
-          "read_at": "2026-11-07T02:40:54-05:00",
-          "seven_day": 41
+          "read_at": "2026-11-07T03:33:43-05:00",
+          "seven_day": 43
         },
         "metric": "codex weekly",
         "next_checkpoint": 3,
@@ -2835,11 +2930,11 @@
           },
           {
             "baseline": 0,
-            "last": 41,
+            "last": 43,
             "resets_at": 1794586709
           }
         ],
-        "session_points": 57,
+        "session_points": 59,
         "stale_ok_until": null
       }
     }

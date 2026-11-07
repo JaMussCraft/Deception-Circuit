@@ -1,0 +1,217 @@
+{
+  "actual_mount_check_all_three_stages_pass": true,
+  "all_four_final_readbacks_passed": true,
+  "control_inventory_separately_authenticated": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r6-r2-sharded/transport-inventory.json",
+    "sha256": "0d35b0ed94c5e5eb0759adee9add614bbe21842a9d66d34e121aaa87bf17dd9c"
+  },
+  "deployment_manifest_sha256": "0da6a11ee021622a4fc153db3dc2d702c663cf55230ee885f2ad45135031bcdc",
+  "final_readback_helper": {
+    "path": "/tmp/lad-a3-release273.py",
+    "sha256": "7e4ef95d0fa9d1b969d6ddd04551798e14f7889779e350f97d283cfa8c39adcf"
+  },
+  "final_readbacks_checked": [
+    {
+      "canonical_owned_empty_child_absent": true,
+      "fresh_spool_pointer_source_scheduler_checks": true,
+      "job_id": "23631878",
+      "mode": "0o2700",
+      "permission_bits": "0o700",
+      "receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/base-0/final-readback.json",
+      "sha256": "255fd58589a1d35a7d8b9a32cf515fd6771d2d92d9017de84ca08059004b1433",
+      "slot": "base-0"
+    },
+    {
+      "canonical_owned_empty_child_absent": true,
+      "fresh_spool_pointer_source_scheduler_checks": true,
+      "job_id": "23631880",
+      "mode": "0o2700",
+      "permission_bits": "0o700",
+      "receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/base-1/final-readback.json",
+      "sha256": "53ec17fb3886f2afaadecc53c8596b464b87d07202143ae084f1320bd8655f13",
+      "slot": "base-1"
+    },
+    {
+      "canonical_owned_empty_child_absent": true,
+      "fresh_spool_pointer_source_scheduler_checks": true,
+      "job_id": "50319105",
+      "mode": "0o2700",
+      "permission_bits": "0o700",
+      "receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/mgnp-0/final-readback.json",
+      "sha256": "41f8a2a8d7d44f4ec2c32a02afef52e570c17fa2764460d07c029f66c364d0ba",
+      "slot": "mgnp-0"
+    },
+    {
+      "canonical_owned_empty_child_absent": true,
+      "fresh_spool_pointer_source_scheduler_checks": true,
+      "job_id": "50319108",
+      "mode": "0o2700",
+      "permission_bits": "0o700",
+      "receipt": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment273/mgnp-1/final-readback.json",
+      "sha256": "8d7bdde18028cb14b62cce723622c62f0456bd07fe91781da8dac2182119535d",
+      "slot": "mgnp-1"
+    }
+  ],
+  "initial_failures_preserved": true,
+  "jobs": [
+    {
+      "account": "beto-delta-cpu",
+      "aliases_checked": 8,
+      "cluster": "delta",
+      "config_sha256": "6b2b15f884422b64a4d4d07ddad7f743550e99ac61cf6d2dfcf04d48bb6fc8a8",
+      "cpus": 2,
+      "environment": "base",
+      "job_id": "23631878",
+      "memory_gib": 32,
+      "partition": "cpu-preempt",
+      "qos": "beto-delta-cpu",
+      "root_empty_owner_verified": true,
+      "root_mode_observation": {
+        "final_readback_verified": true,
+        "inherited_setgid": true,
+        "permission_bits": "0o700",
+        "raw": "0o2700"
+      },
+      "seconds": 4800,
+      "shard": 0,
+      "source_files_checked": 1133,
+      "spool_sha256": "d0ff305fd6826b0e083c26ce7da42c8f565c8900abacb6a5cfdbb72a86c25260"
+    },
+    {
+      "account": "beto-delta-cpu",
+      "aliases_checked": 8,
+      "cluster": "delta",
+      "config_sha256": "0e639498c473aceef3ff169187a3cb1a316a573117defea965e073aa5a10408e",
+      "cpus": 2,
+      "environment": "base",
+      "job_id": "23631880",
+      "memory_gib": 32,
+      "partition": "cpu-preempt",
+      "qos": "beto-delta-cpu",
+      "root_empty_owner_verified": true,
+      "root_mode_observation": {
+        "final_readback_verified": true,
+        "inherited_setgid": true,
+        "permission_bits": "0o700",
+        "raw": "0o2700"
+      },
+      "seconds": 4800,
+      "shard": 1,
+      "source_files_checked": 1133,
+      "spool_sha256": "5ea73d4be3e3914910c7b676e6d97fbe97228c2eacc6c01ab4e3535052c0f6fb"
+    },
+    {
+      "account": "cis260361p",
+      "aliases_checked": 8,
+      "cluster": "bridges2",
+      "config_sha256": "13669a21507d998c679262c4135100d098bfd92bb921199a748e210b8ab00a97",
+      "cpus": 18,
+      "environment": "mgnp",
+      "job_id": "50319105",
+      "memory_gib": 32,
+      "partition": "RM-shared",
+      "qos": "rm",
+      "root_empty_owner_verified": true,
+      "root_mode_observation": {
+        "final_readback_verified": true,
+        "inherited_setgid": true,
+        "permission_bits": "0o700",
+        "raw": "0o2700"
+      },
+      "seconds": 4800,
+      "shard": 0,
+      "source_files_checked": 1133,
+      "spool_sha256": "cce667109a64a29432c19a18914b6ab7eb6c1dab38fe16abd76d5f39fa1c33e7"
+    },
+    {
+      "account": "cis260361p",
+      "aliases_checked": 8,
+      "cluster": "bridges2",
+      "config_sha256": "908fcbf7340d71c4f8a385b329b316fb35837edaaae21a08077d6e07925af2ff",
+      "cpus": 18,
+      "environment": "mgnp",
+      "job_id": "50319108",
+      "memory_gib": 32,
+      "partition": "RM-shared",
+      "qos": "rm",
+      "root_empty_owner_verified": true,
+      "root_mode_observation": {
+        "final_readback_verified": true,
+        "inherited_setgid": true,
+        "permission_bits": "0o700",
+        "raw": "0o2700"
+      },
+      "seconds": 4800,
+      "shard": 1,
+      "source_files_checked": 1133,
+      "spool_sha256": "2077eabb594c328b648678d258b0da141bc1bb8df1ea34a4277f1fddf9c7fe91"
+    }
+  ],
+  "no_native_acceptance": true,
+  "observed_cgroup_RO_flags": {
+    "memory": 4111,
+    "root": 15
+  },
+  "per_job_budget": {
+    "baseline": 610,
+    "final": 120,
+    "oracle": 90,
+    "overhead": 360,
+    "single_cleanup": 20,
+    "suite": 3600,
+    "sum": 4800
+  },
+  "receipt_sha256": {
+    "actual-host-container-check-r2.json": "11ac454427cac1c5b0410c97f6f4f12d14aa7de90fda929accf652e9b8d2b6a6",
+    "actual-host-container-check.json": "d1b8285a78e0fd726603524a39cd4e17b96f1106fc5247b417af96fc79225925",
+    "base-0/binding.json": "b42abe4d7f08faecc0bff57e43d4e0df0c2236f6a96a5ae142906852602dbe53",
+    "base-0/config.json": "6b2b15f884422b64a4d4d07ddad7f743550e99ac61cf6d2dfcf04d48bb6fc8a8",
+    "base-0/config.sha256": "ea673b29fad8c456a1d7cf50c652c402eb089cc71f42c3f2d574af0930989afc",
+    "base-0/dispatch.sh": "d0ff305fd6826b0e083c26ce7da42c8f565c8900abacb6a5cfdbb72a86c25260",
+    "base-0/job.json": "89d3ff597808a03526e212ac5b1c04ff709ca61a0305da8ab9237b5f9b97b2c3",
+    "base-0/registration.json": "c754493a7bba294baa36ba4ffff43ff5db3c5d460d1cca461983c71ba26d9ec1",
+    "base-0/submission.json": "cd98251dfa7b1ad7f82e40a6ee66359bbedd9f04369bd74c3b2a717968e9dccd",
+    "base-0/submitted-script.sh": "d0ff305fd6826b0e083c26ce7da42c8f565c8900abacb6a5cfdbb72a86c25260",
+    "base-1/binding.json": "86087b68c61d387960e0c0761c3e1337d57971e00534132736c2624fba69bd7a",
+    "base-1/config.json": "0e639498c473aceef3ff169187a3cb1a316a573117defea965e073aa5a10408e",
+    "base-1/config.sha256": "caca8f8da9465cfaacf2023f4006945cd6f8c2b3a806ed8fd1cdcf43dcae50b0",
+    "base-1/dispatch.sh": "5ea73d4be3e3914910c7b676e6d97fbe97228c2eacc6c01ab4e3535052c0f6fb",
+    "base-1/job.json": "f1da65c9ffa67abce7f898deef2d56c717ac74891a57ee1033570ceccd5c286e",
+    "base-1/registration.json": "24ea5591a7ec4e82ec85482771cfc04040c227aef5c4be172821be57ce6df0bb",
+    "base-1/submission.json": "2d5a33c13a821b95e7158b7083a191dd8ee697970d25360dfcf2d916001ae393",
+    "base-1/submitted-script.sh": "5ea73d4be3e3914910c7b676e6d97fbe97228c2eacc6c01ab4e3535052c0f6fb",
+    "bridges-scheduler-preview.json": "680cd100903018798efe1503dcb32e73166be01f0dd3be659472d79a15a4c0c9",
+    "bridges-submission-argv.json": "5672d3b16ba410b8765658b83b948029d075ea8707e8741bdfc15c101fe984b5",
+    "control-manifest-inventory.json": "8f70338cdef9ed5f6180853101cb634db6449956ee84a748df7dc16e6e92cdd2",
+    "control-manifest-stage.json": "c25a779c5e8ac02e5416ddfb1518b7de9894bd3fcf3bcd0779cbe5ab02dfb794",
+    "delta-scheduler-previews.json": "b9d4e6e0c819b1d58cca6046789fdd3960c0bbec6c2ed5148f7e1c0720dd5c2f",
+    "deployment-manifest.json": "0da6a11ee021622a4fc153db3dc2d702c663cf55230ee885f2ad45135031bcdc",
+    "input-inventory.json": "23e5795cb7b3b2ed8289dcdd8ea6c26e3e093147594613d808ba363e57866380",
+    "mgnp-0/binding-r2.json": "f4fb92fdb869523675db09e48cdbbb47ec4f117819784cd2e7018b006b074a7f",
+    "mgnp-0/binding.json": "8141a1f981d1dd873f8d32c33eccd140ddf95fa66f3f5214418ec2e6a3f670b0",
+    "mgnp-0/config.json": "13669a21507d998c679262c4135100d098bfd92bb921199a748e210b8ab00a97",
+    "mgnp-0/config.sha256": "7b2763747737206c53e15429d5d4fdf84e03abc52b682a46172da150c41b19bd",
+    "mgnp-0/dispatch.sh": "cce667109a64a29432c19a18914b6ab7eb6c1dab38fe16abd76d5f39fa1c33e7",
+    "mgnp-0/job.json": "2ed745c03d33a148c1eb93eec36404f14e138c508dbe3c81b211e3d81778e5d0",
+    "mgnp-0/registration.json": "fafa733fb508d2df108ea4a490ebce146efa6367da54728acef7c56f804bda53",
+    "mgnp-0/submission.json": "490ef5e278a2937cc3105eec7b13ba43a54def93c1eaf40ac552d5d2ddd8bb88",
+    "mgnp-1/binding.json": "f6382f6db7c3a5afa500ee56f565b607791efd9363f8b4f82fc49c82841d4a0a",
+    "mgnp-1/config.json": "908fcbf7340d71c4f8a385b329b316fb35837edaaae21a08077d6e07925af2ff",
+    "mgnp-1/config.sha256": "4aa8270bbb351b1f5b67d99773370dfe22facd527c4113daa44add78eecc5337",
+    "mgnp-1/dispatch.sh": "2077eabb594c328b648678d258b0da141bc1bb8df1ea34a4277f1fddf9c7fe91",
+    "mgnp-1/job.json": "1191ad4803b483de8aa9f0d99e5518286259ac7f63a743de29cdb0b2bc121551",
+    "mgnp-1/registration.json": "8adbd8b5730faa4ab828d681fbe97b628b78af1c258cb53ac73657fbe1fc14b3",
+    "mgnp-1/submission.json": "b97b7f4163b31c78eb16310a60c599644207c0abff7e03757204c86440dd6441",
+    "remote-input-audit.json": "4818ebe84dd0090d945400dc0b85962b27adaf8a0e5ae9042a5d9fa8578d9262",
+    "stage-readback.json": "326f8df7b058adfeec0ec5de1d6935ab86fe06f51a1472adb496d682f772bde9"
+  },
+  "remote_closure": {
+    "aliases": 8,
+    "initial_matched": 740,
+    "missing_staged": 393,
+    "total": 1133
+  },
+  "root_mode_note": "Observed raw0o2700 includes inherited setgid; permission bits0o700 provide no group/other access.",
+  "source_manifest_refs_verified": true,
+  "source_review": "272-r2"
+}

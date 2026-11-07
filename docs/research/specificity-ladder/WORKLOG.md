@@ -5,9 +5,9 @@
 |---|---|
 | State | Running |
 | Directions | 1. Control ladder: Complete and independently audited; tested sets fail specificity. · 2. Matched masks: All eighteen complete and source-audited; functional scoring preparation continues. · 3. Below-head tests: Mask timing failed at its bound; direction preparation and edge readiness continue. |
-| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Sat 7 Nov 2026, 2:48 am EST |
-| Orchestrator auto-compactions | 17, counted by the compaction hook |
-| Weekly usage, all models | account reads 41%; +56 points this session |
+| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Sat 7 Nov 2026, 3:29 am EST |
+| Orchestrator auto-compactions | 18, counted by the compaction hook |
+| Weekly usage, all models | account reads 43%; +58 points this session |
 | Weekly usage, Fable | no Fable reading |
 | Review checkpoints | 2 of 2 acknowledged; next at +120 session points; cadence 40 points; cap pause at 80% |
 | GPU budget | 20.0 of 125 GPU-h actual (34.4 reserved); at most 99 jobs at once; clusters: Delta, Bridges-2 |
@@ -15,7 +15,7 @@
 | Open needs from you | 0 |
 | Transcripts (for audits) | not recorded yet |
 
-**Right now.** The full-score CPU task passed both environments; its native timing run remains queued while the root release helper is implemented. The focused metadata diagnostic isolated faulty test setup and completed the suspected slow case. Corrected tests are accepted for a complete validation packet, now under focused source correction before CPU deployment.
+**Right now.** A3 corrected complete metadata validation is running on Bridges, with matching BASE shards queued on Delta. A2 complete root-helper validation and fresh-process timing are released on Delta. Process actual results and independent reviews while preparing the next already authorized gates; no model admission yet.
 
 **Terms.** None yet.
 
@@ -360,3 +360,7 @@ Strength is one of: preliminary, reviewed by an independent agent, or final.
 **2:04 am EST · Delta waits continued; complete metadata validation preparation advanced.**
 **2:25 am EST · Diagnostic separated fixture faults from accumulated validation time.**
 **2:44 am EST · Brief orchestration checks unblocked full-score implementation.**
+**3:15 am EST · Resumed after compaction #8.** Recovered the accepted corrected validation source and existing deployment receipts without restarting finished work. Actual container smoke stopped on an incomplete root test configuration before a workload ran; correct that smoke configuration while preserving its failed receipt. Full-score implementation continues independently. Live weekly usage is forty-two percent; cadence forty and cap eighty remain.
+**3:22 am EST · Hand-back: Corrected complete metadata validation source accepted.** Independent review accepted the corrected split validation packet. Actual container checks now preserve host receipts outside the writable child output, and source checks passed on both clusters. Four CPU shards are held for deployment review, preserving every original test and reference control. No native validation result or model admission has been claimed.
+**3:22 am EST · Hand-back: Full-score root helper ready for CPU validation.** Independent source review found no blocker in the full-score root helper, including fixed deadlines, actual remote ownership and live usage controls. The complete validation retains the historical baseline and all new integration cases in both normal Python environments. Root is preparing its bounded CPU run; operational scoring and GPU permission remain gated.
+**3:29 am EST · Reviewed replacement validation is running on Bridges.** Both corrected metadata validation shards started on separate Bridges compute nodes after deployment review and final live checks. The matching Delta shards and complete full-score helper validation are released but queued. Root cancelled two superseded CPU jobs only after confirming neither had started, preserving their source and history. No GPU charge or model execution was added.
