@@ -1,0 +1,1150 @@
+{
+  "active_packet_edited": false,
+  "active_packet_pins_sha256": "4300cdabd1b612e228761b7b4ea204a023ff29121c5ddcd265cb211345ab4761",
+  "actual_job": "23637408",
+  "actual_result": {
+    "actual_GPU_authority": false,
+    "actual_job_id": "23637408",
+    "actual_resource_bindings": false,
+    "cluster": "delta",
+    "complete": false,
+    "observations": [
+      {
+        "argv": [
+          "/sw/external/python/anaconda3/bin/python3.9",
+          "-B",
+          "-m",
+          "pytest",
+          "-c",
+          "/dev/null",
+          "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests",
+          "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp",
+          "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39.xml",
+          "-q",
+          "--tb=short",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py"
+        ],
+        "complete": false,
+        "elapsed_seconds": 327.3494748210069,
+        "environment": "base39",
+        "error_names": [],
+        "exit_code": 1,
+        "failed_names": [
+          "test_whole_chain_normal_native_full_publication",
+          "test_transfer_failure_cannot_cross_score_boundary[catalogue]",
+          "test_transfer_failure_cannot_cross_score_boundary[CPU]",
+          "test_transfer_failure_cannot_cross_score_boundary[SIF]",
+          "test_transfer_failure_cannot_cross_score_boundary[ledger]",
+          "test_transfer_failure_cannot_cross_score_boundary[WAITING]",
+          "test_transfer_failure_cannot_cross_score_boundary[cache]",
+          "test_entry_failure_has_zero_score_calls[postactivation]",
+          "test_entry_failure_has_zero_score_calls[catalogue]",
+          "test_entry_failure_has_zero_score_calls[bank]",
+          "test_entry_failure_has_zero_score_calls[release]",
+          "test_entry_failure_has_zero_score_calls[existing-score]",
+          "test_entry_failure_has_zero_score_calls[null-resource]",
+          "test_entry_failure_has_zero_score_calls[config]",
+          "test_entry_failure_has_zero_score_calls[WAITING]",
+          "test_entry_failure_has_zero_score_calls[expired]",
+          "test_entry_failure_has_zero_score_calls[old-authority]",
+          "test_entry_failure_has_zero_score_calls[short-allocation]",
+          "test_consumed_partial_is_preserved_and_never_retried",
+          "test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI"
+        ],
+        "identity": {
+          "minor": [
+            3,
+            9
+          ],
+          "optimize": 0,
+          "pytest": "8.3.3",
+          "pytest_origin": "/u/swong2/.local/lib/python3.9/site-packages/pytest/__init__.py",
+          "python": "3.9.18 (main, Sep 11 2023, 13:41:44) \n[GCC 11.2.0]"
+        },
+        "junit_sha256": "bfeb0743e0c783ffa63e8be5310aeedf527417c046da18234f629a2ac698a4cf",
+        "passed": 13,
+        "skipped_names": [],
+        "tests": 33
+      },
+      {
+        "argv": [
+          "/u/swong2/.conda/envs/mgnp/bin/python",
+          "-B",
+          "-m",
+          "pytest",
+          "-c",
+          "/dev/null",
+          "--rootdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests",
+          "--confcutdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests",
+          "-p",
+          "no:cacheprovider",
+          "--basetemp=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp",
+          "--junitxml=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp.xml",
+          "-q",
+          "--tb=short",
+          "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-correction312/packet-r3/candidate/tests/test_full_score_integration.py"
+        ],
+        "complete": false,
+        "elapsed_seconds": 329.9949572439946,
+        "environment": "mgnp",
+        "error_names": [],
+        "exit_code": 1,
+        "failed_names": [
+          "test_whole_chain_normal_native_full_publication",
+          "test_transfer_failure_cannot_cross_score_boundary[catalogue]",
+          "test_transfer_failure_cannot_cross_score_boundary[CPU]",
+          "test_transfer_failure_cannot_cross_score_boundary[SIF]",
+          "test_transfer_failure_cannot_cross_score_boundary[ledger]",
+          "test_transfer_failure_cannot_cross_score_boundary[WAITING]",
+          "test_transfer_failure_cannot_cross_score_boundary[cache]",
+          "test_entry_failure_has_zero_score_calls[postactivation]",
+          "test_entry_failure_has_zero_score_calls[catalogue]",
+          "test_entry_failure_has_zero_score_calls[bank]",
+          "test_entry_failure_has_zero_score_calls[release]",
+          "test_entry_failure_has_zero_score_calls[existing-score]",
+          "test_entry_failure_has_zero_score_calls[null-resource]",
+          "test_entry_failure_has_zero_score_calls[config]",
+          "test_entry_failure_has_zero_score_calls[WAITING]",
+          "test_entry_failure_has_zero_score_calls[expired]",
+          "test_entry_failure_has_zero_score_calls[old-authority]",
+          "test_entry_failure_has_zero_score_calls[short-allocation]",
+          "test_consumed_partial_is_preserved_and_never_retried",
+          "test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI"
+        ],
+        "identity": {
+          "minor": [
+            3,
+            12
+          ],
+          "optimize": 0,
+          "pytest": "9.1.1",
+          "pytest_origin": "/u/swong2/.conda/envs/mgnp/lib/python3.12/site-packages/pytest/__init__.py",
+          "python": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]"
+        },
+        "junit_sha256": "032dada42d30939491c3bfee9bec4d8ef1ab8a74946904748462baafa52f9552",
+        "passed": 13,
+        "skipped_names": [],
+        "tests": 33
+      }
+    ],
+    "scientific_rows_produced": 0,
+    "status": "FAIL"
+  },
+  "case_groups": {
+    "base39": {
+      "errors": 0,
+      "failed": 20,
+      "groups": {
+        "direct_lineage": 13,
+        "stage_not_reached": 6,
+        "stale_geometry": 1
+      },
+      "passed": 13,
+      "skips": 0,
+      "tests": 33
+    },
+    "mgnp": {
+      "errors": 0,
+      "failed": 20,
+      "groups": {
+        "direct_lineage": 13,
+        "stage_not_reached": 6,
+        "stale_geometry": 1
+      },
+      "passed": 13,
+      "skips": 0,
+      "tests": 33
+    }
+  },
+  "downstream_sweep": {
+    "WAITING_contract": "All38 diagnosed publish-bound artifacts retain exact raw copy and expected hashes; regression33 passed.",
+    "current_grader_projection": [
+      {
+        "foreign_declarations_match": true,
+        "own_entry_matches": true,
+        "route": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/docs/research/directions.json",
+        "top_matches": true
+      },
+      {
+        "foreign_declarations_match": true,
+        "own_entry_matches": true,
+        "route": "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/directions.json",
+        "top_matches": true
+      }
+    ],
+    "native_remaining": "Runtime source hashes, referenced all18 comparison, complete bank contract/tokenizer/numerical environment, actual full support construction, publication/consumer/audits remain unexecuted beyond current failures. No blanket downstream-green claim.",
+    "support_placeholder": {
+      "accepted_proof249_285_hash": "73002c8b74d13947aeb9bf1f6e09d50544b549ea51ab00a50b9510bd6404ffd8",
+      "classification": "SOURCE_LEVEL_FULL_FIXTURE_PROVENANCE_INCONSISTENCY_NOT_NEW_GUARD_FAILURE",
+      "note": "Small synthetic constructor uses8*64 in all cases. Full fixture constructs native domain but never propagates its actual CPU-format support digest into that synthetic child proof. Current root checks only format/counts, so this is not the observed failure or a proven next thrown guard. A future full-case fixture may bind its actually reconstructed support hash before sealing; never alter real frozen proof.",
+      "observed_synthetic_CPU_hash": "8888888888888888888888888888888888888888888888888888888888888888"
+    }
+  },
+  "fixture_edits": false,
+  "geometry": {
+    "classification": "FIXTURE_ENVIRONMENT_NAMESPACE_MISMATCH_SOURCE_REPLAY",
+    "config_paths": {
+      "observed_shell_default": {
+        "raw_sha256": "29e4c210b0d6ac178b16b2a255a568bdb23b581e50ca1ef6a6d071dd85704e6e",
+        "resolved": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/blobs/0bb6fd75b3ad2fe988565929f329945262c2814e",
+        "snapshot": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659/config.json"
+      },
+      "original": {
+        "raw_sha256": "29e4c210b0d6ac178b16b2a255a568bdb23b581e50ca1ef6a6d071dd85704e6e",
+        "resolved": "/work/nvme/beto/swong2/models--meta-llama--Llama-3.1-8B-Instruct/blobs/0bb6fd75b3ad2fe988565929f329945262c2814e",
+        "snapshot": "/work/nvme/beto/swong2/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659/config.json"
+      }
+    },
+    "evidence_limit": "Actual job HF environment and fresh_geometry object were not captured. Actual stale-geometry exception is observed; nested-hub resolver path is a deterministic source replay under the observed submission-shell environment, not a fabricated job observation.",
+    "frozen": {
+      "geometry": {
+        "head_dim": 128,
+        "hidden_size": 4096,
+        "num_heads": 32,
+        "num_layers": 32
+      },
+      "source": {
+        "config_sha256": "bf0a9ac88871834860e816600ee6174a576f3086b3845173463db3e997eb26d1",
+        "file_sha256": "29e4c210b0d6ac178b16b2a255a568bdb23b581e50ca1ef6a6d071dd85704e6e",
+        "injected": false,
+        "model": "meta-llama/Llama-3.1-8B-Instruct",
+        "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+        "path": "/work/nvme/beto/swong2/models--meta-llama--Llama-3.1-8B-Instruct/blobs/0bb6fd75b3ad2fe988565929f329945262c2814e"
+      }
+    },
+    "observed_current_shell_environment": {
+      "HF_HOME": "/work/nvme/beto/swong2",
+      "HF_HUB_CACHE": null,
+      "HUGGINGFACE_HUB_CACHE": null,
+      "TRANSFORMERS_CACHE": "/work/nvme/beto/swong2/",
+      "XDG_CACHE_HOME": null
+    },
+    "observed_runtime_failure": "stale A2 model_geometry in both actual logs",
+    "only_different_field": "model_geometry.source.path",
+    "replay_scope": "Original metadata-only geometry function with only external resolver supplied a known path; no huggingface/native/application import or actual resolver invocation.",
+    "replayed": {
+      "observed_shell_default": {
+        "geometry": {
+          "head_dim": 128,
+          "hidden_size": 4096,
+          "num_heads": 32,
+          "num_layers": 32
+        },
+        "source": {
+          "config_sha256": "bf0a9ac88871834860e816600ee6174a576f3086b3845173463db3e997eb26d1",
+          "file_sha256": "29e4c210b0d6ac178b16b2a255a568bdb23b581e50ca1ef6a6d071dd85704e6e",
+          "injected": false,
+          "model": "meta-llama/Llama-3.1-8B-Instruct",
+          "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+          "path": "/work/nvme/beto/swong2/hub/models--meta-llama--Llama-3.1-8B-Instruct/blobs/0bb6fd75b3ad2fe988565929f329945262c2814e"
+        }
+      },
+      "original": {
+        "geometry": {
+          "head_dim": 128,
+          "hidden_size": 4096,
+          "num_heads": 32,
+          "num_layers": 32
+        },
+        "source": {
+          "config_sha256": "bf0a9ac88871834860e816600ee6174a576f3086b3845173463db3e997eb26d1",
+          "file_sha256": "29e4c210b0d6ac178b16b2a255a568bdb23b581e50ca1ef6a6d071dd85704e6e",
+          "injected": false,
+          "model": "meta-llama/Llama-3.1-8B-Instruct",
+          "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+          "path": "/work/nvme/beto/swong2/models--meta-llama--Llama-3.1-8B-Instruct/blobs/0bb6fd75b3ad2fe988565929f329945262c2814e"
+        }
+      }
+    },
+    "source_cause": "Observer inherits HF variables and never establishes the original wrappers HF_HUB_CACHE=/work/nvme/beto/swong2 or offline env before native imports. HF_HOME alone defaults to HF_HOME/hub. Both config files have identical bytes/numerical geometry; absolute resolved path is part of frozen provenance."
+  },
+  "kind": "READ_ONLY_SOURCE_AND_EXTRACTED_PREDICATE_DIAGNOSIS",
+  "lineage": {
+    "cause": "Fixture seals pre-transition origin old.json; native original_snapshot_path is the preserved snapshot of the active successor, new.json. Mapping/lineage references match; only snapshot anchor fails.",
+    "classification": "FIXTURE_SNAPSHOT_ANCHOR_MISMATCH",
+    "field": "cutover.ledger_sha256",
+    "original_source": {
+      "authenticate": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:138",
+      "normalize": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/a3_direction_runtime.py:335"
+    },
+    "pairs": [
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c0/native/new.json",
+        "active_snapshot_sha256": "12a40780dd08bead6c33581db2d28942d6e4aa10d8de25140d3995b9b7e6aeb0",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c0/cutover.json",
+        "environment": "base39",
+        "fixture": "test_transfer_failure_cannot_c0",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c0/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c1/native/new.json",
+        "active_snapshot_sha256": "f1bfb5d2283f13982c0dd084ba7549406bea70fc49754a715567f641442ac500",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c1/cutover.json",
+        "environment": "base39",
+        "fixture": "test_transfer_failure_cannot_c1",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c1/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c2/native/new.json",
+        "active_snapshot_sha256": "a76e669ed083af98bd70e3535e29211a9f467b75c58e20c801d4a6b9c678b00e",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c2/cutover.json",
+        "environment": "base39",
+        "fixture": "test_transfer_failure_cannot_c2",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c2/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c3/native/new.json",
+        "active_snapshot_sha256": "e32d9536209d21abdac0dd45c078b36caa2b7b09f9c4d4d2258987a7c8637207",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c3/cutover.json",
+        "environment": "base39",
+        "fixture": "test_transfer_failure_cannot_c3",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c3/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c4/native/new.json",
+        "active_snapshot_sha256": "de2c4602dab053828fe31398b30c6ad60f60d3cc955de4dd690c606ed5c8f4eb",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c4/cutover.json",
+        "environment": "base39",
+        "fixture": "test_transfer_failure_cannot_c4",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c4/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c5/native/new.json",
+        "active_snapshot_sha256": "02e3657954f6d2c63f8dfd7d7b78ceb9633789df1e0e42bef4ac9af8a6dfc4bb",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c5/cutover.json",
+        "environment": "base39",
+        "fixture": "test_transfer_failure_cannot_c5",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_transfer_failure_cannot_c5/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc0/native/new.json",
+        "active_snapshot_sha256": "020c9727343e32d1287f20a0495414b1a1e5d652d9fb78f34b0a6a4eb2a1799e",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc0/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc0",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc0/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc1/native/new.json",
+        "active_snapshot_sha256": "6794c5192907467baadb6cfb7b789b0ab3e6d480679198a730384896e7712dc5",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc1/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc1",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc1/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc2/native/new.json",
+        "active_snapshot_sha256": "f53e0b32d511fee5619abca3c3b82e528df3528f8d9acd27540e9965e748dac8",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc2/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc2",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc2/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc3/native/new.json",
+        "active_snapshot_sha256": "6545312d184d3b86ca918326867684038ac366fdf3097f0e60e8840b7220ef28",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc3/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc3",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc3/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc4/native/new.json",
+        "active_snapshot_sha256": "d21e1b7a55246a348f493509d97818b5ea534b7b4e6324cf12817ed495c18d38",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc4/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc4",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc4/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc5/native/new.json",
+        "active_snapshot_sha256": "e4676feee600943e5b3174afdbe8b7e75917dbeeda8c5ba673c457a32b1134e5",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc5/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc5",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc5/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc6/native/new.json",
+        "active_snapshot_sha256": "d98b815552d64e939fa6fe3433b51120211ea2e329718412c95cdb488bfb016b",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc6/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc6",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc6/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc7/native/new.json",
+        "active_snapshot_sha256": "4b937daf99134089b06a0835e2180b825b76fab1c80c5eaa96be5b4cf24677ee",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc7/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc7",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc7/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc8/native/new.json",
+        "active_snapshot_sha256": "a14b8e0fd1c0daf77dcf90077fe354e33693b9a99558635ca88d18e8631281ba",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc8/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc8",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc8/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc9/native/new.json",
+        "active_snapshot_sha256": "c8c0d2069989f27435dac5229125b5d86585ce33203937d524ea345aedca2dba",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc9/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc9",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc9/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc10/native/new.json",
+        "active_snapshot_sha256": "f9dc4490cc794aabab64b0cefada48ebb9df57ebdd08c77f270f884b8155c1a5",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc10/cutover.json",
+        "environment": "base39",
+        "fixture": "test_entry_failure_has_zero_sc10",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_entry_failure_has_zero_sc10/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_consumed_partial_is_prese0/native/new.json",
+        "active_snapshot_sha256": "c867a332b647b3a3df7e4d7919678498f4f88855cbd5311c0f11c7bc51936e19",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_consumed_partial_is_prese0/cutover.json",
+        "environment": "base39",
+        "fixture": "test_consumed_partial_is_prese0",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_consumed_partial_is_prese0/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_actual_consumer_rejects_w0/native/new.json",
+        "active_snapshot_sha256": "f74f258ef96fc40e5e9c148fde532f7ee036556a3940e6aee044057e4dbe0697",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_actual_consumer_rejects_w0/cutover.json",
+        "environment": "base39",
+        "fixture": "test_actual_consumer_rejects_w0",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39-tmp/test_actual_consumer_rejects_w0/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c0/native/new.json",
+        "active_snapshot_sha256": "66c0139ea201f1b39e2926ee0828ccc5090172626e4be73accfe0d86f694ed21",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c0/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_transfer_failure_cannot_c0",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c0/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c1/native/new.json",
+        "active_snapshot_sha256": "8714782f156bd8914aed374ce6287e02c5dd50a0247372e6331dcdf41ef2cb99",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c1/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_transfer_failure_cannot_c1",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c1/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c2/native/new.json",
+        "active_snapshot_sha256": "06ba5926b7cd9908fe6140dd793ee6f71df798c568f48e6de8c853665f4d5834",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c2/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_transfer_failure_cannot_c2",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c2/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c3/native/new.json",
+        "active_snapshot_sha256": "5198ce7e1c09b005b1e3178be0b481bbd23ff49c62b03426de2b34bcded583f8",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c3/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_transfer_failure_cannot_c3",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c3/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c4/native/new.json",
+        "active_snapshot_sha256": "1f34ada27b9edaef9d7d92132a186a6fba7d4139a441069fc38b2207c697b78c",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c4/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_transfer_failure_cannot_c4",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c4/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c5/native/new.json",
+        "active_snapshot_sha256": "ad888d8879705194db00f71065419d16cf299783f99e02623358cc20cafbdf72",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c5/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_transfer_failure_cannot_c5",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_transfer_failure_cannot_c5/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc0/native/new.json",
+        "active_snapshot_sha256": "ac29827feb252560fc676bd542481652126ea9c9c676eb76fe6e14c005d51d19",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc0/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc0",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc0/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc1/native/new.json",
+        "active_snapshot_sha256": "9182235eb4c7e6b926ee35806ca62b3fb509d463527b0d25fc27b26849900f1d",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc1/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc1",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc1/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc2/native/new.json",
+        "active_snapshot_sha256": "884e5ed653c436145482de769d61e686bb1d07fc80f02134d1ba46bf882d6c33",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc2/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc2",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc2/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc3/native/new.json",
+        "active_snapshot_sha256": "b823c416b7d2f82386b4e58c8fa50270a7a8757d83bffcf46d587a11676f61c7",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc3/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc3",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc3/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc4/native/new.json",
+        "active_snapshot_sha256": "dc0f9541a6d65f1228a44f42915066c6b1fe4fc578175f0eabe73b0e262c40c3",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc4/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc4",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc4/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc5/native/new.json",
+        "active_snapshot_sha256": "ea6e8b2fbad19ac15ea1875096022ac36dbe4b1bbcb57fab29252f871165a8ce",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc5/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc5",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc5/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc6/native/new.json",
+        "active_snapshot_sha256": "b18467cf08534dcbf9b2d023331472cdaa63b9ae8d7b11f31d4d0d2961a5f4bb",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc6/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc6",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc6/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc7/native/new.json",
+        "active_snapshot_sha256": "2b15b18d3098d5c7810fde16c8e889434964f65ae088f7009f4ebfc2120e78d2",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc7/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc7",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc7/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc8/native/new.json",
+        "active_snapshot_sha256": "4556fa36521ed549de06da6ae3cbd42ecb3bbf0851893768c8fb069f4df71365",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc8/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc8",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc8/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc9/native/new.json",
+        "active_snapshot_sha256": "99b45a35bbe4108f9facb7d1939cdb356b51a25fa6c8fd46d46241510655718d",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc9/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc9",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc9/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc10/native/new.json",
+        "active_snapshot_sha256": "e9f26e334ebc70fc6294c6ea9d36a1f4af15e57b1fec2bd97ed1d062e527a6db",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc10/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_entry_failure_has_zero_sc10",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_entry_failure_has_zero_sc10/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_consumed_partial_is_prese0/native/new.json",
+        "active_snapshot_sha256": "ca572473d80b46c1614c3193076b3788ec0dd66cc372b02f9cd19d40cc5290aa",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_consumed_partial_is_prese0/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_consumed_partial_is_prese0",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_consumed_partial_is_prese0/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      },
+      {
+        "CPU_GPU_request_identity_matches": true,
+        "CPU_support_mask_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+        "WAITING_expected_hash_matches": true,
+        "WAITING_raw_copy_matches": true,
+        "active_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_actual_consumer_rejects_w0/native/new.json",
+        "active_snapshot_sha256": "a9ff42f8fdfabe803c5a4088b795f6f779cd11acd72eec7e8c6344561085a9d0",
+        "checks": {
+          "active_mapping_reference_matches": true,
+          "canonical_equals_active_snapshot": true,
+          "full_lineage_references_match": true,
+          "seal_matches_active_snapshot": false,
+          "seal_matches_origin_snapshot": true
+        },
+        "cutover_path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_actual_consumer_rejects_w0/cutover.json",
+        "environment": "mgnp",
+        "fixture": "test_actual_consumer_rejects_w0",
+        "hypothetical_correct_active_anchor_passes_predicate": true,
+        "origin_snapshot": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp-tmp/test_actual_consumer_rejects_w0/native/old.json",
+        "original_predicate_rejects": true,
+        "seal_sha256": "9cdc2309c2dc6dc296f3f81b14d8d12871ae862e98c54f86b6ab01c7572ff12c"
+      }
+    ],
+    "production_guard_correct": true
+  },
+  "local_full_tests": false,
+  "minimal_future_proposal": [
+    "Construct cutover from the returned normalized active snapshot SHA, then immediately call original authenticate_cutover with that same normalized object before expensive later fixture work.",
+    "Establish exact original HF_HUB_CACHE/TRANSFORMERS_CACHE/offline environment before importing project/HF modules; retain original S cwd and frozen receipt/geometry bytes. Do not rewrite geometry or bypass native validation.",
+    "Preserve raw-byte regression and stage assertions; add a native-data-free predicate/schema preflight over temporary evidence and deterministic environment checks so construction errors fail before a full job.",
+    "For the full case, consider replacing the synthetic support placeholder with the exact already-reconstructed CPU-format digest before its own prospective proof is sealed; no new reconstruction or real proof mutation.",
+    "Root consolidates and authorizes one corrected packet only after reviewing this diagnosis; this task creates none."
+  ],
+  "native_imports": false,
+  "production_components_unchanged": 17,
+  "raw_evidence": {
+    "RESULT.json": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/RESULT.json",
+      "sha256": "6c6405c5d91d291e25986684bf5b45c06b9b0ffcf030609b8d6978d68e9b37dd"
+    },
+    "base39.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39.log",
+      "sha256": "38012b374936ae58ff6ffb8814b4b5f6df3b3b4da3ef6a8caf3aa63c384de6f8"
+    },
+    "base39.xml": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/base39.xml",
+      "sha256": "bfeb0743e0c783ffa63e8be5310aeedf527417c046da18234f629a2ac698a4cf"
+    },
+    "mgnp.log": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp.log",
+      "sha256": "980ec62e5f0e99ef7a82016ce90bdf0e5831fb247a6be445cbac1b2b0ae8b616"
+    },
+    "mgnp.xml": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/mgnp.xml",
+      "sha256": "032dada42d30939491c3bfee9bec4d8ef1ab8a74946904748462baafa52f9552"
+    },
+    "run_manifest.json": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment315/run-01/run_manifest.json",
+      "sha256": "d58a0eea0ccddf080b176d2cfb0f2c7c9a8a24586c507dcc29b9fa472f6b1da5"
+    }
+  },
+  "real_authority_mutated": false
+}

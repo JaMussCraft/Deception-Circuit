@@ -1,0 +1,175 @@
+F......FFFFFFFFFFFF............F                                         [100%]
+=================================== FAILURES ===================================
+_______________ test_whole_chain_normal_native_full_publication ________________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:437: in test_whole_chain_normal_native_full_publication
+    j=joined(chain,tmp_path,monkeypatch,full=True)
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:293: in joined
+    scored=full_native_score(m,p,producer.g,tmp_path,monkeypatch)
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:334: in full_native_score
+    prepared,_,_=p._load_context(args);p._validate_live(args,receipt,prepared)
+../../../../outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/a2_pipeline.py:1092: in _load_context
+    a1.validate_prepared(ancestor, prepared)
+../../../../outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/component_analysis/ladder_pipeline.py:312: in validate_prepared
+    require(common.file_hash(path)==digest,'stale source/selection hash: '+path)
+../../../../outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime/dataset/user_inversion_pipeline.py:44: in file_hash
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+/sw/external/python/anaconda3/lib/python3.9/pathlib.py:1259: in read_bytes
+    with self.open(mode='rb') as f:
+/sw/external/python/anaconda3/lib/python3.9/pathlib.py:1252: in open
+    return io.open(self, mode, buffering, encoding, errors, newline,
+/sw/external/python/anaconda3/lib/python3.9/pathlib.py:1120: in _opener
+    return self._accessor.open(self, flags, mode)
+E   FileNotFoundError: [Errno 2] No such file or directory: 'data/datasets/far_v2/dataset_config.json'
+___________ test_entry_failure_has_zero_score_calls[postactivation] ____________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+______________ test_entry_failure_has_zero_score_calls[catalogue] ______________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+________________ test_entry_failure_has_zero_score_calls[bank] _________________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+_______________ test_entry_failure_has_zero_score_calls[release] _______________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+___________ test_entry_failure_has_zero_score_calls[existing-score] ____________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+____________ test_entry_failure_has_zero_score_calls[null-resource] ____________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+_______________ test_entry_failure_has_zero_score_calls[config] ________________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+_______________ test_entry_failure_has_zero_score_calls[WAITING] _______________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+_______________ test_entry_failure_has_zero_score_calls[expired] _______________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+____________ test_entry_failure_has_zero_score_calls[old-authority] ____________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+__________ test_entry_failure_has_zero_score_calls[short-allocation] ___________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:493: in test_entry_failure_has_zero_score_calls
+    j=joined(chain,tmp_path,monkeypatch);assert j.producer.publish()['published']
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+_____________ test_consumed_partial_is_preserved_and_never_retried _____________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:500: in test_consumed_partial_is_preserved_and_never_retried
+    j=joined(chain,tmp_path,monkeypatch);j.producer.publish()
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+_________ test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI _________
+../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py:582: in test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI
+    j=joined(chain,tmp_path,monkeypatch);j.producer.publish()
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:605: in publish
+    q,cpu_files=capture_cpu(self.c,r,self.g,self.b['gpu_config']['sha256'],record['request_sha256'])
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:357: in capture_cpu
+    need(sha_bytes(files[str(root/'WAITING.json')])==r['GPU_WAITING_marker_sha256'],'CPU immutable WAITING copy')
+../../plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:33: in need
+    if not ok:raise Rejected(msg)
+E   task3_helper.Rejected: CPU immutable WAITING copy
+=============================== warnings summary ===============================
+test_full_score_integration.py::test_whole_chain_normal_native_full_publication
+  /u/swong2/.local/lib/python3.9/site-packages/pandas/core/arrays/masked.py:61: UserWarning: Pandas requires version '1.3.6' or newer of 'bottleneck' (version '1.3.5' currently installed).
+    from pandas.core import (
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-task4-deployment298/run-01/base39.xml -
+=========================== short test summary info ============================
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_whole_chain_normal_native_full_publication
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[postactivation]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[catalogue]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[bank]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[release]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[existing-score]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[null-resource]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[config]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[WAITING]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[expired]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[old-authority]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_entry_failure_has_zero_score_calls[short-allocation]
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_consumed_partial_is_preserved_and_never_retried
+FAILED ../../plan-a2-whole-packet289-r2/candidate/tests/test_full_score_integration.py::test_actual_consumer_rejects_wrong_temporary_MAIN_before_CLI
+14 failed, 18 passed, 1 warning in 299.77s (0:04:59)

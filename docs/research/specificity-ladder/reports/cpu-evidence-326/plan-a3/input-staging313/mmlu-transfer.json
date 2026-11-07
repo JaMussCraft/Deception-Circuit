@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "rsync",
+    "-rl",
+    "--no-perms",
+    "--no-times",
+    "--checksum",
+    "-e",
+    "ssh -o BatchMode=yes -o ConnectTimeout=15 -o ControlMaster=no -o ControlPath=none -o HostName=br013.bridges2.psc.edu",
+    "--",
+    "/work/nvme/beto/swong2/hub/datasets--cais--mmlu/",
+    "bridges2:/ocean/projects/cis260361p/swong2/hf/hub/datasets--cais--mmlu/"
+  ],
+  "exit_code": 12,
+  "stdout": "",
+  "stderr": "bash: rsync: command not found\nrsync: connection unexpectedly closed (0 bytes received so far) [sender]\nrsync error: error in rsync protocol data stream (code 12) at io.c(228) [sender=3.2.5]\n",
+  "elapsed_seconds": 2.525819386006333
+}

@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "research-session",
+    "job",
+    "add",
+    "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder",
+    "--job-id",
+    "23637408",
+    "--cluster",
+    "delta",
+    "--status",
+    "PENDING",
+    "--timeout-min",
+    "60"
+  ],
+  "exit_code": 0,
+  "stdout": "recorded job 23637408 on delta (PENDING). Waiter, run in the background:\ntimeout 60m sh -c 'until sacct -j 23637408 -X -n -o State | grep -qE \"COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|NODE_FAIL\"; do sleep 300; done'\n",
+  "stderr": "",
+  "observed_unix": 1794051877.1940897
+}

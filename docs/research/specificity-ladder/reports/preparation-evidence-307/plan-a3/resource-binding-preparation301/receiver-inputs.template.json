@@ -1,0 +1,238 @@
+{
+  "accepted_contract": {
+    "bytes": 3207,
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-packet247/receiver.template.json",
+    "sha256": "dcff9d4f5ad3058202cb66c30f42f2ed32bff19987d1b7456f0716ba0877d478"
+  },
+  "actual_bindings": {
+    "actual_allocation": null,
+    "actual_cpu_family": null,
+    "actual_interpreter": null,
+    "actual_job": null,
+    "actual_namespace": null,
+    "actual_resources": null,
+    "actual_software": null,
+    "actual_storage": null,
+    "actual_supervisor": null,
+    "authentic_final_barrier_observation_reference": null,
+    "authentic_handle_observation_reference": null,
+    "consumer_allocation_contract": null,
+    "declared_export_inventory": null,
+    "driver_source_reference": null,
+    "final_source_publication": null,
+    "measurement_run_id": null,
+    "measurement_run_reference": null,
+    "namespace_policy": null,
+    "native_acceptance_reference": null,
+    "original_admission_reference": null,
+    "original_ledger_reference": null,
+    "original_reservation_reference": null,
+    "output_run_manifest": null,
+    "preparation_reference": null,
+    "producer_run_reference": null,
+    "published_export": null,
+    "receiver_deployment": null,
+    "receiver_launch": null,
+    "receiver_resources_reference": null,
+    "source_after": null,
+    "source_before": null,
+    "source_commit": null,
+    "target_reference": null,
+    "terminal_accounting_reference": null
+  },
+  "actual_request": {
+    "account": null,
+    "cluster": null,
+    "cpus": null,
+    "gpus": null,
+    "memory_bytes": null,
+    "partition": null,
+    "qos": null,
+    "walltime_seconds": null
+  },
+  "entry_plan": {
+    "do_not_mint": [
+      "AuthorityContext",
+      "PreparedPilotTarget",
+      "CPU-granted GPU admission"
+    ],
+    "filesystem_cache_claim": null,
+    "final_data_call": "_check_file_witness(result[3]) exactly once",
+    "first_trial": "actual new executable, no earlier target access in that process",
+    "io_contract_expected_not_observed": {
+      "entry": {
+        "SHA_passes": 2,
+        "freeze_passes": 1,
+        "full_payload_reads": 2,
+        "parse_passes": 1,
+        "target_writes": 0
+      },
+      "final": {
+        "SHA_passes": 1,
+        "freeze_passes": 0,
+        "full_payload_reads": 1,
+        "parse_passes": 0,
+        "target_writes": 0
+      },
+      "trial_total": {
+        "SHA_passes": 3,
+        "freeze_passes": 1,
+        "full_payload_reads": 3,
+        "parse_passes": 1,
+        "target_writes": 0
+      }
+    },
+    "native_data_call": "_read_prepared_target_object(target_reference,preparation_reference,namespace_policy)",
+    "new_exec_evidence": null,
+    "root_driver_API": "accepted278r2.receive_native(runtime,target_reference,preparation_reference,namespace_policy,emit,launcher_pid=<actual immediate parent PID>)",
+    "second_trial": "same PID after exact first result/witness release and gc.collect"
+  },
+  "future_native_resource_record_unbound": {
+    "cgroup_peak_bytes_bound": null,
+    "deployment": null,
+    "environment": null,
+    "execution_authorized": null,
+    "extra_transient_bytes_bound": null,
+    "freeze_sha256": null,
+    "kind": null,
+    "measurement": null,
+    "model_loaded": null,
+    "observed_io": null,
+    "process_peak_rss_bytes_bound": null,
+    "provenance": null,
+    "reader_sha256": null,
+    "recipe": null,
+    "references": null,
+    "retained_metadata_bytes_bound": null,
+    "scope": null,
+    "source_identity": null
+  },
+  "namespace_fields_unbound": {
+    "allowed_aliases": null,
+    "expected_resolved": null,
+    "preparation_root": null,
+    "target_root": null,
+    "work_dir": null
+  },
+  "native_record_mapping_requirements": {
+    "allocation_family_exact_keys": [
+      "cluster",
+      "cpus",
+      "memory_bytes"
+    ],
+    "deployment_exact_keys": [
+      "execution_class",
+      "cpu_family",
+      "allocation_family",
+      "storage"
+    ],
+    "disk_io": "Logical Path read bytes are not physical disk/cache-miss bytes; existing supervision captures actual available I/O/accounting, otherwise record unavailable. No filesystem-cold claim.",
+    "measurement_kind": "a3_receiver_measurement_v1",
+    "measurement_required_fields": [
+      "kind",
+      "deployment",
+      "run_manifest_reference",
+      "run_id",
+      "phases"
+    ],
+    "measurement_run_required_fields": [
+      "kind",
+      "run_id",
+      "normal_completion",
+      "exit_code",
+      "pid",
+      "source_identity",
+      "reader_sha256",
+      "freeze_sha256",
+      "references",
+      "environment",
+      "recipe",
+      "scope",
+      "deployment",
+      "source_before",
+      "source_after",
+      "injected",
+      "allocation",
+      "phases"
+    ],
+    "native_recipe": "a3_prepared_reader_unique_graph_buffers_v1",
+    "phase_mapping": "native phases cold/warm preserve same PID, matching measurement/run phase objects, actual entry timings/process scope and per-path deployment. Store full entry/final/trial records separately; do not use trial total3 as native observed_io2.",
+    "resource_kind": "a3_prepared_target_receiver_resources_v1",
+    "resource_observed_io": "Populate exact five native keys from independently observed ENTRY delta only; exclude read_bytes field and keep final1/trial3 evidence separately. Native declared bookkeeping is not independent observation.",
+    "run_kind": "a3_receiver_measurement_run_v1",
+    "run_manifest_reference": "Existing complete ordinary object_reference shape, not only a flat log-file SHA; root publication and terminal provenance required.",
+    "scope_matching": "CPU model/architecture, actual cluster/CPU/RAM family, software and per-path storage must match eventual original consumer context. Validation fixtures or cross-cluster/cross-environment stats are not receiver bounds.",
+    "scope_rule": "Retain native process lifetime/current-cgroup class and cold/warm applicability. Wrapper raw ancestry rows are additional evidence, never relabeled native leaf observations. v2 unavailable maps only exact native not-applicable reason/scope; no missing values converted to zero.",
+    "software_binding": [
+      "Python executable/implementation/version",
+      "numpy/torch versions",
+      "platform",
+      "exact native runtime/workload/export origins+hashes",
+      "wrapper/driver source hashes"
+    ],
+    "storage_per_reference_keys": [
+      "path",
+      "mount_point",
+      "filesystem",
+      "mount_source",
+      "device"
+    ]
+  },
+  "ordinary_reference_shape": {
+    "files": {
+      "COMPLETE.json": {
+        "nbytes": null,
+        "sha256": null
+      },
+      "payload.json": {
+        "nbytes": null,
+        "sha256": null
+      }
+    },
+    "path": null
+  },
+  "provenance_fields_unbound": {
+    "exit_code": null,
+    "normal_completion": null,
+    "pid": null,
+    "source_after": null,
+    "source_before": null
+  },
+  "request_constraints": {
+    "GPU_request_authorized": false,
+    "actual_approved_request": null,
+    "automatic_retries": false,
+    "cpu_measurement_only": true
+  },
+  "resource_bounds_unbound": {
+    "actual_host_capacity": null,
+    "cgroup_peak_bytes_bound": null,
+    "existing_host_obligations": null,
+    "extra_transient_bytes_bound": null,
+    "process_peak_rss_bytes_bound": null,
+    "retained_metadata_bytes_bound": null
+  },
+  "separate_handle_and_final_costs": {
+    "authentic_final_barrier_seconds": null,
+    "authentic_handle_bytes": null,
+    "limits": [
+      "Lower reader does not instantiate/authenticate the native handle or prove this added charge",
+      "Full final_publication_barrier also performs scope/namespace/full witness/fresh live+deadline/cheap identity and remaining publication after union/reconciliation; witness timing alone is a component",
+      "Root must obtain authentic applicable native handle/final-barrier costs through original authorized path, never fabricate seals/contexts on CPU",
+      "Whole startup begins at original wrapper/process start, includes imports/pilot/source/guards/model and geometry; receiver entry/trial timer is not whole startup",
+      "Add pilot/authority proof, raw+decoder+decoded+frozen+memo/workspace overlap, model staging/numeric retention and unchanged storage/M2/shared-pool obligations; no alias/baseline/producer-peak subtraction",
+      "GC/release is not proof RSS was returned; preserve lifetime highwater and whole-cgroup scopes",
+      "Nested producer intervals overlap; two receiver step deltas are disjoint but final production barrier/startup must be charged once through original cost projection"
+    ],
+    "native_handle_charge_expression": "sys.getsizeof(handle)+sys.getsizeof(vars(handle))+_prepared_graph_bytes(handle._binding)+_prepared_graph_bytes(handle._scope)",
+    "native_retention_condition": "observed lower-reader retained_metadata_bytes + authentic handle charge <= anchored retained_metadata_bytes_bound",
+    "whole_startup_seconds": null
+  },
+  "source_identity_fields_unbound": {
+    "code_hashes": null,
+    "commit": null,
+    "design_sha256": null,
+    "protocol_sha256": null
+  },
+  "status": "UNBOUND_DESCRIPTIVE_INPUTS_NOT_RUNNABLE"
+}

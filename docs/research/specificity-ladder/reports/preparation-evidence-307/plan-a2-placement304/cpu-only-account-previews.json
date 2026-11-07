@@ -1,0 +1,77 @@
+[
+  {
+    "account": "bjhz-delta-gpu",
+    "argv": [
+      "sbatch",
+      "--test-only",
+      "--account=bjhz-delta-gpu",
+      "--partition=cpu-interactive",
+      "--constraint=projects",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=2",
+      "--mem=16G",
+      "--time=00:15:00",
+      "--no-requeue",
+      "--export=ALL,CUDA_VISIBLE_DEVICES=",
+      "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet289-r2/run_cpu.sh",
+      "--output",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-placement304/UNRUN"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "sbatch: error: Jobs requesting no GPU resources must be submitted under CPU type accounts\nsbatch: error: Please use the accounts command to list available CPU accounts\nallocation failure: Access/permission denied\n",
+    "observed_unix": 1794048869.9914935
+  },
+  {
+    "account": "bgrb-delta-gpu",
+    "argv": [
+      "sbatch",
+      "--test-only",
+      "--account=bgrb-delta-gpu",
+      "--partition=cpu-interactive",
+      "--constraint=projects",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=2",
+      "--mem=16G",
+      "--time=00:15:00",
+      "--no-requeue",
+      "--export=ALL,CUDA_VISIBLE_DEVICES=",
+      "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet289-r2/run_cpu.sh",
+      "--output",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-placement304/UNRUN"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "sbatch: error: Jobs requesting no GPU resources must be submitted under CPU type accounts\nsbatch: error: Please use the accounts command to list available CPU accounts\nallocation failure: Access/permission denied\n",
+    "observed_unix": 1794048870.0276823
+  },
+  {
+    "account": "bimc-delta-gpu",
+    "argv": [
+      "sbatch",
+      "--test-only",
+      "--account=bimc-delta-gpu",
+      "--partition=cpu-interactive",
+      "--constraint=projects",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=2",
+      "--mem=16G",
+      "--time=00:15:00",
+      "--no-requeue",
+      "--export=ALL,CUDA_VISIBLE_DEVICES=",
+      "--chdir=/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet289-r2/run_cpu.sh",
+      "--output",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-placement304/UNRUN"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "sbatch: error: Jobs requesting no GPU resources must be submitted under CPU type accounts\nsbatch: error: Please use the accounts command to list available CPU accounts\nallocation failure: Access/permission denied\n",
+    "observed_unix": 1794048870.068119
+  }
+]

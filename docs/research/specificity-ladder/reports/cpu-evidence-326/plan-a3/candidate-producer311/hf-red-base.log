@@ -1,0 +1,19 @@
+test_driver_orders_native_steps_and_stops_with_partial_evidence (__main__.Packet) ... ok
+test_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer (__main__.Packet) ... ok
+test_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift (__main__.Packet) ... ok
+test_source_mutation_extra_file_alias_and_foreign_origin_reject (__main__.Packet) ... ok
+test_transport_preserves_slurm_and_writes_only_private_child (__main__.Packet) ... FAIL
+test_unbound_rejected_before_import_or_source_access (__main__.Packet) ... ok
+
+======================================================================
+FAIL: test_transport_preserves_slurm_and_writes_only_private_child (__main__.Packet)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py", line 102, in test_transport_preserves_slurm_and_writes_only_private_child
+    self.assertIn('/ocean/projects/cis260361p/swong2/hf/hub:/work/nvme/beto/swong2/hub:ro',binds)
+AssertionError: '/ocean/projects/cis260361p/swong2/hf/hub:/work/nvme/beto/swong2/hub:ro' not found in ['/ocean/projects/cis260361p/swong2/test/Alignment:/projects/beto/swong2/Alignment:ro', '/ocean:/ocean:ro', '/ocean/projects/cis260361p/swong2/hf/hub:/work/nvme/beto/swong2:ro', '/ocean/projects/cis260361p/swong2/envs/mgnp:/u/swong2/.conda/envs/mgnp:ro', '/ocean/projects/cis260361p/swong2/test/Alignment/run311/child:/projects/beto/swong2/Alignment/run311/child:rw', '/sys/fs/cgroup:/sys/fs/cgroup:ro,/sys/fs/cgroup/memory:/sys/fs/cgroup/memory:ro']
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.242s
+
+FAILED (failures=1)

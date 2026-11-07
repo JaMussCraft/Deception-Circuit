@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,subprocess,time;x=json.load(sys.stdin);r=subprocess.run(x,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=30);print(json.dumps(dict(argv=x,exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr,observed_unix=time.time())));sys.exit(r.returncode)'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"argv\": [\"sbatch\", \"--hold\", \"--parsable\", \"--qos=rm\", \"--account=cis260361p\", \"--partition=RM-shared\", \"--nodes=1\", \"--ntasks=1\", \"--cpus-per-task=18\", \"--mem=32G\", \"--time=01:20:00\", \"--no-requeue\", \"--export=ALL,CUDA_VISIBLE_DEVICES=,A3_HOST_PYTHON=/usr/bin/python3\", \"--chdir=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan/task23-green-r8-sharded\", \"--job-name=lad-A3-mgnp-0\", \"--output=/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment293/mgnp-0/slurm-%j.log\", \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/sharded-deployment293/mgnp-0/dispatch.sh\"], \"exit_code\": 0, \"stdout\": \"50319331\\n\", \"stderr\": \"\", \"observed_unix\": 1794046995.4095442}\n",
+  "stderr": "",
+  "observed_unix": 1794046995.42748
+}

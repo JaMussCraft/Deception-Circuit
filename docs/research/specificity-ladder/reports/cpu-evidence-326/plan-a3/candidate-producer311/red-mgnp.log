@@ -1,0 +1,65 @@
+test_driver_orders_native_steps_and_stops_with_partial_evidence (__main__.Packet.test_driver_orders_native_steps_and_stops_with_partial_evidence) ... ERROR
+test_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer (__main__.Packet.test_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer) ... ERROR
+test_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift (__main__.Packet.test_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift) ... ERROR
+test_source_mutation_extra_file_alias_and_foreign_origin_reject (__main__.Packet.test_source_mutation_extra_file_alias_and_foreign_origin_reject) ... ERROR
+test_transport_preserves_slurm_and_writes_only_private_child (__main__.Packet.test_transport_preserves_slurm_and_writes_only_private_child) ... ERROR
+test_unbound_rejected_before_import_or_source_access (__main__.Packet.test_unbound_rejected_before_import_or_source_access) ... ERROR
+
+======================================================================
+ERROR: test_driver_orders_native_steps_and_stops_with_partial_evidence (__main__.Packet.test_driver_orders_native_steps_and_stops_with_partial_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py", line 111, in test_driver_orders_native_steps_and_stops_with_partial_evidence
+    d.run_steps(cfg,object(),adapter,records.append,checks.append)
+    ^^^^^^^^^^^
+AttributeError: module 'packet311_driver' has no attribute 'run_steps'
+
+======================================================================
+ERROR: test_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer (__main__.Packet.test_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py", line 28, in test_native_plan_is_exact_fresh_freeze_prefit_then_saved_producer
+    steps=c.commands(cfg)
+          ^^^^^^^^^^
+AttributeError: module 'packet311_common' has no attribute 'commands'
+
+======================================================================
+ERROR: test_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift (__main__.Packet.test_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py", line 82, in test_saved_target_inventory_uses_real_bytes_and_rejects_sink_or_drift
+    actual=c.inventory_outputs(cfg)
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'packet311_common' has no attribute 'inventory_outputs'
+
+======================================================================
+ERROR: test_source_mutation_extra_file_alias_and_foreign_origin_reject (__main__.Packet.test_source_mutation_extra_file_alias_and_foreign_origin_reject)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py", line 60, in test_source_mutation_extra_file_alias_and_foreign_origin_reject
+    c.check_sources(cfg)
+    ^^^^^^^^^^^^^^^
+AttributeError: module 'packet311_common' has no attribute 'check_sources'
+
+======================================================================
+ERROR: test_transport_preserves_slurm_and_writes_only_private_child (__main__.Packet.test_transport_preserves_slurm_and_writes_only_private_child)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py", line 92, in test_transport_preserves_slurm_and_writes_only_private_child
+    argv=h.container_command(cfg,'v1',{'SLURM_JOB_ID':'123','SLURM_CPUS_PER_TASK':'128'},9999)
+         ^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'packet311_host' has no attribute 'container_command'
+
+======================================================================
+ERROR: test_unbound_rejected_before_import_or_source_access (__main__.Packet.test_unbound_rejected_before_import_or_source_access)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-producer311/test_packet.py", line 40, in test_unbound_rejected_before_import_or_source_access
+    with self.assertRaisesRegex(ValueError,'unbound'):c.validate({'kind':'UNBOUND_CANDIDATE_ONLY'})
+                                                      ^^^^^^^^^^
+AttributeError: module 'packet311_common' has no attribute 'validate'
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.007s
+
+FAILED (errors=6)

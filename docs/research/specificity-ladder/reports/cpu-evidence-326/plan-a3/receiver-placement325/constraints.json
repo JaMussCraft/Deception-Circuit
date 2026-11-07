@@ -1,0 +1,153 @@
+{
+  "status": "HANDED_BACK_SOURCE_CONSTRAINTS_ONLY",
+  "question": "Can a CPU-only Slurm allocation on an H200-host node supply receiver measurement evidence for a later real H200 GPU Slurm job?",
+  "answer": "Yes in principle: no job-ID or GPU-allocation/visibility equality makes that reuse intrinsically impossible. Admissibility remains conditional on exact native deployment/software/source/reference equality, compatible process/cgroup scopes, authentic measurement provenance and all original resource/admission guards.",
+  "scope": "Read-only exact source310 and accepted278-r2 receiver path; no allocation, measurement, native import, test, implementation, scheduler or model action.",
+  "source_commit_context": "2ba697d7f5fdfd7cebc7225ae004ec9e731e434f",
+  "runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-source310/export/component_analysis/a3_direction_runtime.py",
+  "receiver_adapter": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/prepared-resource-runner278-r2/runner.py",
+  "symbol_resolution": {
+    "requested_name": "_prepared_measurement_context",
+    "requested_name_defined_in_source310": false,
+    "actual_context_projector": "_prepared_receiver_context",
+    "actual_validator": "_validate_prepared_measurement"
+  },
+  "required_equal_to_later_actual_consumer": [
+    {
+      "field": "deployment.execution_class",
+      "rule": "Exactly slurm for both noninjected CPU measurement and GPU consumer. The only alternative class in this projector is injected; there is no CPU-versus-GPU class split.",
+      "source": "runtime:_prepared_receiver_context:327-335; _validate_prepared_measurement:338-348; load_prepared_pilot_target:551-555"
+    },
+    {
+      "field": "deployment.cpu_family",
+      "members": [
+        "architecture",
+        "model"
+      ],
+      "rule": "Exact platform.machine() and first available /proc/cpuinfo model-name/Processor/cpu-model string. Same H200 label alone is insufficient. Node hostname, CPU stepping and CPU topology are not additional members here.",
+      "source": "runtime:_prepared_cpu_family:301-309; _prepared_receiver_context:333-335"
+    },
+    {
+      "field": "deployment.allocation_family",
+      "members": [
+        "cluster",
+        "cpus",
+        "memory_bytes"
+      ],
+      "rule": "Exact equality to the independently observed later GPU allocation projection at loader entry. CPU and memory must be positive integers, cluster a nonempty string. Matching at least the GPU contract is insufficient for this entry equality, even though completed intake also has a separate minimum-capacity check.",
+      "source": "runtime:_prepared_receiver_context:327-335; _validate_prepared_measurement:347; load_prepared_pilot_target:551-555,582-584; completed intake:2775-2783"
+    },
+    {
+      "field": "deployment.storage for target and preparation",
+      "members": [
+        "path",
+        "mount_point",
+        "filesystem",
+        "mount_source",
+        "device"
+      ],
+      "rule": "Exact dictionary equality per actual target/preparation object root. Path is resolve(strict=True); mount_point is the deepest containing mount from /proc/self/mountinfo; filesystem and mount_source come from that mount; device is stat().st_dev. Same bytes or same underlying filesystem alone is insufficient. A different private bind mount point can fail even on the same host and same data.",
+      "source": "runtime:_prepared_storage_identity:312-324; _prepared_receiver_context:335; _validate_prepared_measurement:347; load_prepared_pilot_target:552,582-584"
+    },
+    {
+      "field": "record.environment and run.environment",
+      "members": [
+        "python_implementation",
+        "python_version",
+        "numpy_version",
+        "torch_version",
+        "platform",
+        "deployment_family",
+        "storage_family"
+      ],
+      "rule": "Exact current _prepared_environment(False) dictionary. Platform is platform.system(), deployment_family is slurm-receiver and storage_family is per-path-mount-evidence. This exact tuple does not include GPU count, CUDA visibility, CUDA runtime/device properties, hostname or Slurm job ID. Broader software authenticity remains an existing root provenance obligation.",
+      "source": "runtime:_prepared_environment:292-298; _validate_prepared_receiver_resources:474-477; _validate_prepared_measurement:355-360"
+    },
+    {
+      "field": "record.references, source_identity, reader_sha256, freeze_sha256, recipe and scope",
+      "rule": "Exact target/preparation byte references and paths, commit/code/design/protocol identity, current runtime/workload whole-file hashes and original accounting recipe/scope. The measurement run must independently agree with all those fields and before/after code hashes. The measurement provenance object must remain complete, reachable and byte-identical.",
+      "source": "runtime:_validate_prepared_receiver_resources:469-484; _validate_prepared_measurement:350-360; _prepared_source_identity:286-289"
+    },
+    {
+      "field": "process observation scope and cgroup applicability/scope",
+      "rule": "Each measured process scope must equal the later native process_peak_scope: process lifetime high-water RSS on Linux. Each measured cgroup applicable boolean must equal whether the later native cgroup_scope is non-null; scope must equal that native string, or not applicable when unavailable. CPU/GPU jobs with different native cgroup-v2 availability are incomparable, even on one host. Raw wrapper v1/ancestry observations cannot be relabelled as native v2 applicability.",
+      "source": "runtime:_prepared_process_observation:182-199; _validate_prepared_measurement:377-393; _reconcile_prepared_observation_scopes:397-408; load_prepared_pilot_target:563"
+    }
+  ],
+  "required_provenance_not_equal_to_later_job": [
+    {
+      "field": "measurement allocation.job_id",
+      "rule": "Required nonempty string and must truthfully identify the CPU measurement allocation. Not compared to later GPU job_id. Its allocation cluster/cpus/memory projection must equal deployment.allocation_family.",
+      "source": "runtime:_validate_prepared_measurement:364-367"
+    },
+    {
+      "field": "run.pid and phase.process.pid",
+      "rule": "Run PID is a positive integer; both measurement phases must use that same PID. Not compared to later consumer PID. Actual distinct new-executable launcher evidence is still required for the cold phase.",
+      "source": "runtime:_validate_prepared_measurement:351-354,377-380; adapter:require_fresh_process and receive_native"
+    },
+    {
+      "field": "phase.cgroup.path",
+      "rule": "Required nonempty real path when applicable, but NOT required equal to the later job's literal cgroup path. The reconciliation function explicitly compares classes/scopes rather than job-specific path literals. Cold/warm internal equality also compares applicability/scope, not path literals.",
+      "source": "runtime:_validate_prepared_measurement:382-393; _reconcile_prepared_observation_scopes:397-408"
+    },
+    {
+      "field": "run_id, normal completion, exit code, phase timings and raw process/cgroup observations",
+      "rule": "Truthful source-bound internal provenance: run_id matches measurement, normal_completion true, exit_code zero, cold/warm phase dictionaries identical between run and measurement, correct fresh-process/same-process-repeat labels, nonnegative finite wall/user/system, valid RSS/peak/events. These are observations/requirements, not a demand to equal later consumer timings or numerical measurements.",
+      "source": "runtime:_validate_prepared_measurement:350-395"
+    }
+  ],
+  "not_members_of_receiver_deployment_equality": [
+    "Slurm job_id, step_id, account, partition, QoS, requested walltime, NodeList or hostname",
+    "GPU TRES/count/type/physical presence, CUDA_VISIBLE_DEVICES and other SLURM GPU environment variables",
+    "process PID or literal cgroup path",
+    "directory inode or mount ID; storage does include st_dev, resolved path and deepest mount metadata",
+    "CUDA build/device properties or Transformers version as independent environment keys (torch_version and original source/provenance checks still apply)"
+  ],
+  "important_boundaries": [
+    "H200-host placement is a scheduling strategy to find the same CPU family/storage/software; the measurement context does not require a GPU allocation or physical H200 label. A generic RM placement is not automatically valid, though no extra hardware-label field exists beyond the stated equality tuple.",
+    "Different clusters, CPU/RAM allocations, CPU model strings, Python/library versions, resolved object roots, mount layouts or storage st_dev values fail exact equality. Same host or same filesystem name does not waive any field.",
+    "The production loader supplies independently observed actual GPU allocation context, compares it with original admission receiver_deployment, validates resources before reading, and rechecks context after reading. The data-only default validator fallback is not permission to manufacture matching allocation evidence.",
+    "Applicable native cgroup observations require true current/peak/events and exact whole-current-cgroup lifetime scope. Unavailable requires reason cgroup-v2-observations-unavailable and scope not applicable. Process/cgroup paths and lifetime peaks retain true provenance; no sample establishes an upper bound.",
+    "Accepted receiver adapter calls only untouched lower reader and one final witness per trial, retains the exact result, releases it before same-process warm repeat, and requires real new-executable provenance. It neither calls the authority loader nor needs a GPU to mint a handle, because no handle is minted.",
+    "Same deployment tuple is necessary but not sufficient: actual conservative resource bounds/capacity, authentic retained production handle accounting, original final live/scope/deadline barrier, source adoption/native/numerical and original GPU allocation/admission/ledger/lease guards remain unchanged. A later GPU job still needs its actual H200 authority; CPU measurement grants none."
+  ],
+  "actual_cpu_only_H200_placement": null,
+  "actual_gpu_consumer_deployment": null,
+  "actual_measurement_acceptance": false,
+  "execution_authorized": false,
+  "scheduler_context_root_reported": {
+    "account": "beto-delta-cpu",
+    "partitions": [
+      "gpuH200x8",
+      "gpuH200x8-interactive"
+    ],
+    "cpu_only_previews": "both rejected",
+    "reason": "Jobs requesting no GPU resources must only be submitted to CPU partitions",
+    "job_created": false,
+    "GPU_requested": false,
+    "scope": "root-reported previews, not a scheduler query by this worker; ordinary direct CPU-only placement on those partitions unavailable"
+  },
+  "bounded_existing_cpu_provenance": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a3-direction-prefit-remaining-861f84a3938a-r163-r2/evidence/allocation-before.json",
+    "job_id": "23482242",
+    "cluster": "delta",
+    "partition": "cpu",
+    "host": "cn029.delta.ncsa.illinois.edu",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "scope": "historical actual CPU receipt only, not current node interrogation or receiver applicability; architecture/current consumer CPU family not established"
+  },
+  "bounded_H200_cpu_model_search": {
+    "inspected": [
+      "named historical A3 N5 evidence allocation/environment/run manifest",
+      "named r163-r2 CPU allocation-before/after receipts"
+    ],
+    "actual_H200_CPU_model_string_found": false,
+    "match_to_future_H200_CPU_family": "unknown",
+    "limitation": "No broad tree scan or live node/scheduler/SSH/native action; do not infer H200 CPU model from GPU type or CPU partition hostname"
+  },
+  "no_GPU_escape": {
+    "GPU_reservation_for_profiling_authorized": false,
+    "new_budget_proposal": false,
+    "rule": "Do not spend a GPU solely to escape CPU-only placement rejection; establish actual CPU-family/context match through root-owned existing provenance/scheduler evidence or report unresolved placement"
+  }
+}

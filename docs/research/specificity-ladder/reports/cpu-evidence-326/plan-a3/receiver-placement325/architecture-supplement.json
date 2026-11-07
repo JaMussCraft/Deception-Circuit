@@ -1,0 +1,51 @@
+{
+  "status": "HANDED_BACK_DOCUMENTATION_SUPPLEMENT_NOT_NODE_OBSERVATION",
+  "official_source": {
+    "title": "NCSA Delta System Architecture",
+    "url": "https://docs.ncsa.illinois.edu/systems/delta/en/latest/user_guide/architecture.html",
+    "documented_cpu_nodes": {
+      "cpu": "AMD EPYC 7763 Milan",
+      "cores_per_node": 128,
+      "RAM_GB": 256
+    },
+    "documented_H200_nodes": {
+      "cpu": "Intel Xeon Platinum 8558",
+      "cores_per_node": 96,
+      "RAM_GB": 2048
+    },
+    "scope": "official architecture description read via web; does not record actual /proc/cpuinfo model strings in a job"
+  },
+  "root_reported_resource_inventory": {
+    "nodes": "gpue01-08",
+    "CPUs_per_node": 96,
+    "RAM": "2TB",
+    "source": "root-reported live scontrol/sinfo, not queried by this worker",
+    "actual_CPU_model_observation": false
+  },
+  "placement_previews": {
+    "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/receiver-placement-preview325/preview.json",
+    "account": "beto-delta-cpu",
+    "partitions": [
+      "gpuH200x8-interactive",
+      "gpuH200x8"
+    ],
+    "CPU_only_requests_rejected": true,
+    "error": "Jobs requesting no GPU resources must only be submitted to CPU partitions",
+    "new_job_created": false,
+    "GPU_requested": false
+  },
+  "native_constraint": {
+    "source": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/candidate-source310/export/component_analysis/a3_direction_runtime.py",
+    "projector": "_prepared_cpu_family:301-309 and _prepared_receiver_context:327-335",
+    "comparison": "_validate_prepared_measurement:347 requires deployment == actual receiver_context",
+    "cpu_model_equality": "exact model string equality, in addition to architecture and all other deployment fields"
+  },
+  "inference": "The documented ordinary CPU and H200 node classes have different AMD/Intel CPU models. Ordinary Delta CPU-node measurements cannot be assumed admissible for the H200 consumer under unchanged exact CPU-model equality. Combined with rejected CPU-only H200-partition previews, an ordinary compliant CPU-only placement is not established.",
+  "preserved_original_scope": "The original report correctly recorded no actual H200 /proc CPU-model string from the bounded local provenance search. Documentation adds class evidence without replacing that unknown with a claimed runtime observation.",
+  "actual_H200_CPU_model_string": null,
+  "actual_matching_CPU_only_receiver_placement": null,
+  "GPU_escape_authorized": false,
+  "new_budget_proposal": false,
+  "model_or_measurement_action": false,
+  "remaining": "No source relaxation, architecture change or budget decision. Producer completion, native BASE acceptance and all original resource/source/numerical/admission/lease/deadline/GPU gates remain separate."
+}

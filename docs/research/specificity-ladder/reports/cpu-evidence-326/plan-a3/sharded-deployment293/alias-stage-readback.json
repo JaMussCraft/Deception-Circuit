@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "python3 -B -c 'import sys,json,os,time;from pathlib import Path;rows=json.load(sys.stdin);out=[]\nfor r in rows:\n p=Path(r['\"'\"'physical'\"'\"']);assert not p.exists() and not p.is_symlink();p.parent.mkdir(parents=True,exist_ok=True);os.symlink(r['\"'\"'literal_target'\"'\"'],str(p));assert p.is_symlink() and os.readlink(str(p))==r['\"'\"'literal_target'\"'\"'];out.append(r)\nprint(json.dumps(dict(aliases=out,observed_unix=time.time())))'"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"aliases\": [{\"virtual\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate287/data\", \"literal_target\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/data\", \"physical\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate287/data\"}, {\"virtual\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate287/docs/research/directions.json\", \"literal_target\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/directions.json\", \"physical\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate287/docs/research/directions.json\"}, {\"virtual\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate287/docs/research/held_out.json\", \"literal_target\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/docs/research/held_out.json\", \"physical\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate287/docs/research/held_out.json\"}, {\"virtual\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate287/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07\", \"literal_target\": \"/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07\", \"physical\": \"/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a3/direction-preallocation-candidate287/outputs/_analyses/specificity-ladder/a1-control-77b6487-m07\"}], \"observed_unix\": 1794046618.3761885}\n",
+  "stderr": "",
+  "observed_unix": 1794046618.3885899
+}

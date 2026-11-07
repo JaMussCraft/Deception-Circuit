@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "HostName=br013.bridges2.psc.edu",
+    "bridges2",
+    "lfs quota -p 560453 /ocean/projects/cis260361p"
+  ],
+  "exit_code": 0,
+  "stdout": "Disk quotas for prj 560453 (pid 560453):\n     Filesystem  kbytes   quota   limit   grace   files   quota   limit   grace\n/ocean/projects/cis260361p\n                54394916  1048576000 1048576000       -  230156  6070000 6070000       -\n",
+  "stderr": "",
+  "observed_unix": 1794053459.047456
+}

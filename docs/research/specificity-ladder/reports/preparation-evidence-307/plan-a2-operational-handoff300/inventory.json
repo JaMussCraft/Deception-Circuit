@@ -1,0 +1,1212 @@
+{
+  "actual_bindings": {
+    "SIF_namespace": null,
+    "actual_capacity": null,
+    "actual_job": null,
+    "cache_runtime": null,
+    "current_catalogue_transfer": null,
+    "native_successor": null,
+    "operational_admission": null,
+    "owning_CPU_COMPLETE": null,
+    "remote_release": null,
+    "reservation": null,
+    "reviewed_resource_tuple": null,
+    "sealed_cutover_attestation": null,
+    "source_publication": null
+  },
+  "artifact_contracts": {
+    "CPU_evidence": {
+      "failure_supersedes": [
+        "FAILED.json",
+        "FAILED-full_score.json"
+      ],
+      "required_complete_facts": [
+        "kind=Delta_actual_full_score_preflight",
+        "phase=full_score",
+        "status=PASS",
+        "complete=true",
+        "timely_window=true",
+        "actual_CPU_job_id",
+        "actual_future_GPU_job_id",
+        "source_commit",
+        "groups_file_sha256",
+        "bank_file_sha256",
+        "bank_manifest_sha256",
+        "standing_packet_manifest_sha256",
+        "GPU_packet_manifest_sha256",
+        "launch_packet_manifest_sha256",
+        "request_sha256",
+        "waiting_sha256",
+        "final_GPU_bound_config_sha256==bound_gpu_config_sha256",
+        "CPU_bound_config_sha256",
+        "guard_result_sha256",
+        "child_execution_sha256",
+        "parameters_sha256",
+        "full_rows=59652",
+        "full_controls=3396",
+        "support_reason_mask_sha256",
+        "full_domain_support_audit_complete=true",
+        "source_before==source_after",
+        "catalogues/capture files stable and exact",
+        "normal exit0/no TERM/finished<deadline",
+        "model_loaded/GPU_admitted/freeze_executed/automatic_retry=false"
+      ],
+      "required_files": [
+        "COMPLETE.json",
+        "guard-result.json",
+        "child-execution.json",
+        "parameters.json",
+        "request.json",
+        "WAITING.json",
+        "four exact captured catalogue files"
+      ]
+    },
+    "CPU_resource_proof": {
+      "required": [
+        "complete=true",
+        "independent_review_accepted=true",
+        "phase=full_score",
+        "resources equal exact CPU config fields"
+      ],
+      "resources_keys": [
+        "CPUs",
+        "RAM_bytes",
+        "duration_seconds",
+        "child_cap_seconds",
+        "CPU_finish_margin_seconds",
+        "publication_margin_seconds",
+        "kill_grace_seconds"
+      ]
+    },
+    "GPU_resource_proof": {
+      "required": [
+        "complete=true",
+        "independently_accepted=true",
+        "proof181_accepted=true",
+        "resources==GPU config.resources",
+        "reviewed_components exactly host_memory/gpu_memory/storage/work_ratio/cost, all true",
+        "full_domain_reference {path,sha256} for final native audit"
+      ]
+    },
+    "cache_proof": {
+      "accepted_original_full_proof_sha256": "b28e3897ffc3bda9db3ad4bbaf5a38a5c3ed664b301983eae133c08536461fee",
+      "accepted_reference_sha256": "6d4caf626770067c20ce372a197ec402e7242ab745fad8e3b338dead1a071fbf",
+      "no_full_weight_rehash": true,
+      "reference_payload": [
+        "remote_cache",
+        "revision",
+        "metadata[{name,nbytes,sha256}]",
+        "weights[{name,nbytes,expected_sha256}]"
+      ],
+      "refs": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py:323",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py:481"
+      ],
+      "required_current_checks": [
+        "original.reference_sha256 links exact reference",
+        "physical_HF/model path equals reference.remote_cache",
+        "refs/main exact revision",
+        "each metadata size+SHA",
+        "each weight size+resolved expected blob name"
+      ],
+      "required_fields": [
+        "reference.path",
+        "reference.sha256",
+        "original_full_proof.path",
+        "original_full_proof.sha256"
+      ]
+    },
+    "capacity_proof": {
+      "required": [
+        "complete=true",
+        "independently_accepted=true",
+        "actual_job_id==new GPU job",
+        "resources==GPU config.resources"
+      ]
+    },
+    "composite": {
+      "continuous_live_Delta": false,
+      "emitted_fields": [
+        "kind",
+        "complete",
+        "phase",
+        "source_commit",
+        "actual_GPU_job_id",
+        "actual_CPU_job_id",
+        "groups_file_sha256",
+        "actual_Delta_owning_guards_passed",
+        "stable_Delta_catalogues_before_after",
+        "immutable_CPU_proof_not_rewritten",
+        "continuous_live_Delta",
+        "catalogues",
+        "ledger_sha256",
+        "active_mapping_reference",
+        "budget",
+        "actual_CPU_COMPLETE",
+        "actual_per_start_cache_check"
+      ],
+      "immutable_CPU_proof": true
+    },
+    "cutover_attestation": {
+      "freshness": "finalized-observed in[0,15] seconds and finalized<=current time; later same immutable transition/current normalized chain authenticated, no new15-second historical-age requirement",
+      "required": [
+        "observed_unix",
+        "finalized_unix",
+        "quiescent=true",
+        "active_readers=[]",
+        "root_cutover_attested=true",
+        "originals_preserved=true",
+        "new_reservation_complete=true",
+        "native_successor_complete=true",
+        "native_normalization_complete=true",
+        "readers_released=false",
+        "actual_job_id",
+        "reservation_id",
+        "mapping_origin_sha256",
+        "active_mapping_reference",
+        "mapping_lineage_references",
+        "ledger_sha256"
+      ]
+    },
+    "operational_admission": {
+      "forbidden": [
+        "kind=a3_root_pilot_admission_v1",
+        "pilot_root",
+        "bank_and_prefix4_only"
+      ],
+      "matching_SHA_fields": [
+        "packet_manifest_sha256",
+        "groups_file_sha256",
+        "bank_file_sha256",
+        "bank_manifest_sha256",
+        "input_manifest_sha256",
+        "model_cache_proof_sha256",
+        "resource_proof_sha256",
+        "capacity_proof_sha256"
+      ],
+      "required": [
+        "accepted=true",
+        "complete=true",
+        "phase=full_score",
+        "source_commit",
+        "actual_job_id",
+        "reservation_id",
+        "main_root",
+        "resources",
+        "reader_safe_cutover_complete=true",
+        "native_successor_complete=true"
+      ]
+    },
+    "protection_proof": {
+      "required": [
+        "complete=true",
+        "independently_accepted=true",
+        "catalogues exactly four virtual_path/sha256 identities equal minimum_registry_paths",
+        "nonempty_heldout explicit; nonempty requires nonempty_heldout_closure_reviewed=true and owning independent review"
+      ]
+    },
+    "release": {
+      "emitted_fields": [
+        "active_mapping_reference",
+        "actual_job_id",
+        "bank_file_sha256",
+        "bank_internal_payload_sha256",
+        "bank_manifest_sha256",
+        "bound_config_sha256",
+        "bridges_G3_receipt_sha256",
+        "capacity_proof_sha256",
+        "catalogues",
+        "current_usage_pass",
+        "delta_G3_receipt_sha256",
+        "delta_fresh_preflight_passed",
+        "delta_preflight_receipt",
+        "delta_preflight_receipt_sha256",
+        "expires_at",
+        "full_scoring_admitted",
+        "groups_file_sha256",
+        "groups_receipt_sha256",
+        "image_sha256",
+        "input_manifest_sha256",
+        "issued_at",
+        "launch_packet_manifest_sha256",
+        "ledger_sha256",
+        "main_root",
+        "mapping_origin_sha256",
+        "model_cache_proof_sha256",
+        "operational_admission_sha256",
+        "packet_manifest_sha256",
+        "phase",
+        "placement_sha256",
+        "protection_proof_sha256",
+        "reservation_id",
+        "resource_proof_sha256",
+        "resources",
+        "snapshot_sha256",
+        "source_commit",
+        "source_plan_sha256",
+        "waiting_sha256"
+      ],
+      "note": "Producer emits these fields. GPU acquisition adds private release/waiting hash/path fields; entry adds only-shortenable _entry_work_deadline. Entry lease is300 seconds, not full-run authority.",
+      "remote_pending_final": "Exclusive pending creation, strict actual resource/WAITING/expiry/hash guards, os.link pending->final then unlink pending; no overwrite/renewal."
+    }
+  },
+  "entrypoints": {
+    "cpu": {
+      "environment_required": [
+        "A2_FULL_SCORE_CPU_PACKET=<actual immutable CPU packet directory>"
+      ],
+      "note": "launch.sh is a shell script and execs python3 supervisor.py. Actual supervisor enforces original mgnp child path, Delta CPU allocation/host/resources/no GPU.",
+      "shell_invocation": [
+        "bash",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/launch.sh",
+        "--config",
+        "<actual-CPU-bound.json>",
+        "--config-sha256",
+        "<actual-SHA>"
+      ],
+      "source": {
+        "line": 345,
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/supervisor.py",
+        "sha256": "67e07ab711e23bba843c10037492bc47b7262b8923368b9caf5d41d45bbfc68c",
+        "symbol": "main"
+      }
+    },
+    "gpu": {
+      "environment_required": [
+        "SLURM_JOB_ID=<actual Bridges GPU job>",
+        "A2_FULL_SCORE_PACKET=<physical absolute immutable GPU directory>",
+        "A2_FULL_SCORE_BOUND_CONFIG=<actual physical bound config>",
+        "A2_FULL_SCORE_BOUND_CONFIG_SHA256=<actual-SHA>"
+      ],
+      "note": "Host uses python3 stdlib and current scontrol; container maps physical to original virtual paths, activates original bridges2.env, restores exact environment and runs controller with packed mgnp. Runtime S unchanged.",
+      "shell_invocation": [
+        "bash",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/launch.sh"
+      ],
+      "source": {
+        "line": 100,
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/host-launch.py",
+        "sha256": "80eb4eff09b1f4f59ce1adaa579d444609853a70993b96b43f7af3067248223c",
+        "symbol": "main"
+      }
+    },
+    "root": {
+      "actions": [
+        "trigger",
+        "publish",
+        "run-phase"
+      ],
+      "execute_run_phase_argv": [
+        "<root-supported-python>",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+        "run-phase",
+        "--phase",
+        "full_score",
+        "--bindings",
+        "<actual-bindings.json>",
+        "--bindings-sha256",
+        "<actual-SHA>",
+        "--execute"
+      ],
+      "note": "No --execute only validates actual closed bindings. --execute run-phase calls trigger then publish; publication is real conditional entry authority, never a dry-run.",
+      "source": {
+        "line": 706,
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+        "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+        "symbol": "main"
+      },
+      "validated_only_argv": [
+        "<root-supported-python>",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+        "trigger",
+        "--phase",
+        "full_score",
+        "--bindings",
+        "<actual-bindings.json>",
+        "--bindings-sha256",
+        "<actual-SHA>"
+      ]
+    }
+  },
+  "facts": [
+    {
+      "detail": "Task1 accepted207-r3; Task2 accepted258 with226 per environment; Task3 corrected r4 accepted294 with379 per environment. Do not rerun without a new concern.",
+      "evidence": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/progress.md"
+      ],
+      "id": "accepted_components",
+      "status": "EXISTING_ACCEPTED_SOURCE_AND_COMPONENT_RESULTS"
+    },
+    {
+      "detail": "r2 source ready for bounded CPU validation only; root reports actual CPU job23636443 allocated/held with release imminent. No scheduler state or result independently inspected here; Task4 acceptance remains separate.",
+      "evidence": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-review296-r2/verdict.json"
+      ],
+      "id": "whole_packet",
+      "status": "SOURCE_ACCEPTED_RESULT_STILL_REQUIRED"
+    },
+    {
+      "bank_file_sha256": "a8afbd51a994a6346d1bb8c832b68cab0ea42c83a195c22a29aae4016723e00b",
+      "bank_internal_payload_sha256": "17045db1a43c7a4e53f31edb2e2719367b2efc1665dc6081880dc45f122ec1a1",
+      "bank_manifest_sha256": "3fdff794cb9bba609ee3d181af24c02b1734796270c07985c020345b238b360f",
+      "bank_numeric_environment": {
+        "cpu_threads": 1,
+        "cuda_matmul_allow_tf32": false,
+        "cuda_runtime": "12.8",
+        "cudnn_allow_tf32": true,
+        "deterministic_algorithms": false,
+        "matmul_precision": "highest",
+        "nnsight": "0.7.0",
+        "numpy": "2.5.1",
+        "python": [
+          3,
+          12,
+          13
+        ],
+        "torch": "2.11.0+cu128",
+        "transformers": "5.13.0"
+      },
+      "detail": "Raw file and native payload hashes are distinct. Reuse complete bank; no bank/pilot/limit/summarize/effects.",
+      "different_GPU_UUID_allowed": "Bank old UUID and new actual UUID are recorded independently; exact name/device/dtype/numeric environment, geometry and all original bank contracts remain mandatory.",
+      "evidence": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/config.template.json"
+      ],
+      "expected_controls": 3396,
+      "expected_rows": 59652,
+      "groups_file_sha256": "c3095b10aac09a23ee35e4620402581b0407623d1e111a2407a691f60f599de4",
+      "groups_receipt_sha256": "70bf66db010047ec0fa899f6bd713242facf94af00818c03e5691ceacb0a0135",
+      "id": "science_identity",
+      "runtime": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime",
+      "source_commit": "50e947bb852613e3a270082651f2bd1b7bb0c525",
+      "status": "EXISTING_FROZEN_REFERENCE_REQUIRES_CURRENT_RECHECK"
+    },
+    {
+      "complete_proof_sha256": "56806be4b4f233005f98f338fdc11dd5e46f09e376b0cb7577497494857a519d",
+      "detail": "Proof50316939: host union17981808282 bytes, stage plus512MiB1098877995 bytes; conditional1 H100/4 CPU/96GiB/19800s proposal. Root platform/fixed-envelope decision and actual capacity/resources still unbound. No extra GPU stress inherently required.",
+      "evidence": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-proof-terminal-review249/verdict.json",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/249-proof-terminal-review-handback.md"
+      ],
+      "id": "genuine_schema_resources",
+      "status": "EXISTING_ACCEPTED_CPU_FACT_CONDITIONAL_ENGINEERING_PROPOSAL"
+    },
+    {
+      "child_internal_seconds": 186.876922,
+      "detail": "Actual Delta job23624978; full59652/3396 reconstruction/native bank/context checks; no model. Not remote handoff or prospective tail-latency bound.",
+      "evidence": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/285-handback.md",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-timing-result-review285/checks.json"
+      ],
+      "id": "local_fresh_timing",
+      "local_publication_seconds": 0.394136,
+      "observed_job_peak_bytes": 3092062208,
+      "parent_pipeline_seconds": 193.165566,
+      "status": "EXISTING_ACCEPTED_LOCAL_COMPONENT_MEASUREMENT_ONLY"
+    },
+    {
+      "detail": "Two --test-only forecasts for cis260361p/cis260372p and4CPU96G1H10019800s. Forecast numbers are not actual job IDs/reservations/capacity. Recheck actual placement when binding.",
+      "evidence": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-placement-preview295/preview.json"
+      ],
+      "id": "placement_preview",
+      "status": "EXISTING_SCHEDULER_PREVIEW_NOT_CAPACITY_OR_JOB"
+    },
+    {
+      "cache_reference_sha256": "6d4caf626770067c20ce372a197ec402e7242ab745fad8e3b338dead1a071fbf",
+      "detail": "Need current physical cache/SIF/namespace checks; cache gate hashes metadata and checks weight length/resolved blob, refs/main/revision. No full weight rehash, download or model.",
+      "evidence": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/cache_gate.py",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/config.template.json"
+      ],
+      "full_weight_proof_sha256": "b28e3897ffc3bda9db3ad4bbaf5a38a5c3ed664b301983eae133c08536461fee",
+      "id": "SIF_cache_reference",
+      "image": "/ocean/projects/cis260361p/swong2/specificity-ladder-20261102/containers/ubuntu2204.sif",
+      "image_sha256": "f50c8e39dd5e2ac1c1a4bdfd443351cb970513fdb10a572725eb53d7396f8697",
+      "namespace_requirements": {
+        "device_type": "cuda",
+        "dtype": "torch.bfloat16",
+        "expected_GPU": "NVIDIA H100 80GB HBM3",
+        "historical_physical_Alignment": "/ocean/projects/cis260361p/swong2/specificity-ladder-a2-assay-20261103/Alignment",
+        "historical_physical_HF": "/ocean/projects/cis260361p/swong2/hf/hub",
+        "minimum_GPU_free_bytes": 68719476736,
+        "minimum_GPU_total_bytes": 80000000000,
+        "note": "Historical physical roots and template expected_account=cis260382p are not current placement bindings. Root selects actual supported account/QoS/resources; previews361/372 do not bind these. inner.sh retains frozen DC_B2_ALLOC=cis260361p/cache namespace; preserve original activation/offline environment.",
+        "virtual_Alignment": "/projects/beto/swong2/Alignment",
+        "virtual_HF": "/work/nvme/beto/swong2"
+      },
+      "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+      "status": "EXISTING_HISTORICAL_PINS_CURRENT_DEPLOYMENT_UNBOUND"
+    }
+  ],
+  "immutable_constraints": {
+    "automatic_retry": false,
+    "bank_rerun": false,
+    "expired_reset_exception": "Only strict historical expired_post_reset interpretation with ordered aware timestamps; never cap override.",
+    "live_usage_below_percent": 80,
+    "native_checkpoint": "current targeted native status; cadence currently40, historical16/17 telemetry not authority",
+    "new_native_authority_kind": false,
+    "score_limit_argument": "OMITTED"
+  },
+  "kind": "SOURCE_DERIVED_UNBOUND_NEXT_OPERATIONAL_BINDING_INVENTORY",
+  "limits": "Source/doc-derived inventory. Root supplied Task4 job context is not a scheduler observation; current resources/filesystem/capacity/usage/readers must be checked by root at action time.",
+  "measurement": {
+    "clocks": {
+      "WAITING_publication_max_seconds": 300,
+      "fresh_local_parent_seconds": 193.165566,
+      "local_publication_seconds": 0.394136,
+      "remote_readback_cache_source_allocation_seconds": null,
+      "remote_request_acquisition_seconds": null,
+      "remote_transfer_seconds": null,
+      "request_pickup_max_age_seconds": 15,
+      "root_remote_publication_seconds": null,
+      "stable_capture_native_closure_seconds": null
+    },
+    "operational_feasible": null,
+    "orientation_only": {
+      "fresh_plus_proposed45_seconds": 238.165566,
+      "note": "45-second proposal is not measured remote allowance; no tail-latency or future feasibility follows. Root pretrigger time since WAITING also consumes the same original300-second window.",
+      "unallocated_headroom_seconds": 61.834434
+    },
+    "refs": [
+      "/projects/beto/swong2/Alignment/Deception-Circuit/docs/research/specificity-ladder/reports/285-handback.md",
+      {
+        "line": 706,
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+        "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+        "symbol": "main"
+      },
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/README.md"
+    ],
+    "reusable_existing_CPU_only_route": {
+      "component_APIs": [
+        {
+          "line": 468,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Transport.fetch"
+        },
+        {
+          "line": 467,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Transport.inspect"
+        },
+        {
+          "line": 481,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Transport.cache_check"
+        },
+        {
+          "line": 471,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Transport.stage"
+        }
+      ],
+      "excluded_authority": "Do not call Transport.publish, remote_publish_program, Producer.publish/run-phase or forge RUNNING H100/WAITING/admission facts for CPU rehearsal. Those real release paths require actual GPU job/resource/deadline identity and create once-only entry authority.",
+      "local_only": {
+        "entrypoint": "--config <separate newly bound diagnostic config> --config-sha256 <SHA>; --dry-run validates fixed policy",
+        "limitations": "Already accepted local timing exists; do not repeat merely for this inventory. A newly warranted CPU-only diagnostic reuses accepted unchanged runner/data_path with actual new CPU job/witness/resources. It deliberately emits no operational WAITING/request/COMPLETE/release and cannot fill remote costs.",
+        "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-fresh-cpu-timing239-r2/runner.py",
+        "policy": {
+          "CPUs": 4,
+          "RAM_bytes": 34359738368,
+          "duration_seconds": 900,
+          "fresh_seconds": 240,
+          "prime_seconds": 480,
+          "publication_margin_seconds": 45
+        }
+      },
+      "narrow_missing_scope": "The reviewed runner measures only local proof/local publication; helper CLI has no rehearsal/measure action. Direct component APIs can measure missing remote components without new production, but do not establish the whole ordered request-to-publication path by themselves. No whole-handoff runner or plan is created here.",
+      "no_existing_full_handoff_CPU_only_mode_in_examined_source": true,
+      "permissible_scope": "Root can time existing fetch/hash/metadata-cache/readback operations, and stage exact closure only into a dedicated approved diagnostic mirror, with actual CPU/transport/cache/source provenance. stage writes directories/files and is not read-only. Standalone inspection returns raw scontrol and requires an existing marker; a CPU diagnostic marker/job must remain labelled diagnostic, never be relabelled authentic GPU WAITING."
+    },
+    "status": "MISSING_COMPLETE_ACTUAL_HANDOFF_MEASUREMENT_OR_CONSERVATIVE_FEASIBILITY_CLOSURE"
+  },
+  "ordered_root_operations": [
+    {
+      "artifacts": [
+        "actual run_manifest.json, identities,32-case XML/logs/results in both supported environments",
+        "exact whole-packet acceptance/source publication manifest"
+      ],
+      "operation": "Consume actual Task4 CPU result and independent whole-packet acceptance; freeze exact source/closure",
+      "refs": [
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet289-r2/candidate/README.md",
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet-review296-r2/verdict.json"
+      ],
+      "status": "STILL_REQUIRED",
+      "step": 1
+    },
+    {
+      "artifacts": [
+        "GPU resource_proof complete, independently_accepted, proof181_accepted, resources, five true reviewed_components; full_domain_reference path/SHA",
+        "capacity_proof complete, independently_accepted, exact actual_job_id/resources",
+        "CPU independent resource proof matching exact CPU tuple and timing envelope",
+        "accepted current model-cache proof/reference/original-full-proof closure",
+        "actual SIF hash, quota/inodes/free space and score absence"
+      ],
+      "caution": "Conditional4CPU96GiB19800s is not a default. minimum_entry_seconds, child_cap_seconds and finish_margin_seconds remain explicit reviewed bindings. Existing SIF path/account values do not prove current capacity. Capacity proof preparation does not invent a future job ID; actual_job_id is sealed only after the held job exists at step4/5.",
+      "operation": "Declare existing engineering resource/platform decision and prepare current deployment/cache/SIF/storage/namespace capacity evidence; seal job-bound capacity after actual job identity exists",
+      "refs": [
+        {
+          "line": 299,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py",
+          "sha256": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+          "symbol": "reviewed_admission"
+        },
+        {
+          "line": 323,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py",
+          "sha256": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+          "symbol": "cache"
+        },
+        {
+          "line": 481,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Transport.cache_check"
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-proof-terminal-review249/verdict.json"
+      ],
+      "status": "STILL_UNBOUND",
+      "step": 2
+    },
+    {
+      "artifacts": [
+        "helper manifest: helper.py/cache_gate.py/bindings.template.json",
+        "GPU manifest:8 required members",
+        "CPU manifest:6 required members",
+        "original source511-file/four-literal-link snapshot at fixed runtime S",
+        "corrected422 ordinary input manifest with alias_role_proof and exact aliases",
+        "fresh4-catalogue protection proof/nonempty heldout owning review if applicable",
+        "immutable G3 receipts, complete bank file+manifest, original plan pins"
+      ],
+      "caution": "MAIN parent writable for sibling .score-* rename; bank/groups/all preexisting leaves read-only, source/cache/inputs read-only, evidence separate. Existing score/symlink/scratch rejects.",
+      "operation": "Publish exact immutable operational17-member source and bound proof/input references to actual physical mirror preserving original virtual namespace",
+      "refs": [
+        {
+          "line": 509,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "verify_runtime_pins"
+        },
+        {
+          "line": 267,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "source_export"
+        },
+        {
+          "line": 220,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py",
+          "sha256": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+          "symbol": "packet"
+        },
+        {
+          "line": 280,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py",
+          "sha256": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+          "symbol": "input_closure"
+        },
+        {
+          "line": 65,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/host-launch.py",
+          "sha256": "80eb4eff09b1f4f59ce1adaa579d444609853a70993b96b43f7af3067248223c",
+          "symbol": "build_container_command"
+        }
+      ],
+      "status": "STILL_UNBOUND",
+      "step": 3
+    },
+    {
+      "artifacts": [
+        "actual numeric GPU job ID and new reservation lineage",
+        "complete original/current ledger snapshots, original mapping/admission references plus native successor",
+        "sealed cutover attestation binding actual job/reservation/origin, active mapping/lineage, preserved snapshot SHA; finalized_unix/observed_unix",
+        "actual owning CPU job identity and resource contract for standby; CPU work does not create GPU reservation authority"
+      ],
+      "caution": "No active reader during reservation+COMPLETE finalization; running A3 ends naturally. Fresh observed-to-finalized quiescence<=15s; later same sealed transition is historical, current full chain re-normalized. New transition needs fresh proof. Preserve all charges; exact Decimal seconds and native rounding; capsA1=25,A2=60,A3=40,total125,concurrency99.",
+      "operation": "Obtain actual new full-only held job identity and finalize reader-safe reservation plus COMPLETE native successor",
+      "refs": [
+        {
+          "line": 119,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "validate_cutover"
+        },
+        {
+          "line": 128,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "authenticate_cutover"
+        },
+        {
+          "line": 296,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "collect_native_closure"
+        },
+        {
+          "line": 191,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "validate_budget"
+        }
+      ],
+      "status": "STILL_UNBOUND_ROOT_ONLY",
+      "step": 4
+    },
+    {
+      "artifacts": [
+        "GPU closed config exact job/reservation/resources/phase/full_scoring_admitted/resource_review flags and every reference SHA",
+        "new full-only operational_admission accepted/complete/source/job/reservation/MAIN/resources/all required SHA fields; reader_safe_cutover_complete/native_successor_complete",
+        "CPU closed config exact actual CPU job/resources/packet/G3/bank/base-parameters/request/evidence paths",
+        "base parameters source review/export/G2/input/witness/full-domain references",
+        "root closed bindings references/phase/session/hard80/transport argv"
+      ],
+      "caution": "No A3 pilot authority kind, old timing flags, prefix bank proof or null resource defaults. Actual held job/resources/admission must agree before release; current RUNNING hardware/allocation is rechecked by host/root at execution.",
+      "operation": "Seal actual GPU/CPU configs, operational admission, base parameters and root bindings for the new job",
+      "refs": [
+        {
+          "line": 88,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py",
+          "sha256": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+          "symbol": "validate_config"
+        },
+        {
+          "line": 299,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py",
+          "sha256": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+          "symbol": "reviewed_admission"
+        },
+        {
+          "line": 197,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/supervisor.py",
+          "sha256": "67e07ab711e23bba843c10037492bc47b7262b8923368b9caf5d41d45bbfc68c",
+          "symbol": "validate_config"
+        },
+        {
+          "line": 531,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "load_bindings"
+        }
+      ],
+      "status": "STILL_UNBOUND",
+      "step": 5
+    },
+    {
+      "artifacts": [
+        "actual CPU READY.json matching actual CPU job/source/packet, CPU Slurm resource/host facts",
+        "fresh GPU evidence/allocation captures, exact RUNNING H100 resource tuple",
+        "one WAITING-full_score.json with exact bank/groups/config/packet/resources and fixed publication deadline"
+      ],
+      "caution": "CPU must already be able to acquire request within15s. GPU WAITING publication window<=300s may be shorter if allocation/work floor requires. Job release can lead to model permission only when root later publishes; never arm incidental old release watchers.",
+      "operation": "Start owning CPU standby and reviewed GPU host only after complete native transition and actual admission; observe CPU READY/GPU WAITING",
+      "refs": [
+        {
+          "line": 256,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/supervisor.py",
+          "sha256": "67e07ab711e23bba843c10037492bc47b7262b8923368b9caf5d41d45bbfc68c",
+          "symbol": "supervise_once"
+        },
+        {
+          "line": 100,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/host-launch.py",
+          "sha256": "80eb4eff09b1f4f59ce1adaa579d444609853a70993b96b43f7af3067248223c",
+          "symbol": "main"
+        },
+        {
+          "line": 464,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py",
+          "sha256": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+          "symbol": "gpu_release"
+        },
+        {
+          "line": 563,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Producer.trigger"
+        }
+      ],
+      "status": "STILL_UNBOUND",
+      "step": 6
+    },
+    {
+      "artifacts": [
+        "immutable fetched WAITING, root request and trigger-record",
+        "child request/WAITING/parameters/guard-result/child-execution/catalogue capture sidecars and normal COMPLETE"
+      ],
+      "caution": "Trigger checks pins/live usage/native chain/sealed cutover, fetch+remote WAITING hash, actual CPU READY/scontrol, pins again, then issues one request. CPU deadline=min(now+reviewed child cap, initial/current CPU end-minus-finish, WAITING publication deadline-minus-publication margin). No TERM, stale request, late completion or renewal.",
+      "operation": "Root trigger then original owning CPU normal COMPLETE",
+      "refs": [
+        {
+          "line": 563,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Producer.trigger"
+        },
+        {
+          "line": 73,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "construct_request"
+        },
+        {
+          "line": 67,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/supervisor.py",
+          "sha256": "67e07ab711e23bba843c10037492bc47b7262b8923368b9caf5d41d45bbfc68c",
+          "symbol": "validate_request"
+        },
+        {
+          "line": 93,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/supervisor.py",
+          "sha256": "67e07ab711e23bba843c10037492bc47b7262b8923368b9caf5d41d45bbfc68c",
+          "symbol": "child_deadline"
+        },
+        {
+          "line": 151,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/supervisor.py",
+          "sha256": "67e07ab711e23bba843c10037492bc47b7262b8923368b9caf5d41d45bbfc68c",
+          "symbol": "validate_child_completion"
+        }
+      ],
+      "status": "STILL_UNBOUND",
+      "step": 7
+    },
+    {
+      "artifacts": [
+        "publish-once.claim",
+        "immutable actual CPU proof reference",
+        "current native lineage/ledger closure and four catalogue captures/protection",
+        "actual-cache-check.json",
+        "separate composite-preflight.json",
+        "transfer tree/listing and remote/local readbacks"
+      ],
+      "caution": "CPU COMPLETE never rewritten. Remote catalogues are snapshots, not continuous Delta truth. After transfer: revalidate pins/native chain/cutover/cache/current remote source/bank/SIF/aliases/allocation/deadline/local bytes/CPU proof/usage; publication must remain before original WAITING deadline.",
+      "operation": "Root publish pipeline captures immutable CPU/native closure and stable current catalogues, checks cache, transfers, rereads and rechecks everything",
+      "refs": [
+        {
+          "line": 588,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Producer.publish"
+        },
+        {
+          "line": 343,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "capture_cpu"
+        },
+        {
+          "line": 237,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "collect_reference_closure"
+        },
+        {
+          "line": 471,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Transport.stage"
+        },
+        {
+          "line": 467,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Transport.inspect"
+        }
+      ],
+      "status": "STILL_UNBOUND_AND_REMOTE_COST_UNMEASURED",
+      "step": 8
+    },
+    {
+      "artifacts": [
+        "root-release.json and exclusive remote .pending/final full_score release",
+        "publication.json",
+        "consumer root-release, CONSUMED-full_score.json, full-score-command.json",
+        "original native score/run_manifest.json and controller COMPLETE only after normal full audit"
+      ],
+      "caution": "Remote program independently requires actual RUNNING/account/QoS/typed1H100/resources/duration/UID/deadline/WAITING/hash and exclusive final. Release lifetime300s is entry permission, separate from <=300s WAITING publication window and allocation finish reserve. Costly postactivation checks finish before final immutable+allocation/consume checks. One original score CLI only; no retry/renewal/requeue/time extension; partial outputs preserved.",
+      "operation": "Root remote once-only pending-to-final release; actual consumer acquires and consumes entry permission once",
+      "refs": [
+        {
+          "line": 488,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "Transport.publish"
+        },
+        {
+          "line": 429,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py",
+          "sha256": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085",
+          "symbol": "remote_publish_program"
+        },
+        {
+          "line": 425,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py",
+          "sha256": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+          "symbol": "validate_release"
+        },
+        {
+          "line": 528,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py",
+          "sha256": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+          "symbol": "entry_release"
+        },
+        {
+          "line": 54,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/controller.py",
+          "sha256": "e9ac72c163eb06a543711efeccb4dc35ce183392218471099ac1d40ccf961cc4",
+          "symbol": "preflight_full_score"
+        },
+        {
+          "line": 147,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/controller.py",
+          "sha256": "e9ac72c163eb06a543711efeccb4dc35ce183392218471099ac1d40ccf961cc4",
+          "symbol": "run_full_score"
+        }
+      ],
+      "status": "STILL_UNBOUND_REAL_AUTHORITY_BOUNDARY",
+      "step": 9
+    },
+    {
+      "artifacts": [
+        "native full59652-row/3396-control/support-reason/source/bank/provenance audit"
+      ],
+      "caution": "Fixture/component/timing success does not accept science. No held-out scoring or summary/effects is included in operational preparation.",
+      "operation": "Independent normal full-result acceptance and any later summarize/effects decision",
+      "refs": [
+        {
+          "line": 100,
+          "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/controller.py",
+          "sha256": "e9ac72c163eb06a543711efeccb4dc35ce183392218471099ac1d40ccf961cc4",
+          "symbol": "audit_score_result"
+        },
+        "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet289-r2/candidate/root-release-contract.json"
+      ],
+      "status": "LATER_EXISTING_PHASE",
+      "step": 10
+    }
+  ],
+  "schemas": {
+    "CPU_config": {
+      "closed_keys": [
+        "CPU_finish_margin_seconds",
+        "CPUs",
+        "GPU_packet_manifest_sha256",
+        "RAM_bytes",
+        "allowed_partitions",
+        "bank_file_sha256",
+        "bank_manifest_sha256",
+        "base_parameters",
+        "child_cap_seconds",
+        "duration_seconds",
+        "evidence_output",
+        "expected_account",
+        "expected_qos",
+        "frozen_G3_root",
+        "frozen_G3_sha256",
+        "kill_grace_seconds",
+        "packet_manifest",
+        "packet_manifest_sha256",
+        "phase",
+        "publication_margin_seconds",
+        "python",
+        "request_path",
+        "resource_proof",
+        "resource_review_accepted",
+        "runtime",
+        "source_commit",
+        "standing_CPU_job_id"
+      ],
+      "note": "Template values are references/proposals only; actual runtime bindings remain null in this inventory.",
+      "null_template_keys": [
+        "CPU_finish_margin_seconds",
+        "CPUs",
+        "GPU_packet_manifest_sha256",
+        "RAM_bytes",
+        "child_cap_seconds",
+        "duration_seconds",
+        "evidence_output",
+        "expected_account",
+        "expected_qos",
+        "kill_grace_seconds",
+        "packet_manifest_sha256",
+        "publication_margin_seconds",
+        "request_path",
+        "standing_CPU_job_id"
+      ],
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/config.template.json",
+      "pinned_reference_keys": [
+        "base_parameters",
+        "packet_manifest",
+        "resource_proof"
+      ],
+      "resources_keys": null,
+      "sha256": "647b7c27da1615718cc2e51302f17cdbcc89c1839b22e601bfa4ddf0b8f3a377"
+    },
+    "CPU_parameters": {
+      "closed_keys": [
+        "accepted_export_receipt",
+        "accepted_runtime",
+        "accepted_source_commit",
+        "accepted_source_snapshot",
+        "bank_file_sha256",
+        "bank_internal_payload_sha256",
+        "bank_manifest_sha256",
+        "current_catalogue_witness",
+        "design",
+        "frozen_G3_sha256",
+        "full_domain_proof",
+        "historical_G2",
+        "independent_source_acceptance",
+        "input_manifest",
+        "new_g3_output",
+        "phase",
+        "registry",
+        "root_source_review_accepted",
+        "selected"
+      ],
+      "note": "Template values are references/proposals only; actual runtime bindings remain null in this inventory.",
+      "null_template_keys": [],
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/parameters.template.json",
+      "pinned_reference_keys": [
+        "accepted_export_receipt",
+        "accepted_source_snapshot",
+        "current_catalogue_witness",
+        "full_domain_proof",
+        "historical_G2",
+        "independent_source_acceptance",
+        "input_manifest"
+      ],
+      "resources_keys": null,
+      "sha256": "43db65f89511ab0a255ff42bc4e32dc3e2d1673ca58937cb209932a3d09c90e0"
+    },
+    "GPU_config": {
+      "closed_keys": [
+        "a1_design",
+        "a1_selected",
+        "actual_job_id",
+        "allowed_partitions",
+        "attention_backend",
+        "bank_file",
+        "bank_file_sha256",
+        "bank_gpu_uuid",
+        "bank_internal_payload_sha256",
+        "bank_manifest",
+        "bank_manifest_sha256",
+        "bank_numeric_environment",
+        "bridges_G3_receipt",
+        "bridges_G3_receipt_sha256",
+        "canonical_ledger",
+        "capacity_proof",
+        "capacity_proof_sha256",
+        "commit",
+        "delta_G3_receipt",
+        "delta_G3_receipt_sha256",
+        "dtype",
+        "evidence_root",
+        "expected_account",
+        "expected_controls",
+        "expected_qos",
+        "expected_score_rows",
+        "experiment_limits",
+        "full_scoring_admitted",
+        "global_limit",
+        "groups",
+        "groups_file_sha256",
+        "groups_receipt_sha256",
+        "image",
+        "image_sha256",
+        "input_manifest",
+        "input_manifest_sha256",
+        "launch_packet_manifest_sha256",
+        "main_root",
+        "mapping_origin",
+        "mapping_origin_sha256",
+        "maximum_allocation_capture_age_seconds",
+        "minimum_gpu_free_bytes",
+        "minimum_gpu_total_bytes",
+        "minimum_registry_paths",
+        "model_cache_proof",
+        "model_cache_proof_sha256",
+        "operational_admission",
+        "operational_admission_sha256",
+        "packet_manifest",
+        "packet_manifest_sha256",
+        "phase",
+        "physical_Alignment_root",
+        "physical_HF_cache",
+        "placement_sha256",
+        "protection_proof",
+        "protection_proof_sha256",
+        "python",
+        "registry",
+        "release_directory",
+        "release_max_age_seconds",
+        "reservation_id",
+        "resource_proof",
+        "resource_proof_sha256",
+        "resource_review_accepted",
+        "resources",
+        "runtime",
+        "scope",
+        "snapshot",
+        "snapshot_sha256",
+        "source_plan",
+        "source_plan_sha256",
+        "trigger_max_age_seconds",
+        "virtual_Alignment_root",
+        "virtual_HF_cache",
+        "worktree"
+      ],
+      "note": "Template values are references/proposals only; actual runtime bindings remain null in this inventory.",
+      "null_template_keys": [
+        "actual_job_id",
+        "bank_gpu_uuid",
+        "bridges_G3_receipt",
+        "bridges_G3_receipt_sha256",
+        "capacity_proof",
+        "capacity_proof_sha256",
+        "delta_G3_receipt",
+        "delta_G3_receipt_sha256",
+        "evidence_root",
+        "input_manifest",
+        "input_manifest_sha256",
+        "launch_packet_manifest_sha256",
+        "mapping_origin",
+        "mapping_origin_sha256",
+        "model_cache_proof",
+        "model_cache_proof_sha256",
+        "operational_admission",
+        "operational_admission_sha256",
+        "packet_manifest",
+        "packet_manifest_sha256",
+        "placement_sha256",
+        "protection_proof",
+        "protection_proof_sha256",
+        "release_directory",
+        "reservation_id",
+        "resource_proof",
+        "resource_proof_sha256",
+        "snapshot"
+      ],
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/config.template.json",
+      "pinned_reference_keys": [],
+      "resources_keys": [
+        "CPUs",
+        "GPU_count",
+        "RAM_bytes",
+        "child_cap_seconds",
+        "duration_seconds",
+        "finish_margin_seconds",
+        "minimum_entry_seconds"
+      ],
+      "sha256": "d6247a0a630d87c9e94d7ea158b9c7fde7e2cccf3a32b27bd757c7c65f2d4e4d"
+    },
+    "request": {
+      "closed_keys": [
+        "GPU_WAITING_marker_path",
+        "GPU_WAITING_marker_sha256",
+        "GPU_WAITING_requested_at",
+        "GPU_packet_manifest_sha256",
+        "accepted_source_commit",
+        "actual_future_GPU_job_id",
+        "bank_file_sha256",
+        "bank_manifest_sha256",
+        "final_GPU_bound_config_sha256",
+        "frozen_G3_sha256",
+        "phase",
+        "root_trigger_issued_at",
+        "standing_CPU_job_id",
+        "standing_packet_manifest_sha256"
+      ],
+      "note": "Template values are references/proposals only; actual runtime bindings remain null in this inventory.",
+      "null_template_keys": [
+        "GPU_WAITING_marker_path",
+        "GPU_WAITING_marker_sha256",
+        "GPU_WAITING_requested_at",
+        "GPU_packet_manifest_sha256",
+        "actual_future_GPU_job_id",
+        "final_GPU_bound_config_sha256",
+        "root_trigger_issued_at",
+        "standing_CPU_job_id",
+        "standing_packet_manifest_sha256"
+      ],
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/request.template.json",
+      "pinned_reference_keys": [],
+      "resources_keys": null,
+      "sha256": "f5494a81d7f55903ebdee0ae1ce3d2c9bd757fae857513c6fd26b59676bafe04"
+    },
+    "root_bindings": {
+      "closed_keys": [
+        "GPU_execution_output",
+        "GPU_release_directory",
+        "cutover_attestation",
+        "dtn_host",
+        "gpu_config",
+        "helper_manifest",
+        "phase",
+        "remote_model_cache_reference",
+        "rsync_ssh_argv",
+        "session",
+        "ssh_argv",
+        "standing_config",
+        "state_directory",
+        "usage_pause_percent"
+      ],
+      "note": "Template values are references/proposals only; actual runtime bindings remain null in this inventory.",
+      "null_template_keys": [
+        "GPU_execution_output",
+        "GPU_release_directory",
+        "session",
+        "state_directory"
+      ],
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/bindings.template.json",
+      "pinned_reference_keys": [
+        "cutover_attestation",
+        "gpu_config",
+        "helper_manifest",
+        "remote_model_cache_reference",
+        "standing_config"
+      ],
+      "resources_keys": null,
+      "sha256": "33b7d592acf1f2c6957f8357c4d538420600a44eaf35a3322be99454f358a094"
+    }
+  },
+  "scope": "existing approved plan186 only; no architecture/approval/cap changes",
+  "source_of_truth": {
+    "component_files": {
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/config.template.json": "647b7c27da1615718cc2e51302f17cdbcc89c1839b22e601bfa4ddf0b8f3a377",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/launch.sh": "7a18e0730c65f46f0d59eaa523618c895b60769c7a333531d11657643e12dde8",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/parameters.template.json": "43db65f89511ab0a255ff42bc4e32dc3e2d1673ca58937cb209932a3d09c90e0",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/request.template.json": "f5494a81d7f55903ebdee0ae1ce3d2c9bd757fae857513c6fd26b59676bafe04",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/supervisor.py": "67e07ab711e23bba843c10037492bc47b7262b8923368b9caf5d41d45bbfc68c",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/cpu/validate-phase.py": "72c0a4e0f79c9ffba7449984a843225b50ee3341750a651fbbaec884c186b4d3",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/common.py": "17c298366d6e6d816c9984206232b808ec47d6194ec6c1d98f11cbdef408c791",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/config.template.json": "d6247a0a630d87c9e94d7ea158b9c7fde7e2cccf3a32b27bd757c7c65f2d4e4d",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/controller.py": "e9ac72c163eb06a543711efeccb4dc35ce183392218471099ac1d40ccf961cc4",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/gpu-probe.py": "0d4cdcd2728b752f8e175bd8f9373f8620b92b290ff13c1102ba77a9c453f1d2",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/host-launch.py": "80eb4eff09b1f4f59ce1adaa579d444609853a70993b96b43f7af3067248223c",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/inner.sh": "2a3e6caa6406a73f3b2fbfb2126e48f421fd3f805ec93ee8fa7004bd34c1e100",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/launch.sh": "15e58aab53a103b6844542adcad24641bf42a2098d9d71e2c4d721ee3f324fdb",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/gpu/module-probe.py": "63e348a3f0aea97c75282feb03283b85d33f90195f67aee6f9597f38f37df504",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/bindings.template.json": "33b7d592acf1f2c6957f8357c4d538420600a44eaf35a3322be99454f358a094",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/cache_gate.py": "55d6517228832e0254c10086d03d3b5e3534ad91bf8ddbe54d96e9913fa3fa06",
+      "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate/root/helper.py": "522e6c9a87aaa041a2d63fb3218dd3637791ab859182d8619bc0a4ec0956d085"
+    },
+    "frozen_candidate": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-plan-a2-full-score-operational186/task3/green270-r4/closure/sdd/plan-a2-full-score-operational186/candidate",
+    "plan": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-full-score-operational186/plan.md",
+      "sha256": "bcbf94b80561b6731fa4058e01b1d69be4dcc1a8e3d617ab97414c2d1907955f"
+    },
+    "release_contract": {
+      "path": "/projects/beto/swong2/Alignment/Deception-Circuit/.claude/worktrees/specificity-ladder/.superpowers/sdd/plan-a2-whole-packet289-r2/candidate/root-release-contract.json",
+      "sha256": "d6c533a2c63f835a046761edc3b60d72137666c1e21a3070d88111a9523843c9"
+    }
+  },
+  "status": "handed-back",
+  "worker_actions": "Read-only source/evidence inspection and inventory/README authoring only. No tests/native imports/Git/RS/SSH/jobs/real bindings/agents."
+}
