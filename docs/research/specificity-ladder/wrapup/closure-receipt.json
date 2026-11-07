@@ -1,0 +1,93 @@
+{
+  "session": "codex-01a1a2f4",
+  "status": "Closed; direction paused",
+  "completed_unix": 1794062538.66864,
+  "merge": {
+    "merge_commit": "eed4ac7bb9582e55e0be86dcfb7f6aed54624e36",
+    "parents": [
+      "5f1d671b7f6fa694b4e9a536cad58ba3ff84b590",
+      "738fd377e586af2602b44140097bd1346a501beb"
+    ],
+    "user_approved_ordinary_merge": true
+  },
+  "candidate_branch": {
+    "name": "specificity-ladder-candidate-cpu310",
+    "commit": "2ba697d7f5fdfd7cebc7225ae004ec9e731e434f",
+    "pushed": true
+  },
+  "session_branch_removed": true,
+  "worktree_removed": true,
+  "origin_session_branch": "already absent; confirmed absent",
+  "finding": "F-lad-003 (reviewed), local F3",
+  "findings_check": "0 errors, 0 warnings",
+  "jobs": {
+    "50319720": {
+      "state": "FAILED",
+      "elapsed_seconds": 5056,
+      "raw_terminal_files": 11
+    },
+    "23636235": {
+      "state": "CANCELLED",
+      "elapsed_seconds": 0
+    },
+    "23636244": {
+      "state": "CANCELLED",
+      "elapsed_seconds": 0
+    },
+    "23639005": {
+      "state": "CANCELLED",
+      "elapsed_seconds": 0
+    }
+  },
+  "collection": {
+    "primary_root": "/projects/beto/swong2/Alignment/Deception-Circuit",
+    "remote_source_entries_verified": 1558,
+    "remote_packet_source_records": 3818,
+    "job_logs_verified": 646,
+    "local_output_regular_files": 42400,
+    "local_log_regular_files": 64,
+    "local_packet_tree": "moved atomically into .superpowers/sdd; source inventory and explicit Git list preserved",
+    "container": "Only located copy preserved at containers/ubuntu2204.sif",
+    "studies": "No matching remote outputs/_studies/specificity-ladder directories found",
+    "count_verification": "wrapup/copy-verification.json and wrapup/local-output-verification.json"
+  },
+  "ledger": {
+    "A1": {
+      "reservations": 9,
+      "reserved_gpu_hours": 4.5,
+      "actual_gpu_seconds": 10150,
+      "cap_gpu_hours": 25
+    },
+    "A2": {
+      "reservations": 30,
+      "reserved_gpu_hours": 28.3668,
+      "actual_gpu_seconds": 59497,
+      "cap_gpu_hours": 60
+    },
+    "A3": {
+      "reservations": 2,
+      "reserved_gpu_hours": 1.5,
+      "actual_gpu_seconds": 2342,
+      "cap_gpu_hours": 40
+    },
+    "total": {
+      "actual_gpu_seconds": 71989,
+      "api_usd_known": 0.0,
+      "api_usd_reserve": 0.0,
+      "reserved_gpu_hours": 34.3668
+    }
+  },
+  "left_on_bridges": [
+    "Original remote copies were not deleted",
+    "Shared HF cache and environment installations with local counterparts",
+    "Regenerable pytest temporary arrays excluded from final requested archival set; see remote-packet-mirror.json"
+  ],
+  "local_not_in_git": [
+    "Large generated packet/output data retained on disk",
+    ".superpowers/sdd-bridges-preserved retains the partial broader remote fixture copy",
+    ".scratch/specificity-ladder-wrapup contains the preserved core dump"
+  ],
+  "new_research_runs": 0,
+  "new_research_reviews": 0,
+  "limitations": "Historical absolute worktree paths require rebinding for any fresh execution; archival integration is not scientific acceptance."
+}

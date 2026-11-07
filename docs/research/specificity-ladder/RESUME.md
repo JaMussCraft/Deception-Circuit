@@ -20,7 +20,7 @@ All paths below are relative to the primary Deception-Circuit checkout after col
 | Material | Source and evidence |
 | --- | --- |
 | A1 control ladder | Execution commit `5f450dc93dac707af649dee8c8ca60888b2831db`; reports 34 and 98; outputs/_analyses/specificity-ladder/ladder-5f450dc and the preserved control pools |
-| Eighteen A2 masks | Training commit `6bd8bf5334f2e83613a129d2fcfeacf83e762191`; original mask directories in outputs/_studies and outputs/_analyses, mapped by report 139 and its run manifest |
+| Eighteen A2 masks | Training commit `6bd8bf5334f2e83613a129d2fcfeacf83e762191`; original mask directories in outputs/_training_specificity_ladder and outputs/_analyses/specificity-ladder, mapped by report 139 and its run manifest |
 | A2 all-mask comparison | Commit `40fe57289405fd53a3fce02e5d4e47a0ebf78b64`; report 139 and outputs/_analyses/specificity-ladder/a2-analysis/all18-40fe57289405-v1 |
 | Corrected A2 grading runtime | Commit `50e947bb852613e3a270082651f2bd1b7bb0c525`; outputs/_analyses/specificity-ladder/a2-grader-runtime-50e947bb8526/runtime |
 | A2 bank and scoring prefix | Report 177 accepts the H100 timing/control run only; full scoring was not admitted by that result |
