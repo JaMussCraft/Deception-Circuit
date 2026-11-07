@@ -5,9 +5,9 @@
 |---|---|
 | State | Running |
 | Directions | 1. Control ladder: Complete and independently audited; tested sets fail specificity. · 2. Matched masks: All eighteen complete and source-audited; functional scoring preparation continues. · 3. Below-head tests: Mask timing failed at its bound; direction preparation and edge readiness continue. |
-| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Sat 7 Nov 2026, 1:19 am EST |
+| Started / last updated | Sun 1 Nov 2026, 12:59 pm EST / Sat 7 Nov 2026, 2:48 am EST |
 | Orchestrator auto-compactions | 17, counted by the compaction hook |
-| Weekly usage, all models | account reads 35%; +50 points this session |
+| Weekly usage, all models | account reads 41%; +56 points this session |
 | Weekly usage, Fable | no Fable reading |
 | Review checkpoints | 2 of 2 acknowledged; next at +120 session points; cadence 40 points; cap pause at 80% |
 | GPU budget | 20.0 of 125 GPU-h actual (34.4 reserved); at most 99 jobs at once; clusters: Delta, Bridges-2 |
@@ -15,7 +15,7 @@
 | Open needs from you | 0 |
 | Transcripts (for audits) | not recorded yet |
 
-**Right now.** The full-scoring CPU resource proof is complete and independently accepted. Below-head integration reached its test limit after six assertion failures; a focused unchanged-source diagnostic is being packaged. Required Delta checks remain queued. An exact-interpreter compatibility probe is being implemented for fixture-only tests on Bridges. Actual validation, handoff timing and numerical results still precede model admission.
+**Right now.** The full-score CPU task passed both environments; its native timing run remains queued while the root release helper is implemented. The focused metadata diagnostic isolated faulty test setup and completed the suspected slow case. Corrected tests are accepted for a complete validation packet, now under focused source correction before CPU deployment.
 
 **Terms.** None yet.
 
@@ -69,6 +69,7 @@ Strength is one of: preliminary, reviewed by an independent agent, or final.
 | P29 | Fri 11:19 pm | Root started a deployment dry run before confirming that staging had finished. | The dry run stopped at an absent configuration file before running tests or changing scientific inputs. | Preserve the failed receipt. Wait for the staging completion receipt, then repeat the unchanged read-only check. Keep dependent operations sequential. |
 | P30 | Fri 11:36 pm | A dependency checker falsely reported a launcher path defect, and root checked a different expression before cancelling the queued job. | The valid CPU regression was cancelled before execution, losing its queue position. No implementation defect or failed test was established. | Evaluate the actual launcher expression and preserve the correction receipt. Restore one deliberate submission of the unchanged reviewed packet, without modifying its code or assertions. |
 | P31 | Fri 11:39 pm | Root added a scheduler-supported preemptible partition without checking the short regression observer allocation guard. | The unchanged observer would reject that partition even though Slurm accepted the request. Neither affected job started there. | Remove preemptible eligibility from the restored unstarted regression and preserve the original guard. Check both scheduler support and application allocation contracts before placement changes. |
+| P32 | Sat 1:34 am | Root used the Delta requested-resource field while reading a held Bridges job. | The metadata reader stopped before creating the job binding or releasing the job. No workload ran. | Preserve the failed readback and use the actual Bridges resource field with the same exact CPU, memory and GPU checks. Continue with the same held job. |
 
 ## Log
 
@@ -352,3 +353,10 @@ Strength is one of: preliminary, reviewed by an independent agent, or final.
 **12:36 am EST · Metadata integration reached its test limit with assertion failures.** The intended baseline and original reference preflight completed normally. The implementation suite then reached its fixed time limit after reporting six failures; it produced no complete test report. Preserve the run without accepting partial passes. A focused unchanged-source diagnostic will record those failure traces and the possible slow case, while the independent fixture transport work proceeds.
 **1:14 am EST · Resumed after compaction #7.**
 **1:19 am EST · Full-score CPU task accepted; implementation and timing advanced.**
+**1:30 am EST · Hand-back: Fresh-process timing deployment accepted and released.**
+**1:30 am EST · Actual container check narrowed the remaining diagnostic fix.**
+**1:34 am EST · Process incident P32.** Root used the Delta requested-resource field while reading a held Bridges job. Effect: The metadata reader stopped before creating the job binding or releasing the job. No workload ran. Fix: Preserve the failed readback and use the actual Bridges resource field with the same exact CPU, memory and GPU checks. Continue with the same held job.
+**1:39 am EST · Hand-back: Focused metadata diagnostic released on Bridges.**
+**2:04 am EST · Delta waits continued; complete metadata validation preparation advanced.**
+**2:25 am EST · Diagnostic separated fixture faults from accumulated validation time.**
+**2:44 am EST · Brief orchestration checks unblocked full-score implementation.**

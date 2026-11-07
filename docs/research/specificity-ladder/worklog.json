@@ -252,6 +252,13 @@
       "fix": "Remove preemptible eligibility from the restored unstarted regression and preserve the original guard. Check both scheduler support and application allocation contracts before placement changes.",
       "id": "P31",
       "what": "Root added a scheduler-supported preemptible partition without checking the short regression observer allocation guard."
+    },
+    {
+      "at": "2026-11-07T01:34:57-05:00",
+      "effect": "The metadata reader stopped before creating the job binding or releasing the job. No workload ran.",
+      "fix": "Preserve the failed readback and use the actual Bridges resource field with the same exact CPU, memory and GPU checks. Continue with the same held job.",
+      "id": "P32",
+      "what": "Root used the Delta requested-resource field while reading a held Bridges job."
     }
   ],
   "needs": [
@@ -304,7 +311,7 @@
       "text": "Please apply the already authorized sixteen-point cadence and temporary reset-bound cap exception to this new recovery thread using the targeted human commands in chat. The previous settings remain on the old thread."
     }
   ],
-  "right_now": "The full-scoring CPU resource proof is complete and independently accepted. Below-head integration reached its test limit after six assertion failures; a focused unchanged-source diagnostic is being packaged. Required Delta checks remain queued. An exact-interpreter compatibility probe is being implemented for fixture-only tests on Bridges. Actual validation, handoff timing and numerical results still precede model admission.",
+  "right_now": "The full-score CPU task passed both environments; its native timing run remains queued while the root release helper is implemented. The focused metadata diagnostic isolated faulty test setup and completed the suspected slow case. Corrected tests are accepted for a complete validation packet, now under focused source correction before CPU deployment.",
   "schema": 1,
   "state": "Running",
   "terms": [],

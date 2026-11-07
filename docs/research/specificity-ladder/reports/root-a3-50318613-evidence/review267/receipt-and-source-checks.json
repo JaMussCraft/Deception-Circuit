@@ -1,0 +1,95 @@
+{
+  "all_artifact_hashes_match": true,
+  "author_manifest_sha256": "4877a4fb1ad5968eca51c8bc9b8b1087423b12bc7e930e991110f0fbb9a805c9",
+  "candidate_sha256": "e2a7c5622508974fafafe016e9c3d1d55903302f646f05c5f35630570a1f6e86",
+  "changed_functions": [
+    "test_prepared_receiver_resource_identity_and_capacity",
+    "test_prepared_final_barrier_after_all_costly_work"
+  ],
+  "fetch_receipt_sha256": "ffefd554066c76de2cbefd52879bb3d80a074c65238e632f70979535c5a24377",
+  "original_sha256": "ccdecf2545b4bbc5ab9448f2c2114c72c3e2c6d4a0fbce8dcad7fdb76fdf8bf1",
+  "other_ast_and_parameter_decorators_unchanged": true,
+  "phases": {
+    "next-122": {
+      "call_results": [
+        {
+          "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[identical-target-tree-before-publication]",
+          "outcome": "passed",
+          "seconds": 46.79214670415968
+        }
+      ],
+      "full_collection_equal": true,
+      "last_event": {
+        "acceptance": false,
+        "event": "finished",
+        "requested_count": 1,
+        "unix_seconds": 1794034443.1797357
+      },
+      "phase_receipt": {
+        "acceptance": false,
+        "allocation_end_bound": 1794035014.0,
+        "cleanup_error": null,
+        "error": null,
+        "label": "next-122",
+        "raw_returncode": 0,
+        "status": "DIAGNOSTIC_PARTIAL",
+        "timed_out": false
+      },
+      "preflight_complete_source_equal": true
+    },
+    "six-failure-traces": {
+      "call_results": [
+        {
+          "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-100-True]",
+          "outcome": "failed",
+          "seconds": 16.990662220865488
+        },
+        {
+          "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[target-99-False]",
+          "outcome": "failed",
+          "seconds": 17.286923772655427
+        },
+        {
+          "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-100-True]",
+          "outcome": "failed",
+          "seconds": 17.51419747620821
+        },
+        {
+          "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_receiver_resource_identity_and_capacity[preparation-99-False]",
+          "outcome": "failed",
+          "seconds": 17.624757169745862
+        },
+        {
+          "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[target-payload-restored-mtime-final-live-guard]",
+          "outcome": "failed",
+          "seconds": 49.94829459208995
+        }
+      ],
+      "full_collection_equal": true,
+      "last_event": {
+        "duration_seconds": 0.002188742160797119,
+        "event": "phase-report",
+        "longrepr": null,
+        "nodeid": "test_a3_prepared_pilot_target.py::test_prepared_final_barrier_after_all_costly_work[descriptor-marker-final-live-guard]",
+        "outcome": "passed",
+        "unix_seconds": 1794034112.7445402,
+        "when": "setup"
+      },
+      "phase_receipt": {
+        "acceptance": false,
+        "allocation_end_bound": 1794035014.0,
+        "cleanup_error": null,
+        "error": null,
+        "label": "six-failure-traces",
+        "raw_returncode": -15,
+        "status": "DIAGNOSTIC_PARTIAL",
+        "timed_out": true
+      },
+      "preflight_complete_source_equal": true
+    }
+  },
+  "production_read_dependencies_match": true,
+  "terminal_accounting": "50318613|COMPLETED|0:0|952|18|32G|r390|2026-11-07T01:38:34|2026-11-07T01:54:26\n",
+  "terminal_files_verified": 23,
+  "terminal_host_postchecks_normal": true
+}
