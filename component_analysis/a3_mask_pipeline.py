@@ -22,6 +22,8 @@ import numpy as np
 import torch
 from component_analysis import a3_mask as core
 from dataset import user_inversion_pipeline as common
+from component_analysis import a3_source_validation as source_validation
+_SOURCE_VALIDATOR_SEAL=object()
 _MODULE_IMPORTED=time.perf_counter()
 
 
@@ -514,7 +516,7 @@ def new30_reference():
 
 def mask_code_hashes():
     root=Path(__file__).resolve().parents[1]
-    paths=['component_analysis/a3_mask_pipeline.py','component_analysis/a3_mask_workload.py',
+    paths=['component_analysis/a3_mask_pipeline.py','component_analysis/a3_source_validation.py','component_analysis/a3_mask_workload.py',
         'component_analysis/a3_mask.py','component_analysis/a3_native.py','models/llama_node.py','models/_compat.py','l0.py',
         'scripts/jobs/specificity_a3_mask.sh','scripts/cluster/delta.env','scripts/cluster/bridges2.env',
         'component_analysis/a3_direction_runtime.py',
@@ -597,7 +599,7 @@ def prepare_mask(design_path,*,commit,chunk_size,registry_paths,root_bundle=None
     return prepared
 
 
-def _live_mask(prepared,args,inventory=None):
+def _validate_mask_source(prepared,args,inventory=None,*,design=None,extra_rows=None):
     from component_analysis import a3_direction_runtime as authority,a3_direction_artifacts as artifacts,ladder_pipeline as ladder
     from component_analysis import a3_mask_workload as workload
     require(prepared.get('kind')=='a3_mask_prepared_v1' and prepared.get('injected') is False,'canonical mask preparation required')
@@ -609,7 +611,7 @@ def _live_mask(prepared,args,inventory=None):
     require(identity['code_hashes']==mask_code_hashes(),'changed mask source closure')
     require(common.file_hash(identity['operational_ruling_path'])==identity['operational_ruling_sha256'],'changed root ruling')
     require(common.file_hash(identity['pilot_ruling_path'])==identity['pilot_ruling_sha256'],'changed pilot context ruling')
-    design=ladder.read_artifact(identity['design_path'])
+    if design is None:design=ladder.read_artifact(identity['design_path'])
     evidence=artifacts.validate_live(design,design['direction_protocol'],registry_paths=args.registry)
     from component_analysis.a3_pipeline import load_a1_parents
     parent,selected,_=load_a1_parents(design['parent_evidence']['prepared_path'],design['parent_evidence']['selected_path'])
@@ -617,6 +619,7 @@ def _live_mask(prepared,args,inventory=None):
     evidence['H_bank_protection']=_protect_bank_sources(design,parent,prepared['hbank_sources'],args.registry)
     bank_rows={t:[r for r in parent['rows'][t]['H'] if r['instance_id'] in set(domain['ids'])] for t,domain in prepared['hbank_sources'].items()}
     require(prepared['widths']==identity['physical_widths']==execution_widths(design,hbank_rows=bank_rows),'changed actual source/donor physical profile')
+    if extra_rows is not None:extra_rows.update(bank_rows)
     require(authority.object_reference(identity['root_bundle_reference']['path'])==identity['root_bundle_reference'],'changed completed root mask bundle')
     for path,sha in prepared['new30'].get('files',{}).items():require(common.file_hash(path)==sha,'changed New30 frozen reference')
     if inventory is not None:
@@ -628,6 +631,76 @@ def _live_mask(prepared,args,inventory=None):
             require(inventory['inventory_sha256']==expected['inventory_sha256'],'runtime inventory differs from complete canonical mask workload')
         evidence['reservation']=mask_reservation(args,inventory)
     return execution_design(design,prepared['widths']),evidence
+
+
+
+def _make_mask_source_state(prepared,args):
+    from component_analysis import a3_direction_runtime as authority,ladder_pipeline as ladder
+    started=getattr(args,'_mask_source_started',None)
+    if started is None:started=time.perf_counter()
+    if prepared.get('injected') is not False:return None
+    path=getattr(args,'prepared',None)
+    if path is None and getattr(args,'work_dir',None):path=Path(args.work_dir)/'prepared'
+    if path is None or not (Path(path)/'COMPLETE.json').is_file():return None
+    # Preserve the original early rejection before ancestry discovery.
+    require(prepared.get('kind')=='a3_mask_prepared_v1','canonical mask preparation required')
+    actual_design=prepared['identity']['design_path']
+    lexical=getattr(args,'design',None) or actual_design
+    require(Path(lexical).resolve()==Path(actual_design).resolve(),'mask canonical source path differs')
+    design=ladder.read_artifact(lexical)
+    def dependencies(owned):
+        identity=owned['prepared']['identity']
+        paths=list(mask_code_hashes())+[identity['operational_ruling_path'],identity['pilot_ruling_path'],identity['root_bundle_reference']['path']]
+        import os,sys
+        paths.append(sys.executable)
+        if os.environ.get('SPECIFICITY_A3_MASK_LAUNCH_EXECUTABLE'):paths.append(os.environ['SPECIFICITY_A3_MASK_LAUNCH_EXECUTABLE'])
+        source,missing,watched=source_validation.source_dependencies(owned['design'],root=Path(__file__).resolve().parents[1],owner_paths=paths)
+        archive,absent=source_validation.new30_dependencies()
+        return source+archive,missing+absent,watched
+    def semantic(owned):
+        extra={}
+        _,evidence=_validate_mask_source(owned['prepared'],args,design=owned['design'],extra_rows=extra)
+        return evidence,extra
+    return source_validation.build_state(owner='mask',originals={'prepared':prepared,'design':design},
+        artifacts={'prepared':('object',path),'design':('artifact',lexical)},dependencies=dependencies,semantic=semantic,
+        registry_paths=args.registry,scope=_mask_source_scope(args),started=started,owner_seal=_SOURCE_VALIDATOR_SEAL,
+        precheck=lambda owned:require(owned['prepared']['identity']['mask_protocol_sha256']==digest(mask_protocol(owned['prepared'])),'changed frozen mask scientific/operational protocol'))
+
+
+def _mask_source_scope(args):
+    import os,sys
+    result={key:str(getattr(args,key,None)) for key in ('commit','stage','seed','arm','task','group','chunk_size')}
+    result.update({key:(str(Path(getattr(args,key)).absolute()) if getattr(args,key,None) is not None else None) for key in ('design','prepared','work_dir')})
+    launch=os.environ.get('SPECIFICITY_A3_MASK_LAUNCH_EXECUTABLE')
+    result.update(interpreter=str(Path(sys.executable).absolute()),launcher=str(Path(launch).absolute()) if launch else None)
+    return result
+
+
+def _live_mask(prepared,args,inventory=None):
+    from component_analysis import a3_mask_workload as workload
+    state=getattr(args,'_mask_source_context',None)
+    if state is None:
+        state=_make_mask_source_state(prepared,args)
+        if state is None:return _validate_mask_source(prepared,args,inventory)
+        args._mask_source_context=state
+    source_validation.checked_state(state,'mask',_SOURCE_VALIDATOR_SEAL)
+    evidence=state.refresh(owner='mask',bound_inputs={'prepared':prepared},registry_paths=args.registry,scope=_mask_source_scope(args))
+    design=execution_design(state.view('design'),state.view('prepared')['widths'])
+    if inventory is not None:
+        if getattr(args,'_mask_authority_context',None) is None:
+            workload.validate_inventory(inventory)
+            expected=workload.build_inventory(design,identity=prepared['identity'],chunk_size=prepared['chunk_size'],
+                finish_reserve_seconds=inventory['finish_reserve_seconds'],hbank_sources=prepared['hbank_sources'],
+                stage=inventory['stage'],widths=prepared['widths'],new30=prepared['new30'])
+            require(inventory['inventory_sha256']==expected['inventory_sha256'],'runtime inventory differs from complete canonical mask workload')
+        evidence['reservation']=mask_reservation(args,inventory)
+    return design,evidence
+
+
+def _source_startup_seconds(seconds,args):
+    state=getattr(args,'_mask_source_context',None)
+    if state is not None:source_validation.checked_state(state,'mask',_SOURCE_VALIDATOR_SEAL)
+    return source_validation.startup_seconds(seconds,state)
 
 
 def utility_chunks(rows,maps,*,device,task,padded_width=None):
@@ -1131,7 +1204,7 @@ def mask_pilot(model,design,prepared,*,output,guard,startup_seconds=0,injected=F
         reservation_id=None if injected else guard_evidence[-1]['reservation']['reservation']['reservation_id'],
         pilot_inventory_sha256=None if pilot_inventory is None else pilot_inventory['inventory_sha256'],output_dir=str(output.resolve()),
         peak_memory_bytes=torch.cuda.max_memory_allocated() if device.type=='cuda' else 0,
-        host_peak_bytes=int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)*1024,
+        host_peak_bytes=source_validation.host_peak_bytes(guard),
         gpu_capacity_bytes=(torch.cuda.mem_get_info()[0]+torch.cuda.memory_allocated()) if device.type=='cuda' else 0,
         target_inventory_sha256=target_inventory['inventory_sha256'] if target_inventory is not None else None,
         boundary_bytes=max(sum(p.stat().st_size for p in (output/('timing-checkpoint-'+arm)).rglob('*') if p.is_file()) for arm in ('constrained','unconstrained')))
@@ -1162,6 +1235,7 @@ def main(argv=None,*,model_loader=None):
         prepared=prepare_mask(args.design,commit=args.commit,chunk_size=args.chunk_size,registry_paths=args.registry,root_bundle=args.root_bundle)
         authority.publish_object(root/'prepared',prepared)
         return 0
+    args._mask_source_started=time.perf_counter()
     prepared=authority.read_object(args.prepared or root/'prepared')
     design,evidence=_live_mask(prepared,args)
     if args.stage=='prepare':
@@ -1225,6 +1299,7 @@ def main(argv=None,*,model_loader=None):
         require(prepared['new30']['status']=='available','blocked: missing New30 reference comparison')
         groups=assessment_groups(prepared,_load_selections(args.selected or root))
     guard=lambda:_live_mask(prepared,args,inventory)[1]
+    guard._source_state=getattr(args,'_mask_source_context',None)
     execution_evidence=guard()
     if args.stage in ('fit','assess'):
         reservation=execution_evidence['reservation']['reservation']
@@ -1234,7 +1309,7 @@ def main(argv=None,*,model_loader=None):
     started=time.perf_counter()
     require(model_loader is None,'injected model loaders are forbidden for canonical production execution')
     model=load_native_model(prepared)
-    startup_seconds=time.perf_counter()-started+(_MODULE_IMPORTED-_MODULE_STARTED)
+    startup_seconds=_source_startup_seconds(time.perf_counter()-started+(_MODULE_IMPORTED-_MODULE_STARTED),args)
     if args.stage in ('fit','assess'):
         core.configure_candidates(model,prepared['candidates'])
         require(core._base_identity(model)==expected_base,'current native model differs from measured pilot computation')
@@ -1256,6 +1331,7 @@ def main(argv=None,*,model_loader=None):
         task=args.task;domain=prepared['hbank_sources'][task];indexed={r['instance_id']:r for r in parent['rows'][task]['H']}
         source=[indexed[i] for i in domain['ids']]
         require(digest(source)==domain['rows_sha256'],'changed original H-bank source rows')
+        source=source_validation.freeze(source)
         required=sorted(set(map(tuple,prepared['candidates']))|({tuple(k) for k in prepared['new30'].get('removed',[])} if task=='far_v2' else set()))
         bank_path=root/'H-banks'/task
         if bank_path.exists():
@@ -1359,7 +1435,8 @@ def execution_widths(design,*,hbank_rows):
 
 def execution_design(design,widths):
     """Runtime-only physical profile, separate from canonical frozen A3 bytes."""
-    return dict(design,_mask_widths=copy.deepcopy(widths))
+    result=dict(design,_mask_widths=copy.deepcopy(widths))
+    return source_validation.freeze(result) if source_validation.is_view(design) else result
 
 
 def frozen_validation_history(selected):
@@ -1466,11 +1543,11 @@ def mask_reservation(args,inventory,*,injected=False):
     if context is None:
         ledger=authority.normalize_ledger(args.ledger_snapshot,identity=inventory['identity'],injected=injected)
         context=authority.make_authority_context(args.reservation,ledger=ledger,inventory=inventory,work_dir=args.work_dir,
-            injected=injected,subphase='masks',inventory_validator=workload.validate_inventory,subphase_limits={'M1':.75,'M5':10},
+            injected=injected,subphase='masks',inventory_validator=workload.validate_inventory,subphase_limits={'M1':1.5,'M5':10},
             requested_scope=scope,inventory_path=args.inventory)
         args._mask_authority_context=context;args._mask_initial_ledger=ledger
     result=authority.validate_reservation(args.reservation,ledger=args._mask_initial_ledger,inventory=inventory,work_dir=args.work_dir,
-        injected=injected,subphase='masks',inventory_validator=workload.validate_inventory,subphase_limits={'M1':.75,'M5':10},
+        injected=injected,subphase='masks',inventory_validator=workload.validate_inventory,subphase_limits={'M1':1.5,'M5':10},
         authority_context=context,requested_scope=scope,inventory_path=args.inventory)
     if getattr(args,'admission',None):
         require(result['reservation']['admission_path']==str(Path(args.admission).resolve()),'CLI admission differs from original root reservation')

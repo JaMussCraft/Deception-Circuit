@@ -23,6 +23,8 @@ from component_analysis import a3_direction_artifacts as artifacts
 from component_analysis import ladder_design
 from component_analysis import ladder_pipeline as ladder
 from dataset import user_inversion_pipeline as common
+from component_analysis import a3_source_validation as source_validation
+_SOURCE_VALIDATOR_SEAL=object()
 
 require=common.require
 SEEDS=(42,1,123)
@@ -587,7 +589,7 @@ def pilot_stability(model,design,task,graph,*,guard,cache_root=None,identity=Non
 
 
 def code_hashes():
-    paths=set(artifacts.code_hashes())|{'component_analysis/a3_edge_pipeline.py','component_analysis/a3_edge_workload.py','component_analysis/a3_native.py','component_analysis/a3_edges.py','scripts/jobs/specificity_a3_edges.sh','tests/test_a3_edges.py'}
+    paths=set(artifacts.code_hashes())|{'component_analysis/a3_source_validation.py','component_analysis/a3_edge_pipeline.py','component_analysis/a3_edge_workload.py','component_analysis/a3_native.py','component_analysis/a3_edges.py','scripts/jobs/specificity_a3_edges.sh','tests/test_a3_edges.py'}
     return {name:common.file_hash(ladder.REPO/name) for name in sorted(paths)}
 
 
@@ -708,12 +710,58 @@ def _read_design(path):
     return design
 
 
+
+def _edge_source_scope(args):
+    result={key:str(getattr(args,key,None)) for key in ('commit','stage','steps','measure_stage')}
+    result.update({key:(str(Path(getattr(args,key)).absolute()) if getattr(args,key,None) is not None else None) for key in ('design','prepared','work_dir')})
+    return result
+
+
+def _make_edge_source_state(prepared,design,args):
+    import time
+    if design.get('injected') is not False:return None
+    path=getattr(args,'prepared',None)
+    if path is None and getattr(args,'work_dir',None):path=Path(args.work_dir)/'prepared'
+    reference=prepared.get('design_reference',{});canonical=getattr(args,'design',None) or reference.get('path')
+    if not canonical or path is None or not (Path(path)/'COMPLETE.json').is_file():return None
+    def dependencies(owned):
+        root=Path(__file__).resolve().parents[1]
+        paths=[root/name for name in code_hashes()]
+        ruling=owned['prepared'].get('ruling',{}).get('path')
+        if ruling:paths.append(ruling)
+        return source_validation.source_dependencies(owned['design'],root=root,owner_paths=paths)
+    def semantic(owned):
+        evidence=validate_prepared(owned['prepared'],owned['design'],registry_paths=args.registry)
+        extra={task:bank['rows'] for task,bank in owned['prepared'].get('bank_sources',{}).items()}
+        return evidence,extra
+    return source_validation.build_state(owner='edge',originals={'prepared':prepared,'design':design},
+        artifacts={'prepared':('object',path),'design':('artifact',canonical)},dependencies=dependencies,semantic=semantic,
+        registry_paths=args.registry,scope=_edge_source_scope(args),started=getattr(args,'_source_started',None),owner_seal=_SOURCE_VALIDATOR_SEAL)
+
+
+
+def _source_startup_seconds(seconds,args):
+    # The unchanged projector charges this consumed field for every modeled load;
+    # including one full process initialization is deliberately conservative.
+    state=getattr(args,'_edge_source_context',None)
+    if state is not None:source_validation.checked_state(state,'edge',_SOURCE_VALIDATOR_SEAL)
+    return source_validation.startup_seconds(seconds,state)
+
+
 def execution_guard(design,prepared,args,inventory):
     from component_analysis import a3_edge_workload as workload
     context=None
+    state=getattr(args,'_edge_source_context',None)
+    if state is None:
+        state=_make_edge_source_state(prepared,design,args)
+        if state is not None:args._edge_source_context=state
+    if state is not None:source_validation.checked_state(state,'edge',_SOURCE_VALIDATOR_SEAL)
     def guard():
         nonlocal context
-        live=validate_prepared(prepared,design,registry_paths=args.registry)
+        if state is None:live=validate_prepared(prepared,design,registry_paths=args.registry)
+        else:
+            require(getattr(args,'_edge_source_context',None) is state,'source state replaced')
+            live=state.refresh(owner='edge',bound_inputs={'prepared':prepared,'design':design},registry_paths=args.registry,scope=_edge_source_scope(args))
         require(args.ledger_snapshot and args.reservation,'fresh root reservation/ledger required before model access')
         ledger=authority.normalize_ledger(args.ledger_snapshot,identity=inventory['identity'],injected=design.get('injected',False))
         if context is None:
@@ -723,6 +771,7 @@ def execution_guard(design,prepared,args,inventory):
         live['storage_capacities']=ledger.get('storage_capacities')
         live['authority_retained_bytes']=getattr(context,'retained_bytes',0)
         return live
+    guard._source_state=state
     return guard
 
 
@@ -1016,13 +1065,18 @@ def main(argv=None,*,model_loader=None):
     require(not args.final or args.stage=='summarize','--final is only valid for completed summary intake')
     require(re.fullmatch('[0-9a-f]{40}',args.commit) is not None,'full execution commit required')
     if args.dry_run:return dry_run(args)
+    args._source_started=time.perf_counter()
     design=_read_design(args.design)
     require(design['direction_protocol']['commit']==args.commit,'execution commit differs from frozen design')
     if args.stage=='prepare':
         prepare(design,_metadata_geometry(design,args),commit=args.commit,registry_paths=args.registry,output=Path(args.work_dir)/'prepared',design_path=args.design)
         return
     prepared=authority.read_object(args.prepared or Path(args.work_dir)/'prepared')
-    validate_prepared(prepared,design,registry_paths=args.registry)
+    state=_make_edge_source_state(prepared,design,args)
+    if state is None:validate_prepared(prepared,design,registry_paths=args.registry)
+    else:
+        args._edge_source_context=state
+        design=state.view('design');prepared=state.view('prepared')
     identity=_stage_identity(design,prepared)
     if args.stage=='summarize':return _run_summary(design,prepared,args,identity)
     fitted=authority.read_object(Path(args.fit_evidence) if args.fit_evidence else Path(args.work_dir)/'fit') if args.stage=='select' else None
@@ -1074,7 +1128,7 @@ def main(argv=None,*,model_loader=None):
     startup=time.monotonic();model=(model_loader or _native_loader)(design,prepared,args)
     args.native_load_seconds=time.monotonic()-startup
     args.baseline_load_seconds=baseline_load_seconds
-    args.startup_seconds=args.native_load_seconds+baseline_load_seconds
+    args.startup_seconds=_source_startup_seconds(args.native_load_seconds+baseline_load_seconds,args)
     guard()
     if args.stage=='pilot':return _run_pilot(model,design,prepared,args,guard,identity,controls,baselines=baselines)
     if args.stage=='fit':return _run_fit(model,design,prepared,args,guard,identity)
@@ -1568,7 +1622,7 @@ def collect_profile_measurements(model,design,prepared,inventory,*,guard,root,st
         complete=True,exit_state='completed',runtime=runtime,hardware=torch.cuda.get_device_name() if cuda else 'CPU tiny',
         startup_seconds=float(startup_seconds),startup_measured=startup_measured,measurements=measurements,
         guard_seconds=guards,guard_evidence=guard_evidence,serialization=dict(seconds=serialization_seconds,bytes=serialized_bytes,reference=authority.object_reference(run_root/'serialization')),
-        cpu_summary=dict(seconds=cpu_seconds,rows=max(1,len(values)),bootstrap_calibrations=bootstrap_calibrations),host_peak_bytes=int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)*1024,
+        cpu_summary=dict(seconds=cpu_seconds,rows=max(1,len(values)),bootstrap_calibrations=bootstrap_calibrations),host_peak_bytes=source_validation.host_peak_bytes(guard),
         producer_inventory_sha256=inventory['inventory_sha256'],source_scope='fixed first eight validation IDs only; utility validation rows; no assessment outcomes',
         reused_means='timing-only validation-H bank values never enter actual floor artifacts')
     authority.publish_object(run_root/'receipt',result)
@@ -1717,7 +1771,7 @@ def admit_parent_sources(design,*,registry_paths):
     if design.get('injected') is True and not design.get('parent_evidence'):
         return dict(kind='a3_edge_source_admission',injected=True,source_sha256=source_rows_digest(design),scope='explicit software fixture; no production authority')
     from component_analysis import a3_pipeline
-    from transformers import AutoTokenizer
+    from types import SimpleNamespace
     evidence=design['parent_evidence'];parent,selected,current=a3_pipeline.load_a1_parents(evidence['prepared_path'],evidence['selected_path'])
     require(current==evidence,'changed actual A1 parent evidence')
     validate_original_streams(design,parent)
@@ -1726,7 +1780,7 @@ def admit_parent_sources(design,*,registry_paths):
     settings.update(probe_max_bytes=protocol['fit_cache']['probe_max_bytes'],dtype=protocol['numeric_profile']['dtype'],backend=protocol['numeric_profile']['backend'])
     if 'axis_tile_sizes' in cfg:settings['axis_tile_sizes']=copy.deepcopy(cfg['axis_tile_sizes'])
     history=list(design['historical_source_hashes']);require(len(history)==1,'single frozen historical clause-head source required')
-    tokenizer=AutoTokenizer.from_pretrained(parent['model'],revision=parent['tokenizer_revision'],local_files_only=True)
+    tokenizer=common.load_tokenizer(SimpleNamespace(model=parent['model'],tokenizer_revision=parent['tokenizer_revision']))
     rebuilt=a3_pipeline.prepare(a1_design=evidence['prepared_path'],a1_selected=evidence['selected_path'],matched_root=Path(design['matched_build_path']).parent,
         historical_csv=history[0],root_ruling=design['root_ruling'],tokenizer=tokenizer,registry_paths=list(registry_paths),output=None,
         a1_repo_root=design['a1_repo_root'],commit=protocol['commit'],execution_settings=settings)

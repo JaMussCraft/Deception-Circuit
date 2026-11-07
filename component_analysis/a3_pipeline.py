@@ -198,7 +198,7 @@ def assessment_exclusions(parent):
     return fixed
 
 
-def direction_protocol(design, *, commit, injected_code_hashes=None):
+def direction_protocol(design, *, commit, injected_code_hashes=None, execution_settings=None):
     """Freeze the reviewed operational contract, separately from the A1 identity."""
     from component_analysis import a3_direction_artifacts as artifacts
     require(isinstance(commit,str) and re.fullmatch('[0-9a-f]{40}',commit) is not None,
@@ -210,7 +210,7 @@ def direction_protocol(design, *, commit, injected_code_hashes=None):
     else: closure=artifacts.code_hashes()
     protocol=dict(schema_version=1,kind='a3_direction_protocol',commit=commit,code_hashes=closure,
         design_sha256=ladder.design._hash(design),injected=bool(design.get('injected')),
-        task_order=list(design['tasks']),candidate_sites={t:v['direction_sites'] for t,v in design['tasks'].items()},
+        task_order=list(design['tasks']) if design.get('injected') else list(ladder.TASKS),candidate_sites={t:v['direction_sites'] for t,v in design['tasks'].items()},
         stream_order=list(ladder.design.STREAMS),seeds=[42,1,123],assessment_orientations=199,calibration_orientations=32,
         bootstrap=dict(assessment=2000,assessment_seed=9001,power=2000,power_seed=19001),
         confirmatory_tasks=['far_v2','ser_v2'],descriptive_tasks=['sdr_v2'],
@@ -228,12 +228,41 @@ def direction_protocol(design, *, commit, injected_code_hashes=None):
                              selection='first unique disjoint candidates; no redraw/network/outcome filtering'),
         finalization=dict(requires_complete_runtime=True,injected_forbidden=True,pilot_forbidden=True))
     if injected_code_hashes is not None: protocol['injected_source_closure']=closure
+    if execution_settings is not None:
+        from component_analysis.a3_direction_runtime import freeze_operational_contract
+        freeze_operational_contract(design,protocol,execution_settings)
+    else:
+        require(design.get("injected") is True,"validated execution settings required for production preparation")
     return protocol
+
+
+def _validated_prepare_tokenizer(tokenizer,parent):
+    """Use the independently loaded pinned standard implementation for production."""
+    if parent.get('injected'):
+        require(tokenizer is not None,'injected preparation requires explicit tokenizer adapter');return tokenizer
+    from transformers import PreTrainedTokenizerBase
+    if tokenizer is not None:
+        require(isinstance(tokenizer,PreTrainedTokenizerBase),'unverified tokenizer adapters are injected-only')
+    expected=common.load_tokenizer(SimpleNamespace(model=parent['model'],tokenizer_revision=parent['tokenizer_revision']))
+    if tokenizer is None:return expected
+    require(type(tokenizer) is type(expected),'production tokenizer implementation differs from pinned standard')
+    for method in ('encode','__call__','apply_chat_template','tokenize','_encode_plus','_batch_encode_plus','_call_one'):
+        require(method not in vars(tokenizer),'production tokenizer method override is injected-only')
+    def signature(value):
+        backend=getattr(value,'backend_tokenizer',None)
+        require(backend is not None,'pinned production fast tokenizer backend required')
+        payload=json.loads(backend.to_str());payload.pop('padding',None);payload.pop('truncation',None)
+        fields=('chat_template','special_tokens_map','model_max_length','padding_side','truncation_side','clean_up_tokenization_spaces','add_bos_token','add_eos_token','split_special_tokens')
+        return dict(backend_type=type(backend).__module__+'.'+type(backend).__qualname__,backend=payload,
+            configuration={key:getattr(value,key,None) for key in fields})
+    require(signature(tokenizer)==signature(expected),'production tokenizer configuration differs from pinned standard')
+    # Canonical preparation consumes the independently loaded object, never an adapter's dispatch.
+    return expected
 
 
 def prepare(*, a1_design, a1_selected, matched_root, historical_csv, root_ruling,
             tokenizer, registry_paths=(), output=None, a1_repo_root=ladder.REPO,
-            commit=None, injected_code_hashes=None):
+            commit=None, injected_code_hashes=None, execution_settings=None):
     """Validate CPU provenance and freeze; no call to A1 freeze_design/draw_sample.
 
     The output is immutable. ``output=None`` validates without writing. Fixtures
@@ -243,6 +272,7 @@ def prepare(*, a1_design, a1_selected, matched_root, historical_csv, root_ruling
     from component_analysis.ladder_tasks import _ioi_candidates, mmlu_rows, ioi_item_swap_maps, mmlu_calibration_maps
     p,s,evidence=load_a1_parents(a1_design,a1_selected)
     _validate_parent_files(p,a1_repo_root=a1_repo_root)
+    tokenizer=_validated_prepare_tokenizer(tokenizer,p)
     fresh_identity=common.tokenizer_identity(tokenizer,p['tokenizer_revision'],injected=p.get('injected',False))
     require(fresh_identity==p['tokenizer_identity'],'changed tokenizer identity')
     ladder.validate_tokenization(p,tokenizer)
@@ -260,6 +290,7 @@ def prepare(*, a1_design, a1_selected, matched_root, historical_csv, root_ruling
     fixed=list(p['utility']['ioi'])
     validation=a3_design.eligible_ioi(_ioi_candidates(tokenizer,count=1000,seed=2),fixed,n=100)
     require(len(validation)==100,'insufficient unique eligible seed-2 IOI validation prompts')
+    validation=[dict(row,analysis_split='validation') for row in validation]
     result.update(ioi_validation=validation,ioi_validation_seed=2,parent_evidence=evidence,
                   a1_repo_root=str(Path(a1_repo_root).resolve()),
                   reused_a2_validator_sha256=common.file_hash(ladder.REPO/'scripts/twin_training.py'),
@@ -283,7 +314,7 @@ def prepare(*, a1_design, a1_selected, matched_root, historical_csv, root_ruling
                 record['semantic']=a3_design.semantic_record(source,tokenizer)
     result['registry_hashes']=a3_design.validate_access(result,list(registry_paths))
     validate_assessment_membership(result,p)
-    protocol=direction_protocol(result,commit=commit,injected_code_hashes=injected_code_hashes)
+    protocol=direction_protocol(result,commit=commit,injected_code_hashes=injected_code_hashes,execution_settings=execution_settings)
     result['direction_protocol']=protocol
     result['direction_protocol_sha256']=ladder.design._hash(protocol)
     if output is not None:

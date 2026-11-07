@@ -269,3 +269,17 @@ def test_probe_rejects_invalid_fitted_fields(field,value):
     probe=core.fit_ridge_probe(x,labels)
     probe[field]=value
     with pytest.raises(ValueError): core.probe_balanced_accuracy(probe,x,labels)
+
+
+def test_probe_predictions_preserve_balanced_accuracy_ties_and_guards():
+    from component_analysis import a3_directions as d
+    import torch
+    probe=dict(center=torch.zeros(2),scale=torch.ones(2),coefficient=torch.tensor([1.,0.]),intercept=0.,regularization=1.)
+    x=torch.tensor([[0.,0.],[-1.,2.],[1.,3.],[-2.,0.]])
+    y=torch.tensor([1.,-1.,-1.,1.])
+    assert d.probe_predictions(probe,x).tolist()==[1.,-1.,1.,-1.]
+    assert d.probe_balanced_accuracy(probe,x,y)==.5
+    for changed in (dict(probe,scale=torch.zeros(2)),dict(probe,coefficient=torch.tensor([float('inf'),0.])),dict(probe,regularization=2.)):
+        with pytest.raises(ValueError):d.probe_predictions(changed,x)
+    with pytest.raises(ValueError):d.probe_predictions(probe,torch.full((2,2),float('inf')))
+    with pytest.raises(ValueError):d.probe_predictions(dict(probe,coefficient=torch.full((2,),1e38)),torch.full((2,2),1e38))

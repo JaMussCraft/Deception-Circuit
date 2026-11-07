@@ -1157,3 +1157,26 @@ def test_positive_rehashed_incomplete_sender_coverage_blocks(fake):
             sink=lambda x: None,
             identity=identity(),
         )
+
+
+def test_capture_lane_consistency_binds_actual_head_readouts(fake):
+    ident=identity(2);chunks=[]
+    result=runner._capture_readouts(object(),[batch()],sites=[SITE],sink=chunks.append,identity=ident,measuring=True)
+    receipt=result['lane_consistency_receipts'][0]
+    assert receipt['kind']=='a3_intact_lane_consistency_v1'
+    assert receipt['serial_comparison_performed'] is False
+    assert receipt['numeric_profile']==ident['numeric_profile']
+    assert len(receipt['comparisons'])==2
+    assert all(x['head_allclose'] and x['argmax_equal'] for x in receipt['comparisons'])
+    assert chunks[0]['lane_consistency']==receipt
+
+
+def test_capture_lanes_reject_hidden_head_drift_even_if_logits_match(fake,monkeypatch):
+    original=runner._forward
+    def corrupt(*args,**kwargs):
+        capture,logits=original(*args,**kwargs)
+        capture.outputs[SITE][2:]+=1
+        return capture,logits
+    monkeypatch.setattr(runner,'_forward',corrupt)
+    with pytest.raises(ValueError,match='head lanes'):
+        runner._capture_readouts(object(),[batch()],sites=[SITE],sink=lambda _:None,identity=identity(2),measuring=True)

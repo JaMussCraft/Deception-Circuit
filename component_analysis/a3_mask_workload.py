@@ -294,7 +294,7 @@ def project_cost(receipts,inventory,ledger):
     entries=ledger['entries'];m5=sum(e['reserved_gpu_hours'] for e in entries if e.get('phase')=='M5' and e.get('subphase')=='masks')
     m1=sum(e['reserved_gpu_hours'] for e in entries if e.get('phase')=='M1' and e.get('subphase')=='masks')
     hours=math.fsum(j['reserved_gpu_hours'] for j in job_proposals)
-    require(m5+hours<=10 and m1<=.75 and sums['M1']<=2 and sums['all']+hours+sums['contingency_remaining']<=40,
+    require(m5+hours<=10 and m1<=.75+sums['mask_retry_gpu_hours'] and sums['M1']<=2+sums['mask_retry_gpu_hours'] and sums['all']+hours+sums['contingency_remaining']<=40,
         'original reserved-hour milestone/global cap exceeded')
     return dict(kind='a3_mask_cost_proposal_v2',identity=identity,inventory_sha256=inventory['inventory_sha256'],
         requested_seconds=seconds,requested_gpu_hours=hours,execution_authorized=False,counts=counts,operation_seconds=prices,

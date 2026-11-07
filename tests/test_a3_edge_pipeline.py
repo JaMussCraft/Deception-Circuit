@@ -583,3 +583,129 @@ def test_dry_run_rejects_untyped_production_input_and_never_queries_CUDA(tmp_pat
     source.write_text(json.dumps(source_design()))
     result=p.main(args)
     assert not result['source_admitted'] and not result['execution_authorized'] and not (tmp_path/'absent').exists()
+
+
+@pytest.fixture
+def admission_tokenizer_parent(tmp_path, monkeypatch):
+    """Use a real local fast tokenizer; opt into the actual cached pinned model."""
+    import os
+    from transformers import PreTrainedTokenizerFast
+    from tokenizers import Tokenizer, models, pre_tokenizers
+    revision=os.environ.get('A3_TEST_TOKENIZER_REVISION', 'a'*40)
+    model=os.environ.get('A3_TEST_TOKENIZER_MODEL')
+    if model is None:
+        snapshot=tmp_path/revision
+        backend=Tokenizer(models.WordLevel({'[UNK]':0,'hello':1,'world':2,'[EOS]':3},unk_token='[UNK]'))
+        backend.pre_tokenizer=pre_tokenizers.Whitespace()
+        tokenizer=PreTrainedTokenizerFast(tokenizer_object=backend,unk_token='[UNK]',eos_token='[EOS]')
+        tokenizer.save_pretrained(snapshot)
+        model=str(snapshot)
+        import huggingface_hub
+        monkeypatch.setattr(huggingface_hub,'hf_hub_download',lambda model_id, filename, *, revision, local_files_only: str(snapshot/filename))
+    return dict(model=model,tokenizer_revision=revision)
+
+
+def _admit_with_real_tokenizer_validation(parent_settings, tmp_path, monkeypatch):
+    from component_analysis import a3_pipeline
+    d=source_design();d['injected']=False
+    parent=dict(rows={'far_v2':{c:[copy.deepcopy(r) for r in d['access_rows']['far_v2'] if r['condition']==c] for c in p.CONDITIONS}},**parent_settings)
+    parent['tokenizer_identity']={'pinned':True}
+    d['parent_evidence']={'prepared_path':'fixture-parent','selected_path':'fixture-selection'}
+    workload=dict.fromkeys(('microbatch_size','axis_tile_size','head_width','hidden_size','num_layers','vocabulary_size','dtype_bytes','hardware','warmup_batches','serialization_batches','finish_reserve_seconds','jobs'),1)
+    d['direction_protocol']=dict(workload=workload,fit_cache={'probe_max_bytes':1},numeric_profile={'dtype':'float32','backend':'eager'},commit='a'*40)
+    historical=tmp_path/'history.csv';historical.write_text('header\n')
+    d.update(historical_source_hashes={str(historical):p.common.file_hash(historical)},matched_build_path=str(historical),root_ruling={},a1_repo_root=str(tmp_path))
+    monkeypatch.setattr(a3_pipeline,'load_a1_parents',lambda *args:(parent,{},d['parent_evidence']))
+    def prepare(**kwargs):
+        # Keep the production signature guard real at the CPU producer boundary.
+        checked=a3_pipeline._validated_prepare_tokenizer(kwargs['tokenizer'],parent)
+        assert checked.pad_token==checked.eos_token
+        assert checked._user_inversion_actual_revision==parent['tokenizer_revision']
+        assert checked.encode('hello world',add_special_tokens=False)==kwargs['tokenizer'].encode('hello world',add_special_tokens=False)
+        assert kwargs['output'] is None
+        return d
+    monkeypatch.setattr(a3_pipeline,'prepare',prepare)
+    return p.admit_parent_sources(d,registry_paths=[])
+
+
+def test_parent_admission_accepts_canonical_pinned_tokenizer(admission_tokenizer_parent,tmp_path,monkeypatch):
+    # A raw factory misses eos padding and must fail the real signature guard.
+    receipt=_admit_with_real_tokenizer_validation(admission_tokenizer_parent,tmp_path,monkeypatch)
+    assert receipt['kind']=='a3_edge_source_admission' and receipt['injected'] is False
+
+
+def test_parent_admission_rejects_changed_tokenizer_configuration(admission_tokenizer_parent,tmp_path,monkeypatch):
+    # A faulty factory changing padding side must still be rejected, never normalized away.
+    canonical=p.common.load_tokenizer
+    def changed(args):
+        tokenizer=canonical(args)
+        tokenizer.padding_side='left' if tokenizer.padding_side=='right' else 'right'
+        return tokenizer
+    # Patch only the edge factory; the independent canonical validator stays real.
+    from types import SimpleNamespace
+    monkeypatch.setattr(p,'common',SimpleNamespace(**{**vars(p.common),'load_tokenizer':changed}))
+    with pytest.raises(ValueError,match='production tokenizer configuration differs from pinned standard'):
+        _admit_with_real_tokenizer_validation(admission_tokenizer_parent,tmp_path,monkeypatch)
+
+
+def test_cached_edge_source_keeps_fresh_authority_and_runs_semantics_once(tmp_path,monkeypatch):
+    from tests.test_a3_source_validation import setup_case
+    from component_analysis import a3_source_validation as sources, ladder_pipeline as ladder
+    from types import SimpleNamespace
+    c=setup_case(tmp_path,monkeypatch);calls=[];authority_calls=[]
+    design=c.design;design['injected']=False
+    path=tmp_path/'edge-design.json';ladder.write_artifact(path,design)
+    prepared={'kind':'a3_edge_prepared','design_reference':{'path':str(path)}};prep_path=tmp_path/'edge-prepared';p.authority.publish_object(prep_path,prepared)
+    def validate(prepared,design,**kwargs):
+        calls.append((sources.is_view(prepared),sources.is_view(design)))
+        return {'commit':'a'*40,'injected':False}
+    monkeypatch.setattr(p,'validate_prepared',validate)
+    monkeypatch.setattr(sources,'source_dependencies',lambda *a,**k:([c.static],[],[]))
+    monkeypatch.setattr(p,'code_hashes',lambda:{})
+    monkeypatch.setattr(p.authority,'normalize_ledger',lambda *a,**k:{})
+    monkeypatch.setattr(p.authority,'make_authority_context',lambda *a,**k:object())
+    monkeypatch.setattr(p.authority,'validate_reservation',lambda *a,**k:authority_calls.append(k) or {})
+    args=SimpleNamespace(commit='a'*40,registry=[],prepared=str(prep_path),design=str(path),work_dir=str(tmp_path),ledger_snapshot='root',reservation='reservation')
+    guard=p.execution_guard(design,prepared,args,{'identity':{'commit':'a'*40}})
+    first=guard();guard()
+    assert calls==[(True,True)] and len(authority_calls)==2
+    first['registry_hashes'].clear();assert guard()['registry_hashes']
+    monkeypatch.setattr(p.authority,'validate_reservation',lambda *a,**k:(_ for _ in ()).throw(ValueError('live lease expired')))
+    with pytest.raises(ValueError,match='lease'):guard()
+    args._edge_source_context={}
+    with pytest.raises(ValueError):guard()
+
+
+def test_source_views_preserve_actual_edge_copy_consumers():
+    from component_analysis import a3_source_validation as sources
+    d=sources.freeze(source_design())
+    pair=p.source_pair(d,'far_v2','train','a','D','clean',purpose='attribution')
+    assert pair['maps']['rows'][0]['recipient_id']=='a'
+    pair['maps']['rows'][0]['recipient_positions'].append(9)
+    assert d['semantic_twin_maps']['far_v2'][0]['recipient_positions']==[0,1,2,3]
+    utility=copy.deepcopy(d['access_rows']['far_v2'][0]);utility['streams']['clean'].pop('semantic')
+    batch=p._utility_batch(sources.freeze(utility),'clean')
+    assert batch['positions']['assistant_readout']==[[3]]
+
+
+def test_edge_source_initialization_reaches_actual_receipt_and_projector(tmp_path,monkeypatch):
+    from tests.test_a3_source_validation import setup_case
+    from component_analysis import a3_edge_workload as w
+    from types import SimpleNamespace
+    c=setup_case(tmp_path,monkeypatch);state=c.build(owner='edge',owner_seal=p._SOURCE_VALIDATOR_SEAL)
+    startup=p._source_startup_seconds(0.,SimpleNamespace(_edge_source_context=state))
+    d,model=complete_design_and_model();d=eightify(d)
+    d['direction_protocol']['numeric_profile']={'dtype':'torch.float32','backend':'eager'}
+    d['direction_protocol']['workload']={'hidden_size':8,'vocabulary_size':16,'dtype_bytes':4}
+    graph=p.prepare_graph(d,'far_v2',geometry());prepared={'graphs':{'far_v2':graph},'bank_sources':p.ancestral_bank_sources(d)}
+    identity={'commit':'a'*40,'injected':True,'numeric_profile':d['direction_protocol']['numeric_profile']}
+    inventory=w.freeze_inventory(d,prepared['graphs'],stage='fit',identity=identity,bank_sources=prepared['bank_sources'])
+    guard=lambda:None;guard._source_state=state
+    monkeypatch.setattr(p,'code_hashes',lambda:{})
+    measurement=p.collect_profile_measurements(model,d,prepared,inventory,guard=guard,root=tmp_path/'measure',startup_seconds=startup)
+    assert measurement['startup_seconds']==startup and measurement['host_peak_bytes']>=state.stats()['host_peak_bytes']
+    capacities={'host_bytes':10**12,'disk_bytes':10**12}
+    with_source=w.project_cost(inventory,[measurement],capacities=capacities)
+    baseline=copy.deepcopy(measurement);baseline['startup_seconds']=0.
+    without=w.project_cost(inventory,[baseline],capacities=capacities)
+    assert with_source['seconds']-without['seconds']==pytest.approx(inventory['model_loads']*state.stats()['initialization_seconds'])

@@ -263,8 +263,12 @@ def test_frozen_widths_include_donors_and_preserve_readouts():
     assert design['access_rows']['far_v2'][0]['streams']['clean']['tokens']==[1,2,3]
 
 
-def test_actual_validation_only_pilot_covers_all_classes_and_is_nonfinal(tmp_path):
+@pytest.mark.parametrize('sealed',[False,True])
+def test_actual_validation_only_pilot_covers_all_classes_and_is_nonfinal(tmp_path,sealed):
     p=driver();model,support,_=tiny();design=toy_design(model)
+    if sealed:
+        from component_analysis import a3_source_validation
+        design=a3_source_validation.freeze(design)
     widths=p.execution_widths(design,hbank_rows={})
     prepared=dict(injected=True,identity={'injected':True,'numeric_profile':{'hardware':'injected_cpu','dtype':'float32','backend':'eager'}},
         candidates=[list(k) for k in support.candidates],chunk_size=1,updates=200,validation_every=20,widths=widths)
@@ -497,7 +501,8 @@ def test_raw_target_choices_do_not_relabel_fractional_margin_removal():
 
 def test_actual_a1_parent_schema_derives_masks_without_serialized_attention():
     from component_analysis import ladder_pipeline as ladder,ladder_design
-    p=driver();path=Path(__file__).resolve().parents[1]/'outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json'
+    import os
+    p=driver();path=Path(os.environ.get('A3_A1_SCHEMA_TEST_DESIGN',str(Path(__file__).resolve().parents[1]/'outputs/_analyses/specificity-ladder/ladder-5f450dc/design.json')))
     parent=ladder.read_artifact(path);conditions=parent['rows']['far_v2']
     indexed={c:{r['instance_id']:r for r in values if r['split']=='train'} for c,values in conditions.items()}
     rid=sorted(set.intersection(*(set(rows) for rows in indexed.values())))[0]
@@ -724,3 +729,75 @@ def test_final_intake_revalidates_completed_bank_support_and_source(tmp_path,dam
     path=tmp_path/'completed-bad';publish_object(path,broken);result['H_bank_reference']=object_reference(path)
     with pytest.raises(ValueError,match='bank|source|profile|support'):
         p.validate_assessment_result(result,design,prepared,task='far_v2',name='intact',removed=removed)
+
+
+def test_cached_mask_source_refresh_preserves_current_protection_and_semantic_work_once(tmp_path,monkeypatch):
+    from tests.test_a3_source_validation import setup_case
+    from component_analysis import a3_source_validation as sources, a3_direction_artifacts as artifacts, a3_pipeline
+    from component_analysis import a3_direction_runtime as authority, ladder_pipeline as ladder
+    from types import SimpleNamespace
+    p=driver();c=setup_case(tmp_path,monkeypatch);calls=[]
+    design=c.design;design.update(direction_protocol={},parent_evidence={'prepared_path':'parent','selected_path':'selected'})
+    design_path=tmp_path/'mask-design.json';ladder.write_artifact(design_path,design)
+    rule=tmp_path/'rule.json';rule.write_text('{}');bundle=tmp_path/'root-bundle';authority.publish_object(bundle,{})
+    widths={'ioi':4,'mmlu':4}
+    prepared=dict(kind='a3_mask_prepared_v1',injected=False,candidates=[['head',0,0]],chunk_size=1,seeds=[42,1,123],arms=['constrained','unconstrained'],
+        updates=200,validation_every=20,validation_donors='opposite',root_ruling={},random_controls={'count':19},timing_protocol={},new30={'status':'missing_comparison'},hbank_sources={},widths=widths)
+    prepared['identity']=dict(commit='a'*40,design_path=str(design_path),design_file_sha256=p.common.file_hash(design_path),code_hashes={},operational_ruling_path=str(rule),operational_ruling_sha256=p.common.file_hash(rule),pilot_ruling_path=str(rule),pilot_ruling_sha256=p.common.file_hash(rule),root_bundle_reference=authority.object_reference(bundle),physical_widths=widths)
+    prepared['identity']['mask_protocol_sha256']=p.digest(p.mask_protocol(prepared));path=tmp_path/'mask-prepared';authority.publish_object(path,prepared)
+    monkeypatch.setattr(p,'new30_reference',lambda:prepared['new30']);monkeypatch.setattr(p,'mask_code_hashes',lambda:{})
+    monkeypatch.setattr(p,'execution_widths',lambda *a,**k:widths)
+    monkeypatch.setattr(a3_pipeline,'load_a1_parents',lambda *a:({'rows':{}},{'banks':{}},{}))
+    monkeypatch.setattr(artifacts,'validate_live',lambda *a,**k:calls.append('semantic') or {'commit':'a'*40,'injected':False})
+    monkeypatch.setattr(sources,'source_dependencies',lambda *a,**k:([c.static,rule,bundle],[],[]))
+    monkeypatch.setattr(sources,'new30_dependencies',lambda:([],[]))
+    args=SimpleNamespace(commit='a'*40,registry=[],prepared=str(path),design=str(design_path),work_dir=str(tmp_path))
+    first,evidence=p._live_mask(prepared,args);second,again=p._live_mask(prepared,args)
+    assert calls==['semantic']
+    assert sources.is_view(first) and sources.is_view(second)
+    assert first==second and again['registry_hashes']
+    copied=copy.deepcopy(second['access_rows']);copied['far_v2'][0]['instance_id']='copy-only'
+    assert first['access_rows']['far_v2'][0]['instance_id']=='recipient'
+    with monkeypatch.context() as changed:
+        changed.setenv('SPECIFICITY_A3_MASK_LAUNCH_EXECUTABLE',str(tmp_path/'different-python'))
+        with pytest.raises(ValueError,match='scope'):p._live_mask(prepared,args)
+    reservations=[]
+    args._mask_authority_context=object()
+    monkeypatch.setattr(p,'mask_reservation',lambda *a,**k:reservations.append(True) or {'fresh':True})
+    for _ in range(2):assert p._live_mask(prepared,args,{'inventory_sha256':'i'})[1]['reservation']['fresh']
+    assert len(reservations)==2 and calls==['semantic']
+    monkeypatch.setattr(p,'mask_reservation',lambda *a,**k:(_ for _ in ()).throw(ValueError('live budget changed')))
+    with pytest.raises(ValueError,match='budget'):p._live_mask(prepared,args,{'inventory_sha256':'i'})
+    prepared['widths']={}
+    with pytest.raises(ValueError):p._live_mask(prepared,args)
+
+
+def test_mask_source_initialization_reaches_existing_projector_startup_cost(tmp_path,monkeypatch):
+    from tests.test_a3_source_validation import setup_case
+    from component_analysis import a3_mask_workload as w
+    from types import SimpleNamespace
+    c=setup_case(tmp_path,monkeypatch);state=c.build(owner='mask',owner_seal=driver()._SOURCE_VALIDATOR_SEAL)
+    inventory,receipt,ledger=cost_fixture();before=w.project_cost([receipt],inventory,ledger)
+    receipt['startup_seconds']=driver()._source_startup_seconds(receipt['startup_seconds'],SimpleNamespace(_mask_source_context=state))
+    after=w.project_cost([receipt],inventory,ledger)
+    assert all(b['seconds']>a['seconds'] for a,b in zip(before['job_proposals'],after['job_proposals']))
+    assert after['requested_seconds']-before['requested_seconds']==pytest.approx(9*state.stats()['initialization_seconds'])
+
+
+
+def test_n5_completed_replacement_cost_intake_preserves_original_charge():
+    from tests.test_a3_direction_workload import _n5_fixture,_n5_actual
+    w,policy,old,a=_n5_fixture();new,a=_n5_actual(w,policy,a)
+    inventory,receipt,ledger=cost_fixture();a['identity']=copy.deepcopy(inventory['identity'])
+    a['upper_inventory_sha256']=receipt['pilot_inventory_sha256']
+    a['admission_sha256']=w.digest({k:v for k,v in a.items() if k!='admission_sha256'})
+    new.update(state='completed',actual_gpu_hours=.01,inventory_sha256=receipt['pilot_inventory_sha256'])
+    new['actual_entry']['source_commit']=inventory['identity']['commit']
+    new['reservation_lineage'].update(admission_sha256=a['admission_sha256'],upper_inventory_sha256=a['upper_inventory_sha256'])
+    receipt.update(reservation_id='r-new',allocation_job_id='999999',output_dir='/tmp/n5-replacement')
+    ledger.update(entries=[old,new],expected_entry_ids=['r-031','r-new'],contingency_gpu_hours=5.25,original_admissions=[a])
+    from component_analysis import a3_mask_workload as mw
+    assert mw.project_cost([receipt],inventory,ledger)['execution_authorized'] is False
+    assert old['reserved_gpu_hours']==.75
+    bad=copy.deepcopy(ledger);bad['entries'][1]['state']='failed'
+    with pytest.raises(ValueError):mw.project_cost([receipt],inventory,bad)
