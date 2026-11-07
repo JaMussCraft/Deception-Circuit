@@ -203,6 +203,20 @@
       "fix": "Preserve the failed run and original tests. Correct only that test expectation against the untouched published representation, retain canonical digest and coverage checks, then rerun both environments before acceptance.",
       "id": "P24",
       "what": "The native transport test expected the in-memory builder object to equal its JSON round trip, including tuple types."
+    },
+    {
+      "at": "2026-11-06T19:14:54-05:00",
+      "effect": "The CPU job exhausted memory during preflight before any new assertions ran. The runner then tried to parse a missing test report, obscuring the child failure. No test-first acceptance or model execution followed.",
+      "fix": "Preserve the failed source and outputs. Diagnose the exact stage, reduce only permissible injected fixture dimensions while retaining required records and controls, and record raw child status before parsing test reports. Any replacement needs a distinct packet and justified CPU resources.",
+      "id": "P25",
+      "what": "The combined integration test used a selected fixture whose inventory and authority payloads were much larger than the small-test resource request assumed."
+    },
+    {
+      "at": "2026-11-06T20:52:45-05:00",
+      "effect": "Completed CPU results were left unprocessed until the user prompted continuation.",
+      "fix": "Resume both implementation directions from the completed evidence. Treat status and settings questions as commentary within active work, and check runnable tasks before ending any turn.",
+      "id": "P26",
+      "what": "Root ended coordination after answering a cadence question despite ongoing research authorization."
     }
   ],
   "needs": [
@@ -255,7 +269,7 @@
       "text": "Please apply the already authorized sixteen-point cadence and temporary reset-bound cap exception to this new recovery thread using the targeted human commands in chat. The previous settings remain on the old thread."
     }
   ],
-  "right_now": "The full base reference is complete. Its optimized comparison and the corrected transport validation are queued on Delta. Full-scoring workload coverage passed audit; controller implementation and CPU resource-proof review continue, with a separate Bridges CPU preflight being prepared.",
+  "right_now": "A2 controller validation is queued on Delta. The next reviewed Bridges memory-counter diagnostic is being submitted while a separate worker corrects the CPU proof catalogue contract. A3 is preparing a smaller valid integration fixture and clearer failure receipts; its large metadata comparison remains queued. Both directions continue in parallel.",
   "schema": 1,
   "state": "Running",
   "terms": [],
